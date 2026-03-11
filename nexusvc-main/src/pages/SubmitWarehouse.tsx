@@ -1,48 +1,37 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useNavigate, useLocation } from "react-router-dom";
 import { API_ENDPOINTS } from "@/lib/api-config";
-import { CheckCircle2, ChevronDown, Search, Loader2, Warehouse, Map as MapIcon, ArrowLeft, Send, Camera, HardHat, Info, ArrowRight } from "lucide-react";
+import { CheckCircle2, Search, Loader2, Warehouse, Map as MapIcon, ArrowLeft, Camera, ArrowRight } from "lucide-react";
 import { z } from "zod";
-import L from 'leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-// ─── Constants ──────────────────────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────────────────────
 const CATEGORIES = ["General Grade A", "General Grade B", "Bonded", "Cold Storage", "Dark Store", "FTWZ (Free Trade Warehousing Zone)"];
 const INDUSTRIES = [
-    "FMCG (Fast moving consumer goods)",
-    "Pharma and medical supplies",
-    "Food and beverage",
-    "Chemicals/hazardous goods",
-    "Automotive/spare parts",
-    "Agricultural produce",
-    "Electronics and appliances",
-    "Cosmetics",
-    "Apparel and textiles",
-    "Cold storage",
-    "Packaging material",
-    "E-commerce/Retail goods",
-    "Other",
+    "FMCG (Fast moving consumer goods)", "Pharma and medical supplies", "Food and beverage",
+    "Chemicals/hazardous goods", "Automotive/spare parts", "Agricultural produce",
+    "Electronics and appliances", "Cosmetics", "Apparel and textiles", "Cold storage",
+    "Packaging material", "E-commerce/Retail goods", "Other",
 ];
 const FACILITIES = [
-    "Truck parking",
-    "Palletised storage",
-    "Fire Hydrants / Sprinklers",
-    "CCTV cameras",
-    "Office space",
-    "Water supply (Direct or Tanker)",
-    "Handling equipment",
-    "Power backup / Generator",
-    "Washrooms",
-    "Security cabin",
+    "Truck parking", "Palletised storage", "Fire Hydrants / Sprinklers", "CCTV cameras",
+    "Office space", "Water supply (Direct or Tanker)", "Handling equipment",
+    "Power backup / Generator", "Washrooms", "Security cabin",
 ];
 const CITIES = ["Mumbai", "Nashik", "Pune", "Delhi NCR", "Bangalore", "Chennai", "Hyderabad", "Ahmedabad", "Kolkata", "Other"];
-const temperatureOptions = ["Frozen (-25 to -5)", "Low Chilled (-5 to 0)", "Standard Chilled (0 to 8)", "Cool (8 to 15)", "Ambient (15 to 25)"] as const;
-const suitabilityOptions = ["Food & Dairy", "Pharma", "Meat & Seafood"] as const;
+const CLUSTERS = ["Bhiwandi", "Panvel", "Chakan", "Hosur", "Talegaon", "Dombivli", "Navi Mumbai", "Pimpri-Chinchwad", "Mahape", "Kundli"];
 const listerTypeOptions = ["Owner", "3pl op", "Broker", "Business"] as const;
 const landStatusOptions = ["Sanctioned", "Under Development"] as const;
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const currentYear = new Date().getFullYear();
+const YEARS = Array.from({ length: 10 }, (_, i) => (currentYear + i).toString());
 
+// ─── Schemas ─────────────────────────────────────────────────────────────────
 const warehouseSchema = z.object({
     type: z.literal("warehouse"),
     org_name: z.string().min(1, "Organisation name is required"),
@@ -76,6 +65,7 @@ const warehouseSchema = z.object({
     start_year: z.string().optional(),
     end_month: z.string().optional(),
     end_year: z.string().optional(),
+    cluster: z.string().optional(),
 });
 
 const landSchema = z.object({
@@ -83,7 +73,7 @@ const landSchema = z.object({
     org_name: z.string().min(1, "Name is required"),
     lister_type: z.enum(["Owner", "Broker", "Business"]),
     land_size: z.string().min(1, "Land size is required"),
-    rate_sqft: z.string().min(1, "Rate is required"),
+    rate_sqft: z.string().optional(),
     land_status: z.enum(["Sanctioned", "Under Development"]),
     construction_assistance: z.boolean().default(false),
     contact_person: z.string().min(1, "Contact person is required"),
@@ -95,63 +85,27 @@ const landSchema = z.object({
     latitude: z.string(),
     longitude: z.string(),
     description: z.string(),
+    cluster: z.string().optional(),
 });
 
 type WarehouseForm = z.infer<typeof warehouseSchema>;
 type LandForm = z.infer<typeof landSchema>;
 
 const INITIAL_WAREHOUSE: WarehouseForm = {
-    type: "warehouse",
-    org_name: "",
-    lease_type: "Full Space",
-    lister_type: "Owner",
-    is_prime: false,
-    category: "",
-    description: "",
-    measure_by: "area",
-    capacity_value: "",
-    ceiling_height: "",
-    docks: "",
-    floor_strength: "",
-    rate: "",
-    industries: [],
-    facilities: [],
-    contact_person: "",
-    contact_email: "",
-    contact_phone: "",
-    website: "",
-    city: "",
-    address: "",
-    full_address: "",
-    latitude: "19.0760",
-    longitude: "72.8777",
-    temperature_range: "",
-    product_suitability: [],
-    term_type: "long_term",
-    term_duration: "",
-    start_month: "",
-    start_year: "",
-    end_month: "",
-    end_year: "",
+    type: "warehouse", org_name: "", lease_type: "Full Space", lister_type: "Owner",
+    is_prime: false, category: "", description: "", measure_by: "area", capacity_value: "",
+    ceiling_height: "", docks: "", floor_strength: "", rate: "", industries: [], facilities: [],
+    contact_person: "", contact_email: "", contact_phone: "", website: "", city: "", address: "",
+    full_address: "", latitude: "19.0760", longitude: "72.8777", temperature_range: "",
+    product_suitability: [], term_type: "long_term", term_duration: "", start_month: "",
+    start_year: "", end_month: "", end_year: "", cluster: "",
 };
 
 const INITIAL_LAND: LandForm = {
-    type: "land",
-    org_name: "",
-    lister_type: "Owner",
-    land_size: "",
-    rate_sqft: "",
-    land_status: "Sanctioned",
-    construction_assistance: false,
-    contact_person: "",
-    contact_phone: "",
-    contact_email: "",
-    city: "",
-    address: "",
-    full_address: "",
-    latitude: "19.0760",
-    longitude: "72.8777",
-    description: "",
+    type: "land", org_name: "", lister_type: "Owner", land_size: "", rate_sqft: "",
+    land_status: "Sanctioned", construction_assistance: false, contact_person: "",
+    contact_phone: "", contact_email: "", city: "", address: "", full_address: "",
+    latitude: "19.0760", longitude: "72.8777", description: "", cluster: "",
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -159,10 +113,6 @@ const inputClass = "w-full rounded-sm border border-border bg-card px-4 py-3 tex
 const labelClass = "block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground";
 const sectionClass = "rounded-sm border border-border/60 bg-card p-8 space-y-6";
 const sectionTitle = "font-display text-lg font-bold uppercase tracking-tight text-foreground border-b border-border/50 pb-4";
-
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const currentYear = new Date().getFullYear();
-const YEARS = Array.from({ length: 10 }, (_, i) => (currentYear + i).toString());
 
 function CheckboxGroup({ options, selected, onChange }: { options: string[]; selected: string[]; onChange: (v: string[]) => void }) {
     const toggle = (opt: string) => {
@@ -176,7 +126,11 @@ function CheckboxGroup({ options, selected, onChange }: { options: string[]; sel
                         onClick={() => toggle(opt)}
                         className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 transition-colors cursor-pointer ${selected.includes(opt) ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}
                     >
-                        {selected.includes(opt) && <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 text-white fill-current"><path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                        {selected.includes(opt) && (
+                            <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 text-white fill-current">
+                                <path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        )}
                     </div>
                     <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{opt}</span>
                 </label>
@@ -185,60 +139,83 @@ function CheckboxGroup({ options, selected, onChange }: { options: string[]; sel
     );
 }
 
+// ─── Map Helpers ─────────────────────────────────────────────────────────────
+// Fix for default Leaflet icon paths in Vite
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+function MapMarkers({ markerPos, onMarkerDrag, onMapClick, viewState }: any) {
+    const map = useMap();
+    
+    useEffect(() => {
+        map.setView([viewState.latitude, viewState.longitude], viewState.zoom);
+    }, [viewState.latitude, viewState.longitude, viewState.zoom, map]);
+
+    useMapEvents({
+        click(e) {
+            onMapClick(e.latlng.lat, e.latlng.lng);
+        },
+    });
+
+    return (
+        <Marker
+            position={[markerPos.latitude, markerPos.longitude]}
+            draggable={true}
+            eventHandlers={{
+                dragend: (e) => {
+                    const marker = e.target;
+                    const position = marker.getLatLng();
+                    onMarkerDrag(position.lat, position.lng);
+                },
+            }}
+        />
+    );
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 const SubmitWarehouse = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const [subType, setSubType] = useState<"warehouse" | "land" | null>(null);
+
+    useEffect(() => {
+        if (location.state && (location.state as any).type) {
+            setSubType((location.state as any).type);
+        }
+    }, [location.state]);
+
     const [warehouseForm, setWarehouseForm] = useState<WarehouseForm>(INITIAL_WAREHOUSE);
     const [landForm, setLandForm] = useState<LandForm>(INITIAL_LAND);
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [submitError, setSubmitError] = useState("");
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [searchQuery, setSearchQuery] = useState("");
     const [searching, setSearching] = useState(false);
 
-    // Vanilla Leaflet Refs
-    const mapContainerRef = useRef<HTMLDivElement>(null);
-    const mapRef = useRef<L.Map | null>(null);
-    const markerRef = useRef<L.Marker | null>(null);
+    const [viewState, setViewState] = useState({
+        longitude: 72.8777,
+        latitude: 19.0760,
+        zoom: 11,
+    });
+    const [markerPos, setMarkerPos] = useState({
+        longitude: 72.8777,
+        latitude: 19.0760
+    });
 
     const setW = (key: keyof WarehouseForm, value: any) => setWarehouseForm(prev => ({ ...prev, [key]: value }));
     const setL = (key: keyof LandForm, value: any) => setLandForm(prev => ({ ...prev, [key]: value }));
 
-    // Initialize Map conditionally when subType is chosen
     useEffect(() => {
-        if (!subType || !mapContainerRef.current || mapRef.current) return;
-
-        const initialPos = subType === "warehouse"
-            ? [parseFloat(warehouseForm.latitude), parseFloat(warehouseForm.longitude)]
-            : [parseFloat(landForm.latitude), parseFloat(landForm.longitude)];
-
-        const map = L.map(mapContainerRef.current).setView(initialPos as [number, number], 13);
-        mapRef.current = map;
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
-        }).addTo(map);
-
-        const marker = L.marker(initialPos as [number, number], { draggable: true }).addTo(map);
-        markerRef.current = marker;
-
-        marker.on('dragend', () => {
-            const pos = marker.getLatLng();
-            updateLocation(pos.lat, pos.lng);
-        });
-
-        map.on('click', (e) => {
-            marker.setLatLng(e.latlng);
-            updateLocation(e.latlng.lat, e.latlng.lng);
-        });
-
-        return () => {
-            if (mapRef.current) {
-                mapRef.current.remove();
-                mapRef.current = null;
-            }
-        };
-    }, [subType]);
+        const lat = parseFloat(subType === 'warehouse' ? warehouseForm.latitude : landForm.latitude) || markerPos.latitude;
+        const lng = parseFloat(subType === 'warehouse' ? warehouseForm.longitude : landForm.longitude) || markerPos.longitude;
+        setMarkerPos({ latitude: lat, longitude: lng });
+        setViewState(prev => ({ ...prev, latitude: lat, longitude: lng }));
+    }, [warehouseForm.latitude, warehouseForm.longitude, landForm.latitude, landForm.longitude, subType]);
 
     const updateLocation = (lat: number, lng: number) => {
         if (subType === "warehouse") {
@@ -246,67 +223,91 @@ const SubmitWarehouse = () => {
         } else {
             setLandForm(prev => ({ ...prev, latitude: lat.toString(), longitude: lng.toString() }));
         }
+        setMarkerPos({ latitude: lat, longitude: lng });
+        setViewState(prev => ({ ...prev, latitude: lat, longitude: lng }));
         reverseGeocode(lat, lng);
     };
+
+    const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY;
+    const mapStyleUrl: any = MAPTILER_KEY
+        ? `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`
+        : {
+            version: 8,
+            sources: {
+                'raster-tiles': {
+                    type: 'raster',
+                    tiles: [
+                        'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+                        'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+                        'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+                        'https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                    ],
+                    tileSize: 256,
+                    attribution: '&copy; OpenStreetMap &copy; CARTO'
+                }
+            },
+            layers: [
+                {
+                    id: 'simple-tiles',
+                    type: 'raster',
+                    source: 'raster-tiles',
+                    minzoom: 0,
+                    maxzoom: 22
+                }
+            ]
+        };
 
     const reverseGeocode = async (lat: number, lng: number) => {
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
             const data = await res.json();
-            if (data && data.display_name) {
+            if (data?.display_name) {
                 if (subType === "warehouse") setW("full_address", data.display_name);
                 else setL("full_address", data.display_name);
             }
         } catch (err) {
-            console.error("RevGeocode failed", err);
+            console.warn("Reverse geocode failed:", err);
         }
     };
 
     const handleSearch = async () => {
-        if (!searchQuery) return;
+        if (!searchQuery.trim()) return;
         setSearching(true);
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=in`);
             const data = await res.json();
-            if (data && data.length > 0) {
+            if (data?.length > 0) {
                 const { lat, lon, display_name } = data[0];
                 const newLat = parseFloat(lat);
                 const newLng = parseFloat(lon);
-
                 if (subType === "warehouse") {
                     setWarehouseForm(prev => ({ ...prev, latitude: lat, longitude: lon, full_address: display_name }));
                 } else {
                     setLandForm(prev => ({ ...prev, latitude: lat, longitude: lon, full_address: display_name }));
                 }
-
-                if (mapRef.current && markerRef.current) {
-                    mapRef.current.setView([newLat, newLng], 15);
-                    markerRef.current.setLatLng([newLat, newLng]);
-                }
+                setMarkerPos({ latitude: newLat, longitude: newLng });
+                setViewState(prev => ({ ...prev, latitude: newLat, longitude: newLng, zoom: 15 }));
             }
         } catch (err) {
-            console.error("Search failed", err);
+            console.error("Search failed:", err);
         } finally {
             setSearching(false);
         }
     };
 
     const validate = () => {
-        const schema = subType === "warehouse" ? warehouseSchema : landSchema;
-        const form = subType === "warehouse" ? warehouseForm : landForm;
-
-        if (subType === "warehouse" && (form as WarehouseForm).category === "Cold Storage") {
-            const w = form as WarehouseForm;
-            if (!w.temperature_range) {
-                setErrors({ temperature_range: "Temperature Range is required" });
+        if (subType === "warehouse" && warehouseForm.category === "Cold Storage") {
+            if (!warehouseForm.temperature_range) {
+                setErrors({ temperature_range: "Temperature Range is required for Cold Storage" });
                 return false;
             }
-            if (!w.product_suitability || w.product_suitability.length === 0) {
-                setErrors({ product_suitability: "Product Suitability is required" });
+            if (!warehouseForm.product_suitability || warehouseForm.product_suitability.length === 0) {
+                setErrors({ product_suitability: "Product Suitability is required for Cold Storage" });
                 return false;
             }
         }
-
+        const schema = subType === "warehouse" ? warehouseSchema : landSchema;
+        const form = subType === "warehouse" ? warehouseForm : landForm;
         const result = schema.safeParse(form);
         if (!result.success) {
             const e: Record<string, string> = {};
@@ -325,6 +326,8 @@ const SubmitWarehouse = () => {
         e.preventDefault();
         if (!validate()) return;
         setLoading(true);
+        setSubmitError("");
+
         try {
             let payload;
             if (subType === "warehouse") {
@@ -335,14 +338,12 @@ const SubmitWarehouse = () => {
                     area_available: warehouseForm.measure_by === "area" ? warehouseForm.capacity_value : null,
                     tier: isPrimeBackend ? "Prime" : "Standard",
                     is_prime: isPrimeBackend,
-                    term_duration: warehouseForm.term_type === "short_term" ? `${warehouseForm.start_month} ${warehouseForm.start_year} - ${warehouseForm.end_month} ${warehouseForm.end_year}` : null
+                    term_duration: warehouseForm.term_type === "short_term"
+                        ? `${warehouseForm.start_month} ${warehouseForm.start_year} - ${warehouseForm.end_month} ${warehouseForm.end_year}`
+                        : null
                 };
             } else {
-                payload = {
-                    ...landForm,
-                    tier: "Standard",
-                    status: "Land Parcel"
-                };
+                payload = { ...landForm, tier: "Standard", status: "Land Parcel" };
             }
 
             const response = await fetch(API_ENDPOINTS.SUBMIT, {
@@ -350,12 +351,19 @@ const SubmitWarehouse = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
-            if (response.ok) {
-                setSubmitted(true);
-                localStorage.removeItem("nexus_prime");
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setSubmitError(data.error || "Submission failed. Please try again.");
+                return;
             }
+
+            localStorage.removeItem("nexus_prime");
+            setSubmitted(true);
         } catch (err) {
-            console.error(err);
+            console.error("Submit failed:", err);
+            setSubmitError("Connection failed. Please check your internet and try again.");
         } finally {
             setLoading(false);
         }
@@ -370,24 +378,32 @@ const SubmitWarehouse = () => {
                     <input
                         value={subType === 'warehouse' ? warehouseForm.contact_person : landForm.contact_person}
                         onChange={e => subType === 'warehouse' ? setW("contact_person", e.target.value) : setL("contact_person", e.target.value)}
-                        placeholder="Name" className={`${inputClass} ${errors.contact_person ? "border-red-500" : ""}`}
+                        placeholder="Name"
+                        className={`${inputClass} ${errors.contact_person ? "border-red-500" : ""}`}
                     />
+                    {errors.contact_person && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.contact_person}</p>}
                 </div>
                 <div>
                     <label className={labelClass}>Phone *</label>
                     <input
                         value={subType === 'warehouse' ? warehouseForm.contact_phone : landForm.contact_phone}
                         onChange={e => subType === 'warehouse' ? setW("contact_phone", e.target.value) : setL("contact_phone", e.target.value)}
-                        maxLength={10} className={`${inputClass} ${errors.contact_phone ? "border-red-500" : ""}`}
+                        maxLength={10}
+                        placeholder="10-digit number"
+                        className={`${inputClass} ${errors.contact_phone ? "border-red-500" : ""}`}
                     />
+                    {errors.contact_phone && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.contact_phone}</p>}
                 </div>
                 <div>
                     <label className={labelClass}>Email</label>
                     <input
                         value={subType === 'warehouse' ? warehouseForm.contact_email : landForm.contact_email}
                         onChange={e => subType === 'warehouse' ? setW("contact_email", e.target.value) : setL("contact_email", e.target.value)}
-                        type="email" className={`${inputClass} ${errors.contact_email ? "border-red-500" : ""}`}
+                        type="email"
+                        placeholder="email@company.com"
+                        className={`${inputClass} ${errors.contact_email ? "border-red-500" : ""}`}
                     />
+                    {errors.contact_email && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.contact_email}</p>}
                 </div>
                 <div>
                     <label className={labelClass}>City *</label>
@@ -399,13 +415,28 @@ const SubmitWarehouse = () => {
                         <option value="">Select city…</option>
                         {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
+                    {errors.city && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.city}</p>}
+                </div>
+                <div>
+                    <label className={labelClass}>Industrial Area / Cluster</label>
+                    <input
+                        list="cluster-options-list"
+                        value={subType === 'warehouse' ? warehouseForm.cluster : landForm.cluster}
+                        onChange={e => subType === 'warehouse' ? setW("cluster", e.target.value) : setL("cluster", e.target.value)}
+                        placeholder="e.g. Bhiwandi, Panvel, Chakan"
+                        className={inputClass}
+                    />
+                    <datalist id="cluster-options-list">
+                        {CLUSTERS.map(c => <option key={c} value={c} />)}
+                    </datalist>
                 </div>
                 <div>
                     <label className={labelClass}>Area / Landmark</label>
                     <input
                         value={subType === 'warehouse' ? warehouseForm.address : landForm.address}
                         onChange={e => subType === 'warehouse' ? setW("address", e.target.value) : setL("address", e.target.value)}
-                        placeholder="e.g. Bhiwandi" className={inputClass}
+                        placeholder="e.g. MIDC Bhiwandi / Near NH48"
+                        className={inputClass}
                     />
                 </div>
             </div>
@@ -415,18 +446,49 @@ const SubmitWarehouse = () => {
                 <div className="flex gap-2">
                     <div className="relative flex-1">
                         <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                        <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleSearch())} placeholder="Search address..." className={`${inputClass} pl-10`} />
+                        <input
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
+                            placeholder="Search address..."
+                            className={`${inputClass} pl-10`}
+                        />
                     </div>
-                    <button type="button" onClick={handleSearch} disabled={searching} className="bg-primary/20 hover:bg-primary/30 px-6 rounded-sm text-sm font-semibold transition-colors">Search</button>
+                    <button
+                        type="button"
+                        onClick={handleSearch}
+                        disabled={searching}
+                        className="bg-primary/20 hover:bg-primary/30 px-6 rounded-sm text-sm font-semibold transition-colors disabled:opacity-50"
+                    >
+                        {searching ? <Loader2 size={16} className="animate-spin" /> : "Search"}
+                    </button>
                 </div>
 
-                <div className="h-[400px] w-full rounded-sm border border-border overflow-hidden z-0">
-                    <div ref={mapContainerRef} className="h-full w-full" />
+                <div className="h-[400px] w-full rounded-sm border border-border overflow-hidden z-0 bg-white">
+                    <MapContainer
+                        center={[viewState.latitude, viewState.longitude]}
+                        zoom={viewState.zoom}
+                        style={{ width: '100%', height: '400px' }}
+                        zoomControl={false}
+                    >
+                        <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        />
+                        <MapMarkers
+                            markerPos={markerPos}
+                            onMarkerDrag={(lat, lng) => updateLocation(lat, lng)}
+                            onMapClick={(lat, lng) => updateLocation(lat, lng)}
+                            viewState={viewState}
+                        />
+                    </MapContainer>
                 </div>
 
                 <div className="p-4 bg-muted/30 border border-border/50 rounded-sm space-y-2">
                     <label className="text-[10px] font-bold uppercase text-muted-foreground block">Verified Address</label>
-                    <p className="text-xs">{subType === 'warehouse' ? warehouseForm.full_address : landForm.full_address || "Click map or search for address"}</p>
+                    <p className="text-xs">
+                        {(subType === 'warehouse' ? warehouseForm.full_address : landForm.full_address) || "Click map or search for address"}
+                    </p>
                 </div>
             </div>
         </section>
@@ -437,11 +499,17 @@ const SubmitWarehouse = () => {
             <div className="min-h-screen bg-background text-foreground flex flex-col">
                 <Navbar />
                 <main className="flex-1 flex items-center justify-center p-6 text-center">
-                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md w-full bg-card border border-border p-10 rounded-sm space-y-6">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="max-w-md w-full bg-card border border-border p-10 rounded-sm space-y-6"
+                    >
                         <div className="flex justify-center"><CheckCircle2 size={64} className="text-primary" /></div>
                         <h2 className="font-display text-2xl font-bold uppercase tracking-tight">Requirement Submitted!</h2>
                         <p className="text-muted-foreground text-sm">Your {subType} listing is under review. We'll get back to you shortly.</p>
-                        <a href="/listings" className="inline-block rounded-sm bg-primary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-primary-foreground hover:shadow-lg hover:shadow-primary/20 transition-all">Browse Listings</a>
+                        <a href="/listings" className="inline-block rounded-sm bg-primary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-primary-foreground hover:shadow-lg hover:shadow-primary/20 transition-all">
+                            Browse Listings
+                        </a>
                     </motion.div>
                 </main>
                 <Footer />
@@ -522,20 +590,30 @@ const SubmitWarehouse = () => {
                             <form onSubmit={handleSubmit} className="mt-12 space-y-8">
                                 {subType === 'warehouse' ? (
                                     <>
-                                        {/* WAREHOUSE FORM SECTIONS */}
                                         <section className={sectionClass}>
                                             <h2 className={sectionTitle}>1. General Information</h2>
                                             <div>
                                                 <label className={labelClass}>Name of Organisation *</label>
-                                                <input value={warehouseForm.org_name} onChange={e => setW("org_name", e.target.value)} placeholder="e.g. Shree Bhairav Logistics" className={`${inputClass} ${errors.org_name ? "border-red-500" : ""}`} />
+                                                <input
+                                                    value={warehouseForm.org_name}
+                                                    onChange={e => setW("org_name", e.target.value)}
+                                                    placeholder="e.g. Shree Bhairav Logistics"
+                                                    className={`${inputClass} ${errors.org_name ? "border-red-500" : ""}`}
+                                                />
+                                                {errors.org_name && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.org_name}</p>}
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                                 <div>
                                                     <label className={labelClass}>Category *</label>
-                                                    <select value={warehouseForm.category} onChange={e => setW("category", e.target.value)} className={inputClass}>
+                                                    <select
+                                                        value={warehouseForm.category}
+                                                        onChange={e => setW("category", e.target.value)}
+                                                        className={`${inputClass} ${errors.category ? "border-red-500" : ""}`}
+                                                    >
                                                         <option value="">Select category…</option>
                                                         {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                                                     </select>
+                                                    {errors.category && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.category}</p>}
                                                 </div>
                                                 <div>
                                                     <label className={labelClass}>Lister Type *</label>
@@ -546,15 +624,16 @@ const SubmitWarehouse = () => {
                                             </div>
                                         </section>
 
-                                        <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-primary/5 p-6 mt-6 transition-all hover:border-primary/40 hover:shadow-lg">
+                                        {/* Prime Upgrade Banner */}
+                                        <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-primary/5 p-6 transition-all hover:border-primary/40 hover:shadow-lg">
                                             <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
                                                 <div className="space-y-2 flex-1">
                                                     <h3 className="font-display text-xl font-bold uppercase tracking-tight text-foreground">Nexus Prime Upgrade</h3>
                                                     <p className="text-sm text-muted-foreground leading-relaxed">Let our expert team manage everything. Find best tenants faster.</p>
                                                 </div>
                                                 <div className="flex items-center gap-3 shrink-0">
-                                                    <button type="button" onClick={() => setW("is_prime", true)} className={`px-6 py-2 rounded-sm text-sm font-bold uppercase tracking-wider transition-all border ${warehouseForm.is_prime ? 'bg-primary border-primary text-primary-foreground' : 'bg-background'}`}>Join Now</button>
-                                                    <button type="button" onClick={() => setW("is_prime", false)} className={`px-6 py-2 rounded-sm text-sm font-bold uppercase tracking-wider transition-all border ${!warehouseForm.is_prime ? 'bg-muted' : 'bg-background'}`}>No Thanks</button>
+                                                    <button type="button" onClick={() => setW("is_prime", true)} className={`px-6 py-2 rounded-sm text-sm font-bold uppercase tracking-wider transition-all border ${warehouseForm.is_prime ? 'bg-primary border-primary text-primary-foreground' : 'bg-background border-border'}`}>Join Now</button>
+                                                    <button type="button" onClick={() => setW("is_prime", false)} className={`px-6 py-2 rounded-sm text-sm font-bold uppercase tracking-wider transition-all border ${!warehouseForm.is_prime ? 'bg-muted border-border' : 'bg-background border-border'}`}>No Thanks</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -565,26 +644,70 @@ const SubmitWarehouse = () => {
                                                 <div>
                                                     <label className={labelClass}>Lease Term Type *</label>
                                                     <div className="flex gap-4">
-                                                        <label className={`flex-1 flex items-center justify-center p-3 rounded-sm border cursor-pointer ${warehouseForm.term_type === 'long_term' ? 'border-primary bg-primary/10' : 'border-border'}`}>
-                                                            <input type="radio" value="long_term" checked={warehouseForm.term_type === 'long_term'} onChange={(e) => setW("term_type", e.target.value)} className="sr-only" />
-                                                            <span className="font-semibold text-sm">Long Term</span>
-                                                        </label>
-                                                        <label className={`flex-1 flex items-center justify-center p-3 rounded-sm border cursor-pointer ${warehouseForm.term_type === 'short_term' ? 'border-primary bg-primary/10' : 'border-border'}`}>
-                                                            <input type="radio" value="short_term" checked={warehouseForm.term_type === 'short_term'} onChange={(e) => setW("term_type", e.target.value)} className="sr-only" />
-                                                            <span className="font-semibold text-sm">Short Term</span>
-                                                        </label>
+                                                        {(["long_term", "short_term"] as const).map(term => (
+                                                            <label key={term} className={`flex-1 flex items-center justify-center p-3 rounded-sm border cursor-pointer ${warehouseForm.term_type === term ? 'border-primary bg-primary/10' : 'border-border'}`}>
+                                                                <input type="radio" value={term} checked={warehouseForm.term_type === term} onChange={e => setW("term_type", e.target.value)} className="sr-only" />
+                                                                <span className="font-semibold text-sm">{term === "long_term" ? "Long Term" : "Short Term"}</span>
+                                                            </label>
+                                                        ))}
                                                     </div>
                                                 </div>
+
                                                 {warehouseForm.term_type === 'short_term' && (
-                                                    <div className="space-y-4">
-                                                        <select value={warehouseForm.start_month} onChange={e => setW("start_month", e.target.value)} className={inputClass}><option value="">Start Month</option>{MONTHS.map(m => <option key={m} value={m}>{m}</option>)}</select>
-                                                        <select value={warehouseForm.end_month} onChange={e => setW("end_month", e.target.value)} className={inputClass}><option value="">End Month</option>{MONTHS.map(m => <option key={m} value={m}>{m}</option>)}</select>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Start</label>
+                                                            <div className="flex gap-2">
+                                                                <select value={warehouseForm.start_month} onChange={e => setW("start_month", e.target.value)} className={inputClass}>
+                                                                    <option value="">Month</option>
+                                                                    {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+                                                                </select>
+                                                                <select value={warehouseForm.start_year} onChange={e => setW("start_year", e.target.value)} className={inputClass}>
+                                                                    <option value="">Year</option>
+                                                                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">End</label>
+                                                            <div className="flex gap-2">
+                                                                <select value={warehouseForm.end_month} onChange={e => setW("end_month", e.target.value)} className={inputClass}>
+                                                                    <option value="">Month</option>
+                                                                    {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
+                                                                </select>
+                                                                <select value={warehouseForm.end_year} onChange={e => setW("end_year", e.target.value)} className={inputClass}>
+                                                                    <option value="">Year</option>
+                                                                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                                                </select>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 )}
+
                                                 <div>
-                                                    <label className={labelClass}>Value *</label>
-                                                    <input type="number" value={warehouseForm.capacity_value} onChange={e => setW("capacity_value", e.target.value)} placeholder="sq. ft. / pallets" className={inputClass} />
+                                                    <label className={labelClass}>Measure By</label>
+                                                    <div className="flex gap-3">
+                                                        {(["area", "pallets"] as const).map(m => (
+                                                            <label key={m} className={`flex-1 flex items-center justify-center p-3 rounded-sm border cursor-pointer ${warehouseForm.measure_by === m ? 'border-primary bg-primary/10' : 'border-border'}`}>
+                                                                <input type="radio" value={m} checked={warehouseForm.measure_by === m} onChange={e => setW("measure_by", e.target.value)} className="sr-only" />
+                                                                <span className="font-semibold text-sm">{m === "area" ? "Area (sq ft)" : "Pallets"}</span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
                                                 </div>
+
+                                                <div>
+                                                    <label className={labelClass}>{warehouseForm.measure_by === 'area' ? 'Area (Sq. Ft.) *' : 'Capacity (Pallets) *'}</label>
+                                                    <input
+                                                        type="number"
+                                                        value={warehouseForm.capacity_value}
+                                                        onChange={e => setW("capacity_value", e.target.value)}
+                                                        placeholder={warehouseForm.measure_by === 'area' ? 'e.g. 100000' : 'e.g. 1200'}
+                                                        className={`${inputClass} ${errors.capacity_value ? "border-red-500" : ""}`}
+                                                    />
+                                                    {errors.capacity_value && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.capacity_value}</p>}
+                                                </div>
+
                                                 <div>
                                                     <label className={labelClass}>Rent (₹ / sqft)</label>
                                                     <input type="number" value={warehouseForm.rate} onChange={e => setW("rate", e.target.value)} placeholder="e.g. 28" className={inputClass} />
@@ -593,7 +716,7 @@ const SubmitWarehouse = () => {
                                         </section>
 
                                         <section className={sectionClass}>
-                                            <h2 className={sectionTitle}>3. IndustriesServed & Facilities</h2>
+                                            <h2 className={sectionTitle}>3. Industries Served & Facilities</h2>
                                             <div className="space-y-8">
                                                 <CheckboxGroup options={INDUSTRIES} selected={warehouseForm.industries} onChange={v => setW("industries", v)} />
                                                 <div className="pt-6 border-t border-border/50">
@@ -603,43 +726,53 @@ const SubmitWarehouse = () => {
                                         </section>
                                     </>
                                 ) : (
-                                    <>
-                                        {/* LAND PARCEL FORM SECTIONS */}
-                                        <section className={sectionClass}>
-                                            <h2 className={sectionTitle}>1. Land Information</h2>
+                                    <section className={sectionClass}>
+                                        <h2 className={sectionTitle}>1. Land Information</h2>
+                                        <div>
+                                            <label className={labelClass}>Name of Entity / Owner *</label>
+                                            <input
+                                                value={landForm.org_name}
+                                                onChange={e => setL("org_name", e.target.value)}
+                                                placeholder="e.g. Malik Developers"
+                                                className={`${inputClass} ${errors.org_name ? "border-red-500" : ""}`}
+                                            />
+                                            {errors.org_name && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.org_name}</p>}
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             <div>
-                                                <label className={labelClass}>Name of Entity / Owner *</label>
-                                                <input value={landForm.org_name} onChange={e => setL("org_name", e.target.value)} placeholder="e.g. Malik Developers" className={`${inputClass} ${errors.org_name ? "border-red-500" : ""}`} />
+                                                <label className={labelClass}>Land Size (Sq. Ft.) *</label>
+                                                <input
+                                                    type="number"
+                                                    value={landForm.land_size}
+                                                    onChange={e => setL("land_size", e.target.value)}
+                                                    placeholder="e.g. 100000"
+                                                    className={`${inputClass} ${errors.land_size ? "border-red-500" : ""}`}
+                                                />
+                                                {errors.land_size && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.land_size}</p>}
                                             </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                                <div>
-                                                    <label className={labelClass}>Land Size (Sq. Ft.) *</label>
-                                                    <input type="number" value={landForm.land_size} onChange={e => setL("land_size", e.target.value)} placeholder="e.g. 100000" className={`${inputClass} ${errors.land_size ? "border-red-500" : ""}`} />
-                                                </div>
-                                                <div>
-                                                    <label className={labelClass}>Expected Rent / SFT *</label>
-                                                    <input type="number" value={landForm.rate_sqft} onChange={e => setL("rate_sqft", e.target.value)} placeholder="e.g. 15" className={`${inputClass} ${errors.rate_sqft ? "border-red-500" : ""}`} />
-                                                </div>
-                                                <div>
-                                                    <label className={labelClass}>Land Status *</label>
-                                                    <select value={landForm.land_status} onChange={e => setL("land_status", e.target.value)} className={inputClass}>
-                                                        {landStatusOptions.map(o => <option key={o} value={o}>{o}</option>)}
-                                                    </select>
-                                                </div>
-                                                <div className="flex items-center gap-4 pt-6">
-                                                    <label className="flex items-center gap-3 cursor-pointer group">
-                                                        <div
-                                                            onClick={() => setL("construction_assistance", !landForm.construction_assistance)}
-                                                            className={`w-5 h-5 rounded-sm border flex items-center justify-center shrink-0 transition-all ${landForm.construction_assistance ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}
-                                                        >
-                                                            {landForm.construction_assistance && <CheckCircle2 size={12} className="text-white" />}
-                                                        </div>
-                                                        <span className="text-xs font-bold uppercase tracking-widest text-foreground">Construction Assistance Required?</span>
-                                                    </label>
-                                                </div>
+                                            <div>
+                                                <label className={labelClass}>Expected Rent / SFT</label>
+                                                <input type="number" value={landForm.rate_sqft} onChange={e => setL("rate_sqft", e.target.value)} placeholder="e.g. 15" className={inputClass} />
                                             </div>
-                                        </section>
-                                    </>
+                                            <div>
+                                                <label className={labelClass}>Land Status *</label>
+                                                <select value={landForm.land_status} onChange={e => setL("land_status", e.target.value)} className={inputClass}>
+                                                    {landStatusOptions.map(o => <option key={o} value={o}>{o}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="flex items-center gap-4 pt-6">
+                                                <label className="flex items-center gap-3 cursor-pointer group">
+                                                    <div
+                                                        onClick={() => setL("construction_assistance", !landForm.construction_assistance)}
+                                                        className={`w-5 h-5 rounded-sm border flex items-center justify-center shrink-0 transition-all ${landForm.construction_assistance ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}
+                                                    >
+                                                        {landForm.construction_assistance && <CheckCircle2 size={12} className="text-white" />}
+                                                    </div>
+                                                    <span className="text-xs font-bold uppercase tracking-widest text-foreground">Construction Assistance Required?</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </section>
                                 )}
 
                                 {renderMapSection()}
@@ -660,19 +793,35 @@ const SubmitWarehouse = () => {
                                         <div className="rounded-sm border-2 border-dashed border-border p-12 text-center transition-colors hover:border-primary/50">
                                             <Camera size={32} className="mx-auto text-muted-foreground mb-4" />
                                             <p className="text-sm font-semibold text-foreground uppercase tracking-tight">Upload Property Photos</p>
-                                            <p className="mt-2 text-xs text-muted-foreground italic uppercase tracking-widest">Drag & Drop or Click to Browse</p>
+                                            <p className="mt-2 text-xs text-muted-foreground italic uppercase tracking-widest">Coming Soon</p>
                                         </div>
                                     </div>
                                 </section>
 
-                                <button type="submit" disabled={loading} className="w-full bg-primary py-5 rounded-sm font-display text-base font-black uppercase tracking-[0.2em] text-primary-foreground hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-50">
+                                {/* Submit Error */}
+                                {submitError && (
+                                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-sm text-red-500 text-xs font-bold uppercase tracking-wider text-center">
+                                        {submitError}
+                                    </div>
+                                )}
+
+                                {/* Validation Errors Summary */}
+                                {Object.keys(errors).length > 0 && (
+                                    <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-sm text-amber-500 text-xs font-bold uppercase tracking-wider">
+                                        Please fix the errors above before submitting.
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full bg-primary py-5 rounded-sm font-display text-base font-black uppercase tracking-[0.2em] text-primary-foreground hover:shadow-2xl hover:shadow-primary/30 transition-all disabled:opacity-50"
+                                >
                                     {loading ? (
                                         <div className="flex items-center justify-center gap-2">
-                                            <Loader2 className="animate-spin" /> Submitting...
+                                            <Loader2 size={18} className="animate-spin" /> Submitting...
                                         </div>
-                                    ) : (
-                                        "Submit for Verification"
-                                    )}
+                                    ) : "Submit for Verification"}
                                 </button>
                             </form>
                         </motion.div>

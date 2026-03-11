@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import ROICalculator from "@/components/ROICalculator";
 import { useScrollAnimation, useCountUp } from "@/hooks/useScrollAnimation";
 import { API_ENDPOINTS } from "@/lib/api-config";
-import { listings, industries, metrics } from "@/data/mockData";
+import { industries, metrics, featuredListings } from "@/data/mockData";
 import { ArrowRight, Warehouse, Building2, Network, Search } from "lucide-react";
 
 /* ── Hero ── */
@@ -24,21 +24,21 @@ const Hero = () => {
           <p
             className={`mb-6 font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
-            India's Intelligent Warehousing Network
+            INDIA’S FLEXIBLE WAREHOUSING NETWORK
           </p>
           <h1
             className={`font-display text-5xl font-bold uppercase leading-[1.05] tracking-tight text-foreground transition-all delay-150 duration-700 sm:text-7xl lg:text-8xl ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
           >
-            Industrial
+            Warehousing
             <br />
             Infrastructure.
             <br />
-            <span className="text-gradient">Reimagined.</span>
+            <span className="text-gradient">On Demand.</span>
           </h1>
           <p
             className={`mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground transition-all delay-300 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
-            We engineer Grade A flexible warehousing and Build-to-Suit facilities across India's most strategic logistics corridors.
+            We create Flexible Warehousing and Build to Suit solutions across India's key logistics corridors by unlocking underutilized industrial space.
           </p>
           <div
             className={`mt-10 flex flex-wrap gap-4 transition-all delay-500 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
@@ -47,14 +47,14 @@ const Hero = () => {
               to="/listings"
               className="group flex items-center gap-2 rounded-sm bg-primary px-8 py-4 font-display text-sm font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
             >
-              Explore Listings
+              Explore listings
               <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
-              to="/build-to-suit"
+              to="/nexus-prime"
               className="rounded-sm border border-border px-8 py-4 font-display text-sm font-semibold uppercase tracking-wider text-foreground transition-all hover:border-primary/50 hover:text-primary"
             >
-              Build-to-Suit
+              Nexus Prime
             </Link>
           </div>
         </div>
@@ -147,9 +147,16 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetch(API_ENDPOINTS.WAREHOUSES)
-      .then((res) => res.json())
-      .then((data) => {
+    const controller = new AbortController();
+    const loadWarehouses = async () => {
+      try {
+        const res = await fetch(API_ENDPOINTS.WAREHOUSES, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data)) {
+          console.error("Unexpected API response:", data);
+          return;
+        }
         const formatted = data.map((w: any) => ({
           id: w.id,
           city: w.city || "Location",
@@ -158,11 +165,16 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
           unit: "sq ft",
           rate: w.rate,
           status: "Available",
-          image: w.image_url || "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80"
+          image: w.image_url || "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
         }));
         setApiListings(formatted);
-      })
-      .catch((err) => console.error("Failed to fetch warehouses:", err));
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        console.error("Failed to fetch warehouses:", err);
+      }
+    };
+    loadWarehouses();
+    return () => controller.abort();
   }, []);
 
   // Compute filtering
@@ -186,9 +198,16 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
     return true;
   });
 
+  // Ensure we always have at least 3 items to show
+  // Hierarchy: Filtered API -> All API -> Mock Featured
+  let displayPool = filteredListings.length > 0 ? filteredListings : apiListings;
+  if (displayPool.length === 0) displayPool = featuredListings;
+  
+  const displayResults = displayPool.slice(0, Math.max(displayPool.length, 3));
+
   // Calculate pagination
-  const totalPages = Math.ceil(filteredListings.length / ITEMS_PER_PAGE);
-  const paginatedListings = filteredListings.slice(
+  const totalPages = Math.ceil(displayResults.length / ITEMS_PER_PAGE);
+  const paginatedListings = displayResults.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
@@ -298,8 +317,16 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
         )}
 
         {filteredListings.length === 0 && (
+          <div className="mt-8 mb-4 text-center">
+             <span className="inline-block px-4 py-1 rounded-full bg-primary/5 text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 border border-primary/10">
+               {apiListings.length === 0 ? "Global Network Baseline" : "Network Recommendations"}
+             </span>
+          </div>
+        )}
+
+        {apiListings.length === 0 && featuredListings.length === 0 && (
           <div className="mt-12 py-12 text-center text-muted-foreground border border-border/50 rounded-sm bg-card/50">
-            No infrastructure assets match your criteria.
+            Synchronising infrastructure network...
           </div>
         )}
 

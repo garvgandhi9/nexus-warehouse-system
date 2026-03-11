@@ -21,12 +21,17 @@ const GlobeDemo = () => {
     }, []);
 
     useEffect(() => {
-        fetch(API_ENDPOINTS.WAREHOUSES)
-            .then((res) => res.json())
-            .then((json) => {
-                console.log("Raw globe data received:", json);
+        const controller = new AbortController();
+        const loadWarehouses = async () => {
+            try {
+                const res = await fetch(API_ENDPOINTS.WAREHOUSES, { signal: controller.signal });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const json = await res.json();
                 const rawData = Array.isArray(json) ? json : (json.data || []);
-
+                if (!Array.isArray(rawData)) {
+                    console.error("Unexpected API response:", rawData);
+                    return;
+                }
                 const formatted = rawData
                     .filter((w: any) => w.latitude && w.longitude)
                     .map((w: any) => ({
@@ -36,13 +41,17 @@ const GlobeDemo = () => {
                         name: w.org_name || "Nexus Warehouse",
                         category: w.category,
                         size: w.area_available ? parseInt(w.area_available) / 10000 : 0.5,
-                        color: w.is_prime ? "#a855f7" : "#0052FF", // Purple for prime, Nexus Blue for standard
+                        color: w.is_prime ? "#a855f7" : "#0052FF",
                     }));
-
                 console.log("Formatted globe points:", formatted);
                 setData(formatted);
-            })
-            .catch((err) => console.error("Failed to load warehouses for globe", err));
+            } catch (err: any) {
+                if (err.name === "AbortError") return;
+                console.error("Failed to load warehouses for globe:", err);
+            }
+        };
+        loadWarehouses();
+        return () => controller.abort();
     }, []);
 
     useEffect(() => {

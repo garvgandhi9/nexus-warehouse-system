@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { API_ENDPOINTS } from "@/lib/api-config";
-import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
+import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { useFormValidation } from "@/hooks/useFormValidation";
 
 const requirementTypes = ["Flexible Warehousing", "Build-to-Suit", "Managed Network", "Other"];
@@ -13,12 +13,16 @@ const Contact = () => {
   const { ref, isVisible } = useScrollAnimation(0.1);
   const location = useLocation();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const {
     values: formData,
     handleChange,
     getInputStyles,
+    getFieldError,
     isValid: isFormValid,
-    errors
+    setServerErrors,
   } = useFormValidation({
     name: "",
     email: "",
@@ -33,41 +37,49 @@ const Contact = () => {
     message: { required: true },
   });
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid()) {
-      try {
-        const isPrime = localStorage.getItem("nexus_prime") === "1";
+    if (!isFormValid()) return;
 
-        // Extract routing state variables, fallback to defaults
-        const locationState = location.state as { source?: string; context?: string; category?: string } | null;
+    setLoading(true);
+    setError("");
 
-        const payload = {
-          ...formData,
-          category: locationState?.category || formData.category,
-          source: locationState?.source || "Direct Contact",
-          context: locationState?.context || "General",
-          tier: isPrime ? "Prime" : "Standard"
-        };
+    try {
+      const isPrime = localStorage.getItem("nexus_prime") === "1";
+      const locationState = location.state as { source?: string; context?: string; category?: string } | null;
 
-        const response = await fetch(API_ENDPOINTS.CONTACT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
+      const payload = {
+        ...formData,
+        category: locationState?.category || formData.category,
+        source: locationState?.source || "Direct Contact",
+        context: locationState?.context || "General",
+        tier: isPrime ? "Prime" : "Standard"
+      };
 
-        if (response.ok) {
-          setSubmitted(true);
-          localStorage.removeItem("nexus_prime"); // Clear after submission
+      const response = await fetch(API_ENDPOINTS.CONTACT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.field) {
+          setServerErrors({ [data.field]: data.error });
         } else {
-          console.error("Failed to send message");
+          setError(data.error || "Failed to send message. Please try again.");
         }
-      } catch (err) {
-        console.error("Error sending message:", err);
+        return;
       }
+
+      localStorage.removeItem("nexus_prime");
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Error sending message:", err);
+      setError("Connection failed. Please check your internet and try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,6 +89,7 @@ const Contact = () => {
       <main className="min-h-screen pt-24">
         <section ref={ref} className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
           <div className={`grid gap-16 lg:grid-cols-2 transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
+
             {/* Left */}
             <div className="flex flex-col justify-center">
               <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Get in Touch</p>
@@ -88,7 +101,6 @@ const Contact = () => {
               <p className="mt-6 max-w-md text-lg text-muted-foreground">
                 Whether you're looking for ready facilities or a custom-built solution, our team is ready to help.
               </p>
-
               <div className="mt-12 flex flex-col gap-6">
                 <div className="flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10">
@@ -109,7 +121,7 @@ const Contact = () => {
                   <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10">
                     <Mail size={18} className="text-primary" />
                   </div>
-                  <p className="text-sm font-medium text-foreground">info@wareflux.in</p>
+                  <p className="text-sm font-medium text-foreground">info@nexus.in</p>
                 </div>
               </div>
             </div>
@@ -126,44 +138,56 @@ const Contact = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+
+                  {error && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-sm text-red-500 text-xs font-bold uppercase tracking-wider text-center">
+                      {error}
+                    </div>
+                  )}
+
                   <div>
                     <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Name</label>
-                    <input name="name" value={formData.name} onChange={handleChange} required className={getInputStyles("name")} placeholder="Your name" />
-                    {errors.name && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{errors.name}</p>}
+                    <input name="name" value={formData.name} onChange={handleChange} className={getInputStyles("name")} placeholder="Your name" />
+                    {getFieldError("name") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("name")}</p>}
                   </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Email</label>
-                      <input name="email" value={formData.email} onChange={handleChange} required type="email" className={getInputStyles("email")} placeholder="you@company.com" />
-                      {errors.email && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{errors.email}</p>}
+                      <input name="email" value={formData.email} onChange={handleChange} type="email" className={getInputStyles("email")} placeholder="you@company.com" />
+                      {getFieldError("email") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("email")}</p>}
                     </div>
                     <div>
                       <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Phone (10 Digits)</label>
-                      <input name="phone" value={formData.phone} onChange={handleChange} required className={getInputStyles("phone")} placeholder="9876543210" />
-                      {errors.phone && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{errors.phone}</p>}
+                      <input name="phone" value={formData.phone} onChange={handleChange} className={getInputStyles("phone")} placeholder="9876543210" />
+                      {getFieldError("phone") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("phone")}</p>}
                     </div>
                   </div>
+
                   <div>
                     <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Requirement Category</label>
-                    <select name="category" value={formData.category} onChange={handleChange} required className={getInputStyles("category")}>
+                    <select name="category" value={formData.category} onChange={handleChange} className={getInputStyles("category")}>
                       <option value="">Select type</option>
                       {requirementTypes.map((t) => (
                         <option key={t} value={t}>{t}</option>
                       ))}
                     </select>
-                    {errors.category && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{errors.category}</p>}
+                    {getFieldError("category") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("category")}</p>}
                   </div>
+
                   <div>
                     <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Message</label>
-                    <textarea name="message" value={formData.message} onChange={handleChange} required rows={4} className={getInputStyles("message") + " resize-none"} placeholder="Tell us about your requirements..." />
-                    {errors.message && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{errors.message}</p>}
+                    <textarea name="message" value={formData.message} onChange={handleChange} rows={4} className={getInputStyles("message") + " resize-none"} placeholder="Tell us about your requirements..." />
+                    {getFieldError("message") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("message")}</p>}
                   </div>
+
                   <button
-                    disabled={!isFormValid()}
+                    disabled={!isFormValid() || loading}
                     type="submit"
                     className="mt-2 flex items-center justify-center gap-2 rounded-sm bg-primary px-6 py-4 font-display text-sm font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25 disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    {isFormValid() ? "Send Message" : "Complete Form"} <Send size={16} />
+                    {loading ? "Sending..." : isFormValid() ? "Send Message" : "Complete Form"}
+                    <Send size={16} />
                   </button>
                 </form>
               )}

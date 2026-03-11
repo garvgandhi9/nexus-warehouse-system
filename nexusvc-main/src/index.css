@@ -1,21 +1,15 @@
-@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+@import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-
-@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap");
-
-@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
-
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
-
-@import url("https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&display=swap");
-
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap");
 
 @layer base {
   :root {
@@ -174,5 +168,45 @@
       linear-gradient(hsl(215 20% 20% / 0.15) 1px, transparent 1px),
       linear-gradient(90deg, hsl(215 20% 20% / 0.15) 1px, transparent 1px);
     background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  }
+
+  /* ─── Leaflet Custom Styles ─── */
+  .leaflet-container {
+    background-color: #040508 !important; /* Matches app background */
+  }
+
+  .nexus-marker-container {
+    background: transparent !important;
+    border: none !important;
+  }
+
+  @keyframes pulse-marker {
+    0% { transform: scale(0.6); opacity: 0.8; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+
+  @keyframes pulse-submission {
+    0% { transform: scale(0.6); opacity: 0.8; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+
+  @keyframes pulse-white {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  .nexus-popup-custom .leaflet-popup-content-wrapper {
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .nexus-popup-custom .leaflet-popup-tip {
+    background: #0A0B10 !important;
+  }
+
+  .nexus-popup-custom .leaflet-popup-content {
+    margin: 0 !important;
+    width: 280px !important;
   }
 }

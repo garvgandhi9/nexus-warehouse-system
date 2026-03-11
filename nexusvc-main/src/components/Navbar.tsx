@@ -4,7 +4,6 @@ import { Menu, X, User, LogOut, LayoutDashboard, PlusCircle, Shield, Settings } 
 
 const navLinks = [
   { label: "Listings", to: "/listings" },
-  { label: "Globe", to: "/globe" },
   { label: "Nexus Prime", to: "/nexus-prime" },
   { label: "Contact Us", to: "/contact" },
 ];

@@ -1,0 +1,16 @@
+{
+  # Replace {env.DOMAIN} with your real domain before starting Caddy
+}
+
+{env.DOMAIN} {
+    reverse_proxy /api/* backend:3001
+    reverse_proxy / backend:80 {
+        # static frontend is served by frontend container's nginx on port 80
+    }
+}
+
+# Local / no-domain fallback: serve http on :80 and proxy /api
+:80 {
+    reverse_proxy /api/* backend:3001
+    reverse_proxy / backend:80
+}

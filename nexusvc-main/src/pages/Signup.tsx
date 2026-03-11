@@ -16,7 +16,9 @@ const Signup = () => {
         values: formData,
         handleChange,
         getInputStyles,
+        getFieldError,
         isValid,
+        setServerErrors,
     } = useFormValidation({
         name: "",
         email: "",
@@ -41,15 +43,20 @@ const Signup = () => {
 
             const data = await response.json();
 
-            if (response.ok) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
-                navigate("/dashboard");
-            } else {
-                setError(data.error || "Signup failed");
+            if (!response.ok) {
+                if (data.field) {
+                    setServerErrors({ [data.field]: data.error });
+                } else {
+                    setError(data.error || "Signup failed. Please try again.");
+                }
+                return;
             }
+
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+            navigate("/dashboard");
         } catch (err) {
-            setError("Connection failed. Please try again.");
+            setError("Connection failed. Please check your internet and try again.");
         } finally {
             setLoading(false);
         }
@@ -57,11 +64,8 @@ const Signup = () => {
 
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
-            {/* Background Decorative Elements */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-
             <Navbar />
-
             <main className="flex-1 flex items-center justify-center pt-32 pb-20 px-6 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -70,8 +74,12 @@ const Signup = () => {
                 >
                     <div className="glass-morphism border border-white/10 p-8 sm:p-10 rounded-sm shadow-2xl backdrop-blur-xl bg-white/5">
                         <div className="text-center mb-8">
-                            <h1 className="font-display text-3xl font-black uppercase tracking-tight">Create <span className="text-gradient">Account</span></h1>
-                            <p className="mt-2 text-sm text-muted-foreground uppercase tracking-widest font-bold">Join the Nexus network</p>
+                            <h1 className="font-display text-3xl font-black uppercase tracking-tight">
+                                Create <span className="text-gradient">Account</span>
+                            </h1>
+                            <p className="mt-2 text-sm text-muted-foreground uppercase tracking-widest font-bold">
+                                Join the Nexus network
+                            </p>
                         </div>
 
                         {error && (
@@ -93,6 +101,11 @@ const Signup = () => {
                                     className={getInputStyles("name") + " bg-white/5 border-white/10 rounded-sm px-4 py-3 text-sm focus:bg-white/10 focus:border-primary transition-colors focus:outline-none w-full"}
                                     placeholder="John Doe"
                                 />
+                                {getFieldError("name") && (
+                                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                                        {getFieldError("name")}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-2">
@@ -107,6 +120,11 @@ const Signup = () => {
                                     className={getInputStyles("email") + " bg-white/5 border-white/10 rounded-sm px-4 py-3 text-sm focus:bg-white/10 focus:border-primary transition-colors focus:outline-none w-full"}
                                     placeholder="email@nexus.com"
                                 />
+                                {getFieldError("email") && (
+                                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                                        {getFieldError("email")}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-2">
@@ -121,10 +139,15 @@ const Signup = () => {
                                     className={getInputStyles("password") + " bg-white/5 border-white/10 rounded-sm px-4 py-3 text-sm focus:bg-white/10 focus:border-primary transition-colors focus:outline-none w-full"}
                                     placeholder="Min. 6 characters"
                                 />
+                                {getFieldError("password") && (
+                                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                                        {getFieldError("password")}
+                                    </p>
+                                )}
                             </div>
 
                             <button
-                                disabled={loading || !isValid}
+                                disabled={loading || !isValid()}
                                 type="submit"
                                 className="w-full bg-primary text-primary-foreground py-4 font-display text-sm font-bold uppercase tracking-widest transition-all hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
                             >
@@ -135,12 +158,13 @@ const Signup = () => {
 
                         <div className="mt-8 text-center text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-3 duration-500 delay-[500ms]">
                             Already have an account?{" "}
-                            <Link to="/login" className="text-primary hover:underline underline-offset-4">Log In</Link>
+                            <Link to="/login" className="text-primary hover:underline underline-offset-4">
+                                Log In
+                            </Link>
                         </div>
                     </div>
                 </motion.div>
             </main>
-
             <Footer />
         </div>
     );

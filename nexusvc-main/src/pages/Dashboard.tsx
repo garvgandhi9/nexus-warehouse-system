@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
-    LayoutDashboard,
-    Warehouse,
-    Plus,
-    Clock,
-    CheckCircle2,
-    MapPin,
-    Calendar,
-    ChevronRight,
-    Search,
-    Edit2,
-    XCircle
+    LayoutDashboard, Warehouse, Plus, Clock, CheckCircle2,
+    MapPin, Calendar, ChevronRight, Search, Edit2, XCircle,
+    Map as MapIcon
 } from "lucide-react";
+
 import Navbar from "@/components/Navbar";
-import { API_ENDPOINTS, API_BASE_URL } from "@/lib/api-config";
+import { API_ENDPOINTS } from "@/lib/api-config";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
 import { MonthYearRangePicker } from "@/components/MonthYearRangePicker";
@@ -32,7 +25,6 @@ interface UserWarehouse {
     term_type?: string;
     term_duration?: string;
     created_at: string;
-    location?: string;
 }
 
 const Dashboard = () => {
@@ -40,6 +32,9 @@ const Dashboard = () => {
     const [user, setUser] = useState<any>(null);
     const [warehouses, setWarehouses] = useState<UserWarehouse[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [saveError, setSaveError] = useState("");
+    const [search, setSearch] = useState("");
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingWarehouse, setEditingWarehouse] = useState<UserWarehouse | null>(null);
 
@@ -48,10 +43,12 @@ const Dashboard = () => {
         setValues: setFormData,
         handleChange: handleInputChange,
         getInputStyles,
+        getFieldError,
         isValid: isFormValid,
         errors,
         setErrors,
-        setTouched
+        setTouched,
+        setServerErrors,
     } = useFormValidation<Partial<UserWarehouse>>({}, {
         city: { required: true },
         area_available: { required: true },
@@ -60,33 +57,38 @@ const Dashboard = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
         const userData = localStorage.getItem("user");
-
         if (!token || !userData) {
             navigate("/login");
             return;
         }
-
         setUser(JSON.parse(userData));
 
+        const controller = new AbortController();
         const fetchWarehouses = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/user/warehouses`, {
-                    headers: {
-                        "Authorization": token
-                    }
+                const res = await fetch(API_ENDPOINTS.USER_WAREHOUSES, {
+                    headers: { "Authorization": token },
+                    signal: controller.signal
                 });
-                if (response.ok) {
-                    const data = await response.json();
-                    setWarehouses(data);
+                if (res.status === 401) {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    navigate("/login");
+                    return;
                 }
-            } catch (err) {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                setWarehouses(data.data || data);
+            } catch (err: any) {
+                if (err.name === "AbortError") return;
                 console.error("Failed to fetch warehouses:", err);
+                setError("Failed to load your listings. Please refresh the page.");
             } finally {
                 setLoading(false);
             }
         };
-
         fetchWarehouses();
+        return () => controller.abort();
     }, [navigate]);
 
     const handleOpenEditModal = (warehouse: UserWarehouse) => {
@@ -94,46 +96,66 @@ const Dashboard = () => {
         setFormData(warehouse);
         setErrors({});
         setTouched({});
+        setSaveError("");
         setIsEditModalOpen(true);
     };
 
     const handleSaveEdit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingWarehouse) return;
+        setSaveError("");
 
         const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+
         try {
-            const response = await fetch(`${API_BASE_URL}/user/warehouses/${editingWarehouse.id}`, {
+            const response = await fetch(API_ENDPOINTS.USER_WAREHOUSE_UPDATE(editingWarehouse.id), {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": token || ""
+                    "Authorization": token
                 },
                 body: JSON.stringify(formData)
             });
 
-            if (response.ok) {
-                // Refresh list
-                const res = await fetch(`${API_BASE_URL}/user/warehouses`, {
-                    headers: { "Authorization": token || "" }
-                });
-                if (res.ok) setWarehouses(await res.json());
-                setIsEditModalOpen(false);
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (data.field) {
+                    setServerErrors({ [data.field]: data.error });
+                } else {
+                    setSaveError(data.error || "Update failed. Please try again.");
+                }
+                return;
             }
+
+            const res = await fetch(API_ENDPOINTS.USER_WAREHOUSES, {
+                headers: { "Authorization": token }
+            });
+            const refreshed = await res.json();
+            setWarehouses(refreshed.data || refreshed);
+            setIsEditModalOpen(false);
         } catch (err) {
             console.error("Save failed:", err);
+            setSaveError("Connection failed. Please try again.");
         }
     };
+
+    const filteredWarehouses = warehouses.filter(w =>
+        w.city?.toLowerCase().includes(search.toLowerCase()) ||
+        w.warehouse_code?.toLowerCase().includes(search.toLowerCase())
+    );
 
     if (!user) return null;
 
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             <Navbar />
-
             <main className="flex-1 pt-32 pb-20 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
-                    {/* Header */}
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                         <div>
                             <div className="inline-flex items-center gap-2 text-primary mb-3">
@@ -143,18 +165,18 @@ const Dashboard = () => {
                             <h1 className="font-display text-4xl sm:text-5xl font-black uppercase tracking-tight">
                                 Welcome, <span className="text-gradient">{user.name.split(' ')[0]}</span>
                             </h1>
-                            <p className="mt-2 text-muted-foreground text-lg uppercase tracking-widest font-bold">Manage your infrastructure portfolio</p>
+                            <p className="mt-2 text-muted-foreground text-lg uppercase tracking-widest font-bold">
+                                Manage your infrastructure portfolio
+                            </p>
                         </div>
-
-                        <Link
-                            to="/submit"
+                        <Link 
+                            to="/submit" 
                             className="bg-primary text-primary-foreground px-8 py-4 rounded-sm font-display text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] shadow-lg"
                         >
-                            <Plus size={18} /> List New Warehouse
+                            <Plus size={18} /> New listing
                         </Link>
                     </div>
 
-                    {/* Stats Overview */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
                         <div className="bg-card border border-border/50 p-6 rounded-sm">
                             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Total Listings</p>
@@ -163,7 +185,7 @@ const Dashboard = () => {
                         <div className="bg-card border border-border/50 p-6 rounded-sm">
                             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Live Assets</p>
                             <p className="text-3xl font-display font-black text-emerald-500">
-                                {warehouses.filter(w => w.status === 'live').length}
+                                {warehouses.filter(w => w.status === 'Available').length}
                             </p>
                         </div>
                         <div className="bg-card border border-border/50 p-6 rounded-sm">
@@ -174,7 +196,12 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Listings Table */}
+                    {error && (
+                        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-sm text-red-500 text-xs font-bold uppercase tracking-wider text-center">
+                            {error}
+                        </div>
+                    )}
+
                     <div className="bg-card border border-border/50 rounded-sm overflow-hidden shadow-2xl">
                         <div className="p-6 border-b border-border/50 bg-white/5 flex items-center justify-between">
                             <h2 className="font-display text-sm font-bold uppercase tracking-widest">Your Submissions</h2>
@@ -183,6 +210,8 @@ const Dashboard = () => {
                                 <input
                                     type="text"
                                     placeholder="SEARCH LISTINGS..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
                                     className="bg-background/50 border border-border/50 rounded-sm pl-10 pr-4 py-2 text-[10px] uppercase font-bold tracking-widest focus:outline-none focus:border-primary/50 transition-all w-48 sm:w-64"
                                 />
                             </div>
@@ -192,13 +221,19 @@ const Dashboard = () => {
                             <div className="p-20 text-center text-muted-foreground animate-pulse uppercase tracking-[0.5em] text-xs font-bold">
                                 Loading Protocol...
                             </div>
-                        ) : warehouses.length === 0 ? (
+                        ) : filteredWarehouses.length === 0 ? (
                             <div className="p-20 text-center">
                                 <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/5 mb-6">
                                     <Warehouse size={32} className="text-primary/40" />
                                 </div>
-                                <p className="text-muted-foreground text-sm uppercase tracking-widest font-bold">No assets registered yet</p>
-                                <Link to="/submit" className="mt-4 inline-block text-primary text-xs font-bold uppercase tracking-widest hover:underline">Start First Submission</Link>
+                                <p className="text-muted-foreground text-sm uppercase tracking-widest font-bold">
+                                    {search ? "No listings match your search" : "No assets registered yet"}
+                                </p>
+                                {!search && (
+                                    <Link to="/submit" className="mt-4 inline-block text-primary text-xs font-bold uppercase tracking-widest hover:underline">
+                                        Start First Submission
+                                    </Link>
+                                )}
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
@@ -214,14 +249,16 @@ const Dashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/50">
-                                        {warehouses.map((w) => (
+                                        {filteredWarehouses.map((w) => (
                                             <tr key={w.id} className="hover:bg-white/5 transition-colors group">
                                                 <td className="px-6 py-6">
                                                     <div className="flex items-center gap-3">
                                                         <div className="h-8 w-8 rounded-sm bg-primary/10 flex items-center justify-center text-primary">
                                                             <Warehouse size={16} />
                                                         </div>
-                                                        <span className="text-xs font-bold uppercase tracking-tight text-foreground">{w.warehouse_code}</span>
+                                                        <span className="text-xs font-bold uppercase tracking-tight text-foreground">
+                                                            {w.warehouse_code}
+                                                        </span>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-6">
@@ -240,7 +277,7 @@ const Dashboard = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-6">
-                                                    {w.status === "live" ? (
+                                                    {w.status === "Available" ? (
                                                         <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-emerald-500 border border-emerald-500/20">
                                                             <CheckCircle2 size={10} /> Live
                                                         </span>
@@ -259,7 +296,10 @@ const Dashboard = () => {
                                                         >
                                                             <Edit2 size={16} />
                                                         </button>
-                                                        <button className="p-2 text-muted-foreground hover:text-foreground transition-colors">
+                                                        <button
+                                                            onClick={() => navigate(`/listings/${w.id}`)}
+                                                            className="p-2 text-muted-foreground hover:text-foreground"
+                                                        >
                                                             <ChevronRight size={18} />
                                                         </button>
                                                     </div>
@@ -274,7 +314,6 @@ const Dashboard = () => {
                 </div>
             </main>
 
-            {/* Edit Modal */}
             {isEditModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm">
                     <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-sm border border-border/50 bg-card p-6 shadow-2xl">
@@ -287,9 +326,14 @@ const Dashboard = () => {
                             </button>
                         </div>
 
+                        {saveError && (
+                            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-sm text-red-500 text-xs font-bold uppercase tracking-wider text-center">
+                                {saveError}
+                            </div>
+                        )}
+
                         <form onSubmit={handleSaveEdit} className="space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {/* Basic Details */}
                                 <div className="space-y-4 lg:col-span-3">
                                     <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">Identity & Location</h3>
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -299,18 +343,17 @@ const Dashboard = () => {
                                         </div>
                                         <div>
                                             <label className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground font-bold">City*</label>
-                                            <input name="city" required value={formData.city || ""} onChange={handleInputChange} className={getInputStyles("city")} />
-                                            {errors.city && <p className="mt-1 text-[9px] font-bold uppercase text-red-500">{errors.city}</p>}
+                                            <input name="city" value={formData.city || ""} onChange={handleInputChange} className={getInputStyles("city")} />
+                                            {getFieldError("city") && <p className="mt-1 text-[9px] font-bold uppercase text-red-500">{getFieldError("city")}</p>}
                                         </div>
                                         <div>
                                             <label className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Area (Sq Ft)*</label>
                                             <input type="number" name="area_available" value={formData.area_available || ""} onChange={handleInputChange} className={getInputStyles("area_available")} />
-                                            {errors.area_available && <p className="mt-1 text-[9px] font-bold uppercase text-red-500">{errors.area_available}</p>}
+                                            {getFieldError("area_available") && <p className="mt-1 text-[9px] font-bold uppercase text-red-500">{getFieldError("area_available")}</p>}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Term & Duration */}
                                 <div className="space-y-4 lg:col-span-3">
                                     <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">Leasing Terms</h3>
                                     <div className="grid grid-cols-1 gap-6">
@@ -324,15 +367,12 @@ const Dashboard = () => {
                                         {formData.term_type === "short_term" && (
                                             <MonthYearRangePicker
                                                 value={formData.term_duration || ""}
-                                                onChange={(v) => {
-                                                    setFormData(prev => ({ ...prev, term_duration: v }));
-                                                }}
+                                                onChange={(v) => setFormData(prev => ({ ...prev, term_duration: v }))}
                                             />
                                         )}
                                     </div>
                                 </div>
 
-                                {/* Description */}
                                 <div className="lg:col-span-3">
                                     <label className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Brief Description</label>
                                     <textarea

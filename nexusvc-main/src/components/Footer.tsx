@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 const Footer = () => (
-  <footer className="border-t border-border/50 bg-background">
+  <footer className="border-t border-white/5 bg-[#0a0c10] text-white">
     <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
       <div className="grid gap-12 md:grid-cols-4">
         <div className="md:col-span-2">
@@ -17,7 +17,7 @@ const Footer = () => (
           <div className="flex flex-col gap-3">
             {[
               { label: "Listings", to: "/listings" },
-              { label: "Build-to-Suit", to: "/build-to-suit" },
+              { label: "Nexus Prime", to: "/nexus-prime" },
               { label: "Contact", to: "/contact" },
             ].map((l) => (
               <Link key={l.to} to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-primary">

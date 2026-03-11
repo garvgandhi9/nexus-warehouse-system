@@ -16,7 +16,9 @@ const Login = () => {
         values: formData,
         handleChange,
         getInputStyles,
+        getFieldError,
         isValid,
+        setServerErrors,
     } = useFormValidation({
         email: "",
         password: ""
@@ -39,22 +41,26 @@ const Login = () => {
 
             const data = await response.json();
 
-            if (response.ok) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("user", JSON.stringify(data.user));
-
-                if (data.user.isAdmin) {
-                    // For Admin, we also set session storage to maintain compatibility with existing Admin pages
-                    sessionStorage.setItem("admin_token", data.token);
-                    navigate("/admin");
+            if (!response.ok) {
+                if (data.field) {
+                    setServerErrors({ [data.field]: data.error });
                 } else {
-                    navigate("/dashboard");
+                    setError(data.error || "Login failed. Please try again.");
                 }
+                return;
+            }
+
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            if (data.user.isAdmin) {
+                sessionStorage.setItem("admin_token", data.token);
+                navigate("/admin");
             } else {
-                setError(data.error || "Login failed");
+                navigate("/dashboard");
             }
         } catch (err) {
-            setError("Connection failed. Please try again.");
+            setError("Connection failed. Please check your internet and try again.");
         } finally {
             setLoading(false);
         }
@@ -62,11 +68,8 @@ const Login = () => {
 
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
-            {/* Background Decorative Elements */}
             <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2" />
-
             <Navbar />
-
             <main className="flex-1 flex items-center justify-center pt-32 pb-20 px-6 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -75,8 +78,12 @@ const Login = () => {
                 >
                     <div className="glass-morphism border border-white/10 p-8 sm:p-10 rounded-sm shadow-2xl backdrop-blur-xl bg-white/5">
                         <div className="text-center mb-8">
-                            <h1 className="font-display text-3xl font-black uppercase tracking-tight">Portal <span className="text-gradient">Login</span></h1>
-                            <p className="mt-2 text-sm text-muted-foreground uppercase tracking-widest font-bold">Access your Nexus dashboard</p>
+                            <h1 className="font-display text-3xl font-black uppercase tracking-tight">
+                                Portal <span className="text-gradient">Login</span>
+                            </h1>
+                            <p className="mt-2 text-sm text-muted-foreground uppercase tracking-widest font-bold">
+                                Access your Nexus dashboard
+                            </p>
                         </div>
 
                         {error && (
@@ -98,6 +105,11 @@ const Login = () => {
                                     className={getInputStyles("email") + " bg-white/5 border-white/10 rounded-sm px-4 py-3 text-sm"}
                                     placeholder="email@nexus.com"
                                 />
+                                {getFieldError("email") && (
+                                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                                        {getFieldError("email")}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-2">
@@ -112,10 +124,15 @@ const Login = () => {
                                     className={getInputStyles("password") + " bg-white/5 border-white/10 rounded-sm px-4 py-3 text-sm"}
                                     placeholder="Enter your password"
                                 />
+                                {getFieldError("password") && (
+                                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                                        {getFieldError("password")}
+                                    </p>
+                                )}
                             </div>
 
                             <button
-                                disabled={loading || !isValid}
+                                disabled={loading || !isValid()}
                                 type="submit"
                                 className="w-full bg-primary text-primary-foreground py-4 font-display text-sm font-bold uppercase tracking-widest transition-all hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
                             >
@@ -126,12 +143,13 @@ const Login = () => {
 
                         <div className="mt-8 text-center text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-3 duration-500 delay-[500ms]">
                             Don't have an account?{" "}
-                            <Link to="/signup" className="text-primary hover:underline underline-offset-4">Create Account</Link>
+                            <Link to="/signup" className="text-primary hover:underline underline-offset-4">
+                                Create Account
+                            </Link>
                         </div>
                     </div>
                 </motion.div>
             </main>
-
             <Footer />
         </div>
     );

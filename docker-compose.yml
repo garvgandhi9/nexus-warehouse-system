@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nexus
+      POSTGRES_PASSWORD: nexuspass
+      POSTGRES_DB: nexusdb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./warehouse-backend
+    restart: unless-stopped
+    env_file:
+      - ./warehouse-backend/.env.example
+    environment:
+      - DATABASE_URL=postgresql://nexus:nexuspass@db:5432/nexusdb
+      - PORT=3001
+    ports:
+      - '3001:3001'
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./nexusvc-main
+      args:
+        VITE_API_URL: http://localhost:3001
+        VITE_MAPTILER_KEY: ""
+    restart: unless-stopped
+    ports:
+      - '8080:80'
+    depends_on:
+      - backend
+  proxy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  db-data:

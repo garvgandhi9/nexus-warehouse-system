@@ -16,6 +16,8 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Shim mapbox-gl so react-map-gl doesn't crash (we use react-leaflet instead)
+      "mapbox-gl": path.resolve(__dirname, "./src/mapbox-gl-shim.js"),
     },
   },
 }));
