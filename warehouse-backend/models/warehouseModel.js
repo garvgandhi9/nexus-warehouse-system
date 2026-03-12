@@ -93,15 +93,50 @@ const warehouseModel = {
           $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28
         ) RETURNING *`;
 
+            const num = (v) => (v === "" || v === undefined ? null : Number(v));
+
             const values = [
-                warehouseCode, data.org_name, data.city?.trim(), data.address, data.full_address,
-                data.latitude, data.longitude, data.area_available || data.land_size,
-                data.rate || data.rate_sqft, status, data.is_prime || false,
-                data.category || (isLand ? "Land" : ""), data.ceiling_height, data.docks,
-                data.floor_strength, data.term_type, data.term_duration, data.description,
-                data.industries, data.facilities, data.contact_person, data.contact_email,
-                data.contact_phone, data.capacity_value || data.land_size,
-                data.capacity_type || "sq_ft", data.lister_type, data.website, userId
+                warehouseCode,
+                data.org_name,
+                data.city?.trim(),
+                data.address,
+                data.full_address,
+
+                num(data.latitude),
+                num(data.longitude),
+
+                num(data.area_available) || num(data.land_size),
+
+                num(data.rate) || num(data.rate_sqft),
+
+                status,
+
+                data.is_prime || false,
+
+                data.category || (isLand ? "Land" : ""),
+
+                num(data.ceiling_height),
+                num(data.docks),
+                num(data.floor_strength),
+
+                data.term_type,
+                data.term_duration,
+                data.description,
+
+                data.industries,
+                data.facilities,
+
+                data.contact_person,
+                data.contact_email,
+                data.contact_phone,
+
+                num(data.capacity_value) || num(data.land_size),
+
+                data.capacity_type || "sq_ft",
+                data.lister_type,
+                data.website,
+
+                userId
             ];
 
             const result = await pool.query(query, values);
