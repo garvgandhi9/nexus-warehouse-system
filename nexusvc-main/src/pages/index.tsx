@@ -152,7 +152,8 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
       try {
         const res = await fetch(API_ENDPOINTS.WAREHOUSES, { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const json = await res.json();
+        const data = json.data || json;
         if (!Array.isArray(data)) {
           console.error("Unexpected API response:", data);
           return;
