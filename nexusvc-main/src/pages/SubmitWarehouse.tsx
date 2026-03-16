@@ -6,9 +6,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { API_ENDPOINTS } from "@/lib/api-config";
 import { CheckCircle2, Search, Loader2, Warehouse, Map as MapIcon, ArrowLeft, Camera, ArrowRight } from "lucide-react";
 import { z } from "zod";
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import maplibregl from 'maplibre-gl';
+import Map, { Marker } from 'react-map-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const CATEGORIES = ["General Grade A", "General Grade B", "Bonded", "Cold Storage", "Dark Store", "FTWZ (Free Trade Warehousing Zone)"];
@@ -139,42 +139,6 @@ function CheckboxGroup({ options, selected, onChange }: { options: string[]; sel
     );
 }
 
-// ─── Map Helpers ─────────────────────────────────────────────────────────────
-// Fix for default Leaflet icon paths in Vite
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-function MapMarkers({ markerPos, onMarkerDrag, onMapClick, viewState }: any) {
-    const map = useMap();
-
-    useEffect(() => {
-        map.setView([viewState.latitude, viewState.longitude], viewState.zoom);
-    }, [viewState.latitude, viewState.longitude, viewState.zoom, map]);
-
-    useMapEvents({
-        click(e) {
-            onMapClick(e.latlng.lat, e.latlng.lng);
-        },
-    });
-
-    return (
-        <Marker
-            position={[markerPos.latitude, markerPos.longitude]}
-            draggable={true}
-            eventHandlers={{
-                dragend: (e) => {
-                    const marker = e.target;
-                    const position = marker.getLatLng();
-                    onMarkerDrag(position.lat, position.lng);
-                },
-            }}
-        />
-    );
-}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 const SubmitWarehouse = () => {
@@ -465,23 +429,28 @@ const SubmitWarehouse = () => {
                 </div>
 
                 <div className="h-[400px] w-full rounded-sm border border-border overflow-hidden z-0 bg-white">
-                    <MapContainer
-                        center={[viewState.latitude, viewState.longitude]}
-                        zoom={viewState.zoom}
+                    <Map
+                        viewState={viewState}
+                        mapLib={maplibregl}
+                        mapStyle="https://demotiles.maplibre.org/style.json"
                         style={{ width: '100%', height: '400px' }}
-                        zoomControl={false}
+                        onMove={(evt: any) => setViewState(evt.viewState)}
+                        onClick={(e: any) => {
+                            const [lng, lat] = e.lngLat;
+                            updateLocation(lat, lng);
+                        }}
                     >
-                        <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        <Marker
+                            longitude={markerPos.longitude}
+                            latitude={markerPos.latitude}
+                            anchor="bottom"
+                            draggable={true}
+                            onDragEnd={(e: any) => {
+                                const { lng, lat } = e.lngLat;
+                                updateLocation(lat, lng);
+                            }}
                         />
-                        <MapMarkers
-                            markerPos={markerPos}
-                            onMarkerDrag={(lat, lng) => updateLocation(lat, lng)}
-                            onMapClick={(lat, lng) => updateLocation(lat, lng)}
-                            viewState={viewState}
-                        />
-                    </MapContainer>
+                    </Map>
                 </div>
 
                 <div className="p-4 bg-muted/30 border border-border/50 rounded-sm space-y-2">
