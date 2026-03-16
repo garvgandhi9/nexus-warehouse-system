@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import ROICalculator from "@/components/ROICalculator";
 import { useScrollAnimation, useCountUp } from "@/hooks/useScrollAnimation";
 import { API_ENDPOINTS } from "@/lib/api-config";
-import { industries, metrics, featuredListings } from "@/data/mockData";
+import { industries, metrics } from "@/data/mockData";
 import { ArrowRight, Warehouse, Building2, Network, Search } from "lucide-react";
 
 /* ── Hero ── */
@@ -200,10 +200,8 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
 
   // Ensure we always have at least 3 items to show
   // Hierarchy: Filtered API -> All API -> Mock Featured
-  let displayPool = filteredListings.length > 0 ? filteredListings : apiListings;
-  if (displayPool.length === 0) displayPool = featuredListings;
-  
-  const displayResults = displayPool.slice(0, Math.max(displayPool.length, 3));
+  const displayPool = filteredListings.length > 0 ? filteredListings : apiListings;
+  const displayResults = displayPool;
 
   // Calculate pagination
   const totalPages = Math.ceil(displayResults.length / ITEMS_PER_PAGE);
@@ -318,13 +316,13 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
 
         {filteredListings.length === 0 && (
           <div className="mt-8 mb-4 text-center">
-             <span className="inline-block px-4 py-1 rounded-full bg-primary/5 text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 border border-primary/10">
-               {apiListings.length === 0 ? "Global Network Baseline" : "Network Recommendations"}
-             </span>
+            <span className="inline-block px-4 py-1 rounded-full bg-primary/5 text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 border border-primary/10">
+              {apiListings.length === 0 ? "Global Network Baseline" : "Network Recommendations"}
+            </span>
           </div>
         )}
 
-        {apiListings.length === 0 && featuredListings.length === 0 && (
+        {apiListings.length === 0 && (
           <div className="mt-12 py-12 text-center text-muted-foreground border border-border/50 rounded-sm bg-card/50">
             Synchronising infrastructure network...
           </div>
