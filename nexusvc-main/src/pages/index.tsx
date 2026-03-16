@@ -148,16 +148,12 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
 
   useEffect(() => {
     const controller = new AbortController();
-    const loadWarehouses = async () => {
+    const loadFeatured = async () => {
       try {
-        const res = await fetch(API_ENDPOINTS.WAREHOUSES, { signal: controller.signal });
+        const res = await fetch(API_ENDPOINTS.FEATURED_WAREHOUSES, { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        const data = json.data || json;
-        if (!Array.isArray(data)) {
-          console.error("Unexpected API response:", data);
-          return;
-        }
+        const data = json.data || [];
         const formatted = data.map((w: any) => ({
           id: w.id,
           city: w.city || "Location",
@@ -171,45 +167,12 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
         setApiListings(formatted);
       } catch (err: any) {
         if (err.name === "AbortError") return;
-        console.error("Failed to fetch warehouses:", err);
+        console.error("Failed to fetch featured warehouses:", err);
       }
     };
-    loadWarehouses();
+    loadFeatured();
     return () => controller.abort();
   }, []);
-
-  // Compute filtering
-  const citiesList = ["All", ...Array.from(new Set(apiListings.map(w => w.city)))];
-
-  const filteredListings = apiListings.filter(w => {
-    // City
-    if (selectedCity !== "All" && w.city !== selectedCity) return false;
-
-    // Area (remove commas from formatted size string for comparison)
-    const numericSize = parseInt(w.size.replace(/,/g, ''));
-    if (numericSize < minArea) return false;
-
-    // Price
-    if (priceCategory !== "All" && w.rate) {
-      if (priceCategory === "Under20" && w.rate >= 20) return false;
-      if (priceCategory === "20to40" && (w.rate < 20 || w.rate > 40)) return false;
-      if (priceCategory === "Over40" && w.rate <= 40) return false;
-    }
-
-    return true;
-  });
-
-  // Ensure we always have at least 3 items to show
-  // Hierarchy: Filtered API -> All API -> Mock Featured
-  const displayPool = filteredListings.length > 0 ? filteredListings : apiListings;
-  const displayResults = displayPool;
-
-  // Calculate pagination
-  const totalPages = Math.ceil(displayResults.length / ITEMS_PER_PAGE);
-  const paginatedListings = displayResults.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
 
   // Reset page when filters change
   useEffect(() => {
@@ -254,7 +217,7 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
 
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {paginatedListings.map((l, i) => (
+          {apiListings.map((l, i) => (
             <Link
               to={`/listings/${l.id}`}
               key={l.id}
@@ -292,33 +255,12 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
           ))}
         </div>
 
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="mt-12 flex items-center justify-center gap-4">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="rounded-sm border border-border bg-card px-6 py-2 text-xs font-semibold uppercase tracking-widest text-foreground transition-all hover:border-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Page <span className="text-foreground">{currentPage}</span> of {totalPages}
-            </span>
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="rounded-sm border border-border bg-card px-6 py-2 text-xs font-semibold uppercase tracking-widest text-foreground transition-all hover:border-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        )}
+        {/* Removed pagination as featured is limited to 6 items */}
 
-        {filteredListings.length === 0 && (
+        {apiListings.length === 0 && (
           <div className="mt-8 mb-4 text-center">
             <span className="inline-block px-4 py-1 rounded-full bg-primary/5 text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 border border-primary/10">
-              {apiListings.length === 0 ? "Global Network Baseline" : "Network Recommendations"}
+              No featured infrastructure found
             </span>
           </div>
         )}

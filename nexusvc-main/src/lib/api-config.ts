@@ -2,6 +2,8 @@ export const API_BASE_URL = (import.meta as any).env.VITE_API_URL || "http://loc
 
 export const API_ENDPOINTS = {
     WAREHOUSES: `${API_BASE_URL}/public/warehouses`,
+    FEATURED_WAREHOUSES: `${API_BASE_URL}/public/warehouses/featured`,
+    CITIES: `${API_BASE_URL}/public/cities`,
     WAREHOUSE_BY_ID: (id: number | string) => `${API_BASE_URL}/public/warehouses/${id}`,
     SUBMIT: `${API_BASE_URL}/public/submit`,
     CONTACT: `${API_BASE_URL}/public/contact`,

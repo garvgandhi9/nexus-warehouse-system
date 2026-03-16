@@ -79,11 +79,19 @@ export const useFormValidation = <T extends Record<string, any>>(
     }, [rules, validateField]);
 
     const getInputStyles = useCallback((name: keyof T) => {
-        const base = "w-full transition-all duration-200 focus:outline-none ";
-        if (!touched[name]) return base + "border-border focus:border-primary";
-        if (errors[name] || serverErrors[name]) return base + "border-red-500 focus:border-red-500 bg-red-500/5";
-        if (values[name]) return base + "border-emerald-500 focus:border-emerald-500 bg-emerald-500/5";
-        return base + "border-border focus:border-primary";
+        const base = "w-full px-4 py-3 rounded-sm border bg-background/50 text-foreground transition-all duration-200 focus:outline-none placeholder:text-muted-foreground/50 ";
+        
+        if (!touched[name]) return base + "border-border/50 focus:border-primary";
+        
+        if (errors[name] || serverErrors[name]) {
+            return base + "border-red-500 focus:border-red-500 bg-red-500/10";
+        }
+        
+        if (values[name]) {
+            return base + "border-emerald-500/50 focus:border-emerald-500 bg-emerald-500/5";
+        }
+        
+        return base + "border-border/50 focus:border-primary";
     }, [touched, errors, values, serverErrors]);
 
     const getFieldError = useCallback((name: keyof T): string => {

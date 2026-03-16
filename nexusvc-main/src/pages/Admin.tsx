@@ -33,6 +33,7 @@ interface Warehouse {
     term_duration?: string;
     floor_strength?: string;
     amenities?: string[];
+    display_order?: number;
     created_at?: string;
 }
 
@@ -690,6 +691,17 @@ const Admin = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Priority Order (Clients)</label>
+                                    <input 
+                                        type="number"
+                                        name="display_order" 
+                                        value={formData.display_order || 0} 
+                                        onChange={handleInputChange} 
+                                        placeholder="0"
+                                        className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" 
+                                    />
+                                </div>
+                                <div className="space-y-2">
                                     <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Deployment Scale</label>
                                     <select 
                                         name="lease_type" 
@@ -845,6 +857,18 @@ const Admin = () => {
                                     <Building2 size={16} />
                                 </div>
                                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">03. Network Capability (Industries)</h3>
+                                <button 
+                                    type="button"
+                                    onClick={() => {
+                                        const all = ["FMCG (Fast moving consumer goods)", "Pharma and medical supplies", "Food and beverage", "Chemicals/hazardous goods", "Automotive/spare parts", "Agricultural produce", "Electronics and appliances", "Cosmetics", "Apparel and textiles", "Cold storage", "Packaging material", "E-commerce/Retail goods", "Other"];
+                                        const industries: string[] = (formData as any).industries || [];
+                                        const updated = industries.length === all.length ? [] : all;
+                                        setFormData(prev => ({ ...prev, industries: updated } as any));
+                                    }}
+                                    className="ml-auto text-[9px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary transition-colors"
+                                >
+                                    {((formData as any).industries || []).length === 13 ? "Deselect All" : "Select All"}
+                                </button>
                             </div>
                             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 pt-4">
                                 {["FMCG (Fast moving consumer goods)", "Pharma and medical supplies", "Food and beverage", "Chemicals/hazardous goods", "Automotive/spare parts", "Agricultural produce", "Electronics and appliances", "Cosmetics", "Apparel and textiles", "Cold storage", "Packaging material", "E-commerce/Retail goods", "Other"].map(opt => {
@@ -875,6 +899,18 @@ const Admin = () => {
                                     <Settings size={16} />
                                 </div>
                                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">04. Support Protocols (Facilities)</h3>
+                                <button 
+                                    type="button"
+                                    onClick={() => {
+                                        const all = ["Truck parking", "Palletised storage", "Fire Hydrants / Sprinklers", "CCTV cameras", "Office space", "Water supply (Direct or Tanker)", "Handling equipment", "Power backup / Generator", "Washrooms", "Security cabin", "Dock levellers"];
+                                        const facilities: string[] = (formData as any).facilities || [];
+                                        const updated = facilities.length === all.length ? [] : all;
+                                        setFormData(prev => ({ ...prev, facilities: updated } as any));
+                                    }}
+                                    className="ml-auto text-[9px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary transition-colors"
+                                >
+                                    {((formData as any).facilities || []).length === 11 ? "Deselect All" : "Select All"}
+                                </button>
                             </div>
                             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 pt-4">
                                 {["Truck parking", "Palletised storage", "Fire Hydrants / Sprinklers", "CCTV cameras", "Office space", "Water supply (Direct or Tanker)", "Handling equipment", "Power backup / Generator", "Washrooms", "Security cabin", "Dock levellers"].map(opt => {

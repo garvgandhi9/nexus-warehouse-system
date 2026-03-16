@@ -13,28 +13,62 @@ const Listings = () => {
   const [apiListings, setApiListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // const { ref, isVisible } = useScrollAnimation(0.05);
-  const isVisible = true; // Temporary: ensure cards are always visible
+  const [totalPages, setTotalPages] = useState(0);
+  const [citiesList, setCitiesList] = useState<string[]>([]);
+  const isVisible = true;
 
   const [selectedCity, setSelectedCity] = useState("All");
   const [minArea, setMinArea] = useState(0);
   const [priceCategory, setPriceCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
+
+  // Fetch Cities for Filter
+  useEffect(() => {
+    const loadCities = async () => {
+      try {
+        const res = await fetch(API_ENDPOINTS.CITIES);
+        if (res.ok) {
+          const json = await res.json();
+          setCitiesList(["All", ...(json.data || [])]);
+        }
+      } catch (err) {
+        console.error("Failed to load cities:", err);
+      }
+    };
+    loadCities();
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
     const loadWarehouses = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(API_ENDPOINTS.WAREHOUSES, { signal: controller.signal });
+        const params = new URLSearchParams();
+        if (selectedCity !== "All") params.append("city", selectedCity);
+        if (minArea > 0) params.append("min_area", minArea.toString());
+        if (searchQuery) params.append("search", searchQuery);
+        
+        if (priceCategory === "Under20") {
+          params.append("max_rate", "20");
+        } else if (priceCategory === "20to40") {
+          params.append("min_rate", "20");
+          params.append("max_rate", "40");
+        } else if (priceCategory === "Over40") {
+          params.append("min_rate", "40");
+        }
+
+        params.append("page", currentPage.toString());
+        params.append("limit", ITEMS_PER_PAGE.toString());
+
+        const res = await fetch(`${API_ENDPOINTS.WAREHOUSES}?${params.toString()}`, { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        const data = json.data || json;
-        if (!Array.isArray(data)) {
-          console.error("Unexpected API response:", data);
-          setError("Failed to load listings. Please refresh the page.");
-          return;
-        }
+        
+        setTotalPages(json.pages || 0);
+        
+        const data = json.data || [];
         const formatted = data.map((w: any) => ({
           id: w.id,
           city: w.city || "Location",
@@ -57,7 +91,7 @@ const Listings = () => {
           latitude: w.latitude ? Number(w.latitude) : undefined,
           longitude: w.longitude ? Number(w.longitude) : undefined,
         }));
-        console.log("Fetched warehouses:", formatted);
+        
         setApiListings(formatted);
       } catch (err: any) {
         if (err.name === "AbortError") return;
@@ -69,38 +103,11 @@ const Listings = () => {
     };
     loadWarehouses();
     return () => controller.abort();
-  }, []);
+  }, [selectedCity, minArea, priceCategory, searchQuery, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCity, minArea, priceCategory]);
-
-  const citiesList = ["All", ...Array.from(new Set(apiListings.map(w => w.city)))];
-
-  const filteredListings = apiListings.filter(w => {
-    if (selectedCity !== "All" && w.city !== selectedCity) return false;
-    const numericSize = parseInt(w.size.replace(/,/g, ''));
-    if (numericSize < minArea) return false;
-    if (priceCategory !== "All" && w.rate) {
-      if (priceCategory === "Under20" && w.rate >= 20) return false;
-      if (priceCategory === "20to40" && (w.rate < 20 || w.rate > 40)) return false;
-      if (priceCategory === "Over40" && w.rate <= 40) return false;
-    }
-    return true;
-  });
-
-  const totalPages = Math.ceil(filteredListings.length / ITEMS_PER_PAGE);
-  const paginatedListings = filteredListings.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
-  console.log({
-    apiCount: apiListings.length,
-    filteredCount: filteredListings.length,
-    paginatedCount: paginatedListings.length,
-    viewMode
-  });
+  }, [selectedCity, minArea, priceCategory, searchQuery]);
 
   return (
     <>
@@ -166,6 +173,19 @@ const Listings = () => {
               </div>
 
               <div>
+                <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Live Search</label>
+                <div className="relative">
+                  <input
+                    placeholder="Ref, Code, or Info..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="w-full rounded-sm border border-border/50 bg-background/50 p-3.5 text-sm text-foreground focus:border-primary/50 focus:outline-none transition-all pl-10"
+                  />
+                  <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
+                </div>
+              </div>
+
+              <div className="md:col-span-1">
                 <div className="mb-3 flex justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
                   <label>Capacity</label>
                   <span className="text-white">{minArea > 0 ? `${minArea.toLocaleString()} sqft` : 'Any'}</span>
@@ -177,13 +197,9 @@ const Listings = () => {
                   onChange={e => setMinArea(Number(e.target.value))}
                   className="w-full accent-primary h-1.5 rounded-full bg-border/30"
                 />
-                <div className="mt-2 flex justify-between text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                  <span>0 SQFT</span>
-                  <span>500K+ SQFT</span>
-                </div>
               </div>
 
-              <div>
+              <div className="md:col-span-3">
                 <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Price Level</label>
                 <div className="flex w-full rounded-sm border border-border/50 bg-background/50 p-1">
                   {[
@@ -226,19 +242,21 @@ const Listings = () => {
           {/* Map View */}
           {!loading && !error && viewMode === "map" && (
             <div className="mt-12 rounded-sm overflow-hidden border border-border/50 shadow-2xl h-[700px]">
-              <WarehouseMap listings={filteredListings} />
+              <WarehouseMap listings={apiListings} />
             </div>
           )}
 
           {/* Grid View */}
           {!loading && !error && viewMode === "grid" && (
             <>
-              <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                {paginatedListings.map((l) => (
+              <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {apiListings.map((l, i) => (
                   <Link
                     to={`/listings/${l.id}`}
                     key={l.id}
-                    className="group relative overflow-hidden rounded-sm border border-border/50 bg-card/30 backdrop-blur-sm transition-all duration-500 hover:border-primary/40 hover:glow-blue-sm hover:-translate-y-1"
+                    className={`group relative overflow-hidden rounded-sm border border-border/50 bg-card/30 backdrop-blur-sm transition-all duration-500 hover:border-primary/40 hover:glow-blue-sm hover:-translate-y-1 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+                      }`}
+                    style={{ transitionDelay: `${(i % ITEMS_PER_PAGE) * 100}ms` }}
                   >
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
                       <img 
@@ -319,7 +337,7 @@ const Listings = () => {
               )}
 
               {/* Empty State */}
-              {filteredListings.length === 0 && (
+              {apiListings.length === 0 && (
                 <div className="mt-16 py-20 text-center border border-dashed border-border/50 rounded-sm bg-card/20 backdrop-blur-sm">
                   <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-muted-foreground/60">No infrastructure assets matching criteria found</p>
                 </div>

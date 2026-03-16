@@ -33,6 +33,35 @@ const adminController = {
         }
     },
 
+    async updateWarehouse(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id || isNaN(id)) {
+                return res.status(400).json({ success: false, error: "Invalid warehouse ID" });
+            }
+            const data = req.body;
+            const updated = await warehouseModel.adminUpdate(id, data);
+            if (!updated) {
+                return res.status(404).json({ success: false, error: "Warehouse not found" });
+            }
+            res.json({ success: true, data: updated, message: `Warehouse ${id} updated successfully` });
+        } catch (err) {
+            console.error("[ADMIN CONTROLLER] updateWarehouse failed:", err.message);
+            res.status(500).json({ success: false, error: "Failed to update warehouse. Please try again." });
+        }
+    },
+
+    async createWarehouse(req, res) {
+        try {
+            const data = req.body;
+            const created = await warehouseModel.adminCreate(data);
+            res.json({ success: true, data: created, message: "Warehouse created successfully" });
+        } catch (err) {
+            console.error("[ADMIN CONTROLLER] createWarehouse failed:", err.message);
+            res.status(500).json({ success: false, error: "Failed to create warehouse. Please try again." });
+        }
+    },
+
     async approveWarehouse(req, res) {
         try {
             const { id } = req.params;
