@@ -15,11 +15,12 @@ const warehouseModel = {
 
     async getPublic(filters = {}) {
         try {
-            const { 
-                city, 
-                min_area, 
-                max_rate, 
-                category, 
+            const {
+                city,
+                min_area,
+                min_rate,
+                max_rate,
+                category,
                 search,
                 page = 1,
                 limit = 12
@@ -239,7 +240,7 @@ const warehouseModel = {
         if (!id || isNaN(id)) throw new Error("INVALID_ID");
         try {
             const num = (v) => (v === "" || v === undefined ? null : Number(v));
-            
+
             const result = await pool.query(
                 `UPDATE warehouses SET 
                     warehouse_code=$1, org_name=$2, city=$3, address=$4, full_address=$5,
@@ -274,7 +275,7 @@ const warehouseModel = {
         try {
             const num = (v) => (v === "" || v === undefined ? null : Number(v));
             const warehouseCode = data.warehouse_code || ("NXS-" + Date.now());
-            
+
             const query = `
                 INSERT INTO warehouses (
                     warehouse_code, org_name, city, address, full_address,
@@ -290,7 +291,7 @@ const warehouseModel = {
                     $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,
                     $31,$32,$33,$34,$35,$36
                 ) RETURNING *`;
-                
+
             const values = [
                 warehouseCode, data.org_name, data.city?.trim(), data.address, data.full_address,
                 num(data.latitude), num(data.longitude), num(data.area_available), num(data.rate), data.status || 'Available',
