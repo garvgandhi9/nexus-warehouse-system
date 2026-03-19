@@ -29,9 +29,9 @@ const Footer = () => (
         <div>
           <h4 className="mb-4 font-display text-xs font-semibold uppercase tracking-widest text-foreground">Connect</h4>
           <div className="flex flex-col gap-3 text-sm text-muted-foreground">
-            <span>info@nexus.in</span>
-            <span>+91 22 4000 5000</span>
-            <span>Mumbai, India</span>
+            <span>info@bismarcworld.in</span>
+            <span>+91 9967468946</span>
+            <span>B 307, Everest Grande, Shanti Nagar, Andheri East, Mumbai 400093</span>
           </div>
         </div>
       </div>
