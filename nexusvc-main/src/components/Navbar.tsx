@@ -70,6 +70,12 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
+            <Link
+              to={isLoggedIn ? (isAdmin ? "/admin" : "/submit") : "/login"}
+              className="text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-primary text-muted-foreground"
+            >
+              + Add Listing
+            </Link>
           </div>
 
           <div className="h-6 w-px bg-primary/10 mx-1" />
@@ -130,6 +136,13 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
+            <Link
+              to={isLoggedIn ? (isAdmin ? "/admin" : "/submit") : "/login"}
+              onClick={() => setOpen(false)}
+              className="rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-primary/10 text-muted-foreground"
+            >
+              + Add Listing
+            </Link>
 
             <div className="h-px bg-primary/10 my-2" />
 
