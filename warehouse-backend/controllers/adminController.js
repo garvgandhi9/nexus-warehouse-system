@@ -3,12 +3,12 @@ const userModel = require("../models/userModel");
 const messageModel = require("../models/messageModel");
 
 const adminController = {
-    async getWarehouses(req, res) {
+    async getAdminWarehouses(req, res) {
         try {
             const warehouses = await warehouseModel.getAll();
             res.json({ success: true, data: warehouses });
         } catch (err) {
-            console.error("[ADMIN CONTROLLER] getWarehouses failed:", err.message);
+            console.error("[ADMIN CONTROLLER] getAdminWarehouses failed:", err.message);
             res.status(500).json({ success: false, error: "Failed to fetch warehouses. Please try again." });
         }
     },
@@ -23,12 +23,12 @@ const adminController = {
         }
     },
 
-    async getMessages(req, res) {
+    async getAdminMessages(req, res) {
         try {
             const messages = await messageModel.getAll();
             res.json({ success: true, data: messages });
         } catch (err) {
-            console.error("[ADMIN CONTROLLER] getMessages failed:", err.message);
+            console.error("[ADMIN CONTROLLER] getAdminMessages failed:", err.message);
             res.status(500).json({ success: false, error: "Failed to fetch messages. Please try again." });
         }
     },
@@ -62,7 +62,7 @@ const adminController = {
         }
     },
 
-    async approveWarehouse(req, res) {
+    async approveWarehouseListing(req, res) {
         try {
             const { id } = req.params;
             if (!id || isNaN(id)) {
@@ -71,7 +71,7 @@ const adminController = {
             const warehouse = await warehouseModel.approve(id);
             res.json({ success: true, data: warehouse, message: `Warehouse ${id} approved successfully` });
         } catch (err) {
-            console.error("[ADMIN CONTROLLER] approveWarehouse failed:", err.message);
+            console.error("[ADMIN CONTROLLER] approveWarehouseListing failed:", err.message);
             if (err.message === "INVALID_ID") {
                 return res.status(400).json({ success: false, error: "Invalid warehouse ID" });
             }
@@ -82,7 +82,7 @@ const adminController = {
         }
     },
 
-    async deleteWarehouse(req, res) {
+    async deleteWarehouseListing(req, res) {
         try {
             const { id } = req.params;
             if (!id || isNaN(id)) {
@@ -91,7 +91,7 @@ const adminController = {
             await warehouseModel.delete(id);
             res.json({ success: true, message: `Warehouse ${id} deleted successfully` });
         } catch (err) {
-            console.error("[ADMIN CONTROLLER] deleteWarehouse failed:", err.message);
+            console.error("[ADMIN CONTROLLER] deleteWarehouseListing failed:", err.message);
             if (err.message === "INVALID_ID") {
                 return res.status(400).json({ success: false, error: "Invalid warehouse ID" });
             }
@@ -102,7 +102,7 @@ const adminController = {
         }
     },
 
-    async deleteMessage(req, res) {
+    async deleteContactMessage(req, res) {
         try {
             const { id } = req.params;
             if (!id || isNaN(id)) {
@@ -111,7 +111,7 @@ const adminController = {
             await messageModel.delete(id);
             res.json({ success: true, message: `Message ${id} deleted successfully` });
         } catch (err) {
-            console.error("[ADMIN CONTROLLER] deleteMessage failed:", err.message);
+            console.error("[ADMIN CONTROLLER] deleteContactMessage failed:", err.message);
             if (err.message === "INVALID_ID") {
                 return res.status(400).json({ success: false, error: "Invalid message ID" });
             }

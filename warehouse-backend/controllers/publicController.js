@@ -6,18 +6,37 @@ const JWT_SECRET = process.env.JWT_SECRET || "nexus-fallback-secret-key";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const publicController = {
-    async getWarehouses(req, res) {
+    async getPublicWarehouses(req, res) {
         try {
-            const { city, minArea, maxRate } = req.query;
-            const warehouses = await warehouseModel.getPublic({ city, minArea, maxRate });
-            res.json({ success: true, data: warehouses });
+            const { city, min_area, max_rate, min_rate, category, search, page, limit } = req.query;
+            const result = await warehouseModel.getPublic({ 
+                city, 
+                min_area, 
+                max_rate, 
+                min_rate,
+                category, 
+                search, 
+                page: parseInt(page) || 1, 
+                limit: parseInt(limit) || 12 
+            });
+            res.json({ success: true, ...result });
         } catch (err) {
-            console.error("[PUBLIC CONTROLLER] getWarehouses failed:", err.message);
+            console.error("[PUBLIC CONTROLLER] getPublicWarehouses failed:", err.message);
             res.status(500).json({ success: false, error: "Failed to fetch warehouses. Please try again." });
         }
     },
 
-    async getWarehouseById(req, res) {
+    async getPublicFeaturedWarehouses(req, res) {
+        try {
+            const warehouses = await warehouseModel.getFeatured();
+            res.json({ success: true, data: warehouses });
+        } catch (err) {
+            console.error("[PUBLIC CONTROLLER] getPublicFeaturedWarehouses failed:", err.message);
+            res.status(500).json({ success: false, error: "Failed to fetch featured warehouses. Please try again." });
+        }
+    },
+
+    async getPublicWarehouseById(req, res) {
         try {
             const { id } = req.params;
             if (!id || isNaN(id)) {
@@ -29,7 +48,7 @@ const publicController = {
             }
             res.json({ success: true, data: warehouse });
         } catch (err) {
-            console.error("[PUBLIC CONTROLLER] getWarehouseById failed:", err.message);
+            console.error("[PUBLIC CONTROLLER] getPublicWarehouseById failed:", err.message);
             if (err.message === "INVALID_ID") {
                 return res.status(400).json({ success: false, error: "Invalid warehouse ID" });
             }
@@ -37,7 +56,7 @@ const publicController = {
         }
     },
 
-    async submitWarehouse(req, res) {
+    async submitNewWarehouse(req, res) {
         try {
             const data = req.body;
 
@@ -61,7 +80,7 @@ const publicController = {
             const warehouse = await warehouseModel.create(data, userId);
             res.status(201).json({ success: true, data: warehouse });
         } catch (err) {
-            console.error("[PUBLIC CONTROLLER] submitWarehouse failed:", err.message);
+            console.error("[PUBLIC CONTROLLER] submitNewWarehouse failed:", err.message);
             if (err.message === "CITY_REQUIRED") {
                 return res.status(400).json({ success: false, error: "City is required", field: "city" });
             }
@@ -72,7 +91,7 @@ const publicController = {
         }
     },
 
-    async submitContact(req, res) {
+    async submitContactMessage(req, res) {
         try {
             const { name, email, message } = req.body;
 
@@ -89,7 +108,7 @@ const publicController = {
             const result = await messageModel.create(req.body);
             res.status(201).json({ success: true, data: result });
         } catch (err) {
-            console.error("[PUBLIC CONTROLLER] submitContact failed:", err.message);
+            console.error("[PUBLIC CONTROLLER] submitContactMessage failed:", err.message);
             if (err.message === "NAME_REQUIRED") {
                 return res.status(400).json({ success: false, error: "Name is required", field: "name" });
             }
@@ -100,6 +119,16 @@ const publicController = {
                 return res.status(400).json({ success: false, error: "Message is required", field: "message" });
             }
             res.status(500).json({ success: false, error: "Failed to send message. Please try again." });
+        }
+    },
+
+    async getAvailableCities(req, res) {
+        try {
+            const cities = await warehouseModel.getCities();
+            res.json({ success: true, data: cities });
+        } catch (err) {
+            console.error("[PUBLIC CONTROLLER] getAvailableCities failed:", err.message);
+            res.status(500).json({ success: false, error: "Failed to fetch cities." });
         }
     }
 };

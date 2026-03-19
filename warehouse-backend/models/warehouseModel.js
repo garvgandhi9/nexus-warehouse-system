@@ -15,28 +15,101 @@ const warehouseModel = {
 
     async getPublic(filters = {}) {
         try {
+            const { 
+                city, 
+                min_area, 
+                max_rate, 
+                category, 
+                search,
+                page = 1,
+                limit = 12
+            } = filters;
+
             let query = "SELECT * FROM warehouses WHERE status = 'Available'";
+            let countQuery = "SELECT COUNT(*) FROM warehouses WHERE status = 'Available'";
             const params = [];
-            const { city, minArea, maxRate } = filters;
+            let paramIndex = 1;
 
-            if (city && typeof city === "string") {
+            if (city && city !== "All") {
                 params.push(`%${city.trim()}%`);
-                query += ` AND city ILIKE $${params.length}`;
-            }
-            if (minArea && !isNaN(minArea)) {
-                params.push(parseInt(minArea));
-                query += ` AND area_available >= $${params.length}`;
-            }
-            if (maxRate && !isNaN(maxRate)) {
-                params.push(parseFloat(maxRate));
-                query += ` AND rate <= $${params.length}`;
+                const filter = ` AND city ILIKE $${paramIndex++}`;
+                query += filter;
+                countQuery += filter;
             }
 
+            if (min_area && !isNaN(min_area)) {
+                params.push(parseInt(min_area));
+                const filter = ` AND area_available >= $${paramIndex++}`;
+                query += filter;
+                countQuery += filter;
+            }
+
+            if (min_rate && !isNaN(min_rate)) {
+                params.push(parseFloat(min_rate));
+                const filter = ` AND rate >= $${paramIndex++}`;
+                query += filter;
+                countQuery += filter;
+            }
+
+            if (max_rate && !isNaN(max_rate)) {
+                params.push(parseFloat(max_rate));
+                const filter = ` AND rate <= $${paramIndex++}`;
+                query += filter;
+                countQuery += filter;
+            }
+
+            if (category && category !== "All") {
+                params.push(`%${category.trim()}%`);
+                const filter = ` AND category ILIKE $${paramIndex++}`;
+                query += filter;
+                countQuery += filter;
+            }
+
+            if (search) {
+                params.push(`%${search.trim()}%`);
+                const filter = ` AND (city ILIKE $${paramIndex} OR warehouse_code ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
+                paramIndex++;
+                query += filter;
+                countQuery += filter;
+            }
+
+            // Ordering
             query += " ORDER BY display_order DESC, is_prime DESC, created_at DESC";
-            const result = await pool.query(query, params);
-            return result.rows;
+
+            // Pagination
+            const offset = (page - 1) * limit;
+            params.push(limit);
+            query += ` LIMIT $${paramIndex++}`;
+            params.push(offset);
+            query += ` OFFSET $${paramIndex++}`;
+
+            const [result, countResult] = await Promise.all([
+                pool.query(query, params),
+                pool.query(countQuery, params.slice(0, paramIndex - 3))
+            ]);
+
+            const total = parseInt(countResult.rows[0].count);
+
+            return {
+                data: result.rows,
+                total,
+                page: parseInt(page),
+                pages: Math.ceil(total / limit)
+            };
         } catch (err) {
             console.error("[WAREHOUSE MODEL] getPublic failed:", err.message);
+            throw err;
+        }
+    },
+
+    async getFeatured() {
+        try {
+            const result = await pool.query(
+                "SELECT * FROM warehouses WHERE is_prime = true AND status = 'Available' ORDER BY display_order DESC, created_at DESC LIMIT 6"
+            );
+            return result.rows;
+        } catch (err) {
+            console.error("[WAREHOUSE MODEL] getFeatured failed:", err.message);
             throw err;
         }
     },
@@ -262,6 +335,18 @@ const warehouseModel = {
             return result.rows[0];
         } catch (err) {
             console.error("[WAREHOUSE MODEL] delete failed:", err.message);
+            throw err;
+        }
+    },
+
+    async getCities() {
+        try {
+            const result = await pool.query(
+                "SELECT DISTINCT city FROM warehouses WHERE status = 'Available' AND city IS NOT NULL ORDER BY city ASC"
+            );
+            return result.rows.map(r => r.city);
+        } catch (err) {
+            console.error("[WAREHOUSE MODEL] getCities failed:", err.message);
             throw err;
         }
     }

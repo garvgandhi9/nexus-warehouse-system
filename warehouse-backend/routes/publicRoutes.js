@@ -2,9 +2,11 @@ const express = require("express");
 const router = express.Router();
 const publicController = require("../controllers/publicController");
 
-router.get("/warehouses", publicController.getWarehouses);
-router.get("/warehouses/:id", publicController.getWarehouseById);
-router.post("/submit", publicController.submitWarehouse);
-router.post("/contact", publicController.submitContact);
+router.get("/warehouses/featured", publicController.getPublicFeaturedWarehouses);
+router.get("/cities", publicController.getAvailableCities);
+router.get("/warehouses", publicController.getPublicWarehouses);
+router.get("/warehouses/:id", publicController.getPublicWarehouseById);
+router.post("/submit", publicController.submitNewWarehouse);
+router.post("/contact", publicController.submitContactMessage);
 
 module.exports = router;

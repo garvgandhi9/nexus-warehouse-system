@@ -1,12 +1,12 @@
 const warehouseModel = require("../models/warehouseModel");
 
 const userController = {
-    async getWarehouses(req, res) {
+    async getUserWarehouses(req, res) {
         try {
             const warehouses = await warehouseModel.getByUserId(req.userId);
             res.json({ success: true, data: warehouses });
         } catch (err) {
-            console.error("[USER CONTROLLER] getWarehouses failed:", err.message);
+            console.error("[USER CONTROLLER] getUserWarehouses failed:", err.message);
             if (err.message === "INVALID_USER_ID") {
                 return res.status(401).json({ success: false, error: "Unauthorized — please log in again" });
             }
@@ -14,7 +14,7 @@ const userController = {
         }
     },
 
-    async updateWarehouse(req, res) {
+    async updateUserWarehouse(req, res) {
         try {
             const { id } = req.params;
             if (!id || isNaN(id)) {
@@ -33,7 +33,7 @@ const userController = {
 
             res.json({ success: true, data: warehouse });
         } catch (err) {
-            console.error("[USER CONTROLLER] updateWarehouse failed:", err.message);
+            console.error("[USER CONTROLLER] updateUserWarehouse failed:", err.message);
             if (err.message === "INVALID_ID") {
                 return res.status(400).json({ success: false, error: "Invalid warehouse ID" });
             }

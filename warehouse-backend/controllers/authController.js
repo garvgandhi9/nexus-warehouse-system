@@ -38,7 +38,7 @@ const authController = {
         }
     },
 
-    async login(req, res) {
+    async loginUser(req, res) {
         try {
             const { email, password } = req.body;
 
@@ -76,12 +76,12 @@ const authController = {
                 }
             });
         } catch (err) {
-            console.error("[AUTH CONTROLLER] login failed:", err.message);
+            console.error("[AUTH CONTROLLER] loginUser failed:", err.message);
             res.status(500).json({ success: false, error: "Login failed. Please try again." });
         }
     },
 
-    adminLogin(req, res) {
+    loginAdmin(req, res) {
         try {
             const { username, password } = req.body;
 
@@ -95,7 +95,7 @@ const authController = {
 
             res.status(401).json({ success: false, error: "Invalid admin credentials" });
         } catch (err) {
-            console.error("[AUTH CONTROLLER] adminLogin failed:", err.message);
+            console.error("[AUTH CONTROLLER] loginAdmin failed:", err.message);
             res.status(500).json({ success: false, error: "Admin login failed. Please try again." });
         }
     }
