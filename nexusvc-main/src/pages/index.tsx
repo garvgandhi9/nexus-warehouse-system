@@ -150,7 +150,7 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
     const controller = new AbortController();
     const loadFeatured = async () => {
       try {
-        const res = await fetch(API_ENDPOINTS.FEATURED_WAREHOUSES, { signal: controller.signal });
+        const res = await fetch(`${API_ENDPOINTS.WAREHOUSES}?page=1&limit=3`, { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         const data = json.data || [];
