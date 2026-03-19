@@ -17,7 +17,15 @@ const Navbar = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const adminToken = sessionStorage.getItem("admin_token");
     const userStr = localStorage.getItem("user");
+
+    if (adminToken) {
+      setIsLoggedIn(true);
+      setIsAdmin(true);
+      return;
+    }
+
     setIsLoggedIn(!!token);
 
     if (userStr) {
