@@ -432,7 +432,7 @@ const SubmitWarehouse = () => {
                     <Map
                         viewState={viewState}
                         mapLib={maplibregl}
-                        mapStyle="https://demotiles.maplibre.org/style.json"
+                        mapStyle={`https://api.maptiler.com/maps/streets-v2/style.json?key=${import.meta.env.VITE_MAPTILER_API_KEY}`}
                         style={{ width: '100%', height: '400px' }}
                         onMove={(evt: any) => setViewState(evt.viewState)}
                         onClick={(e: any) => {
