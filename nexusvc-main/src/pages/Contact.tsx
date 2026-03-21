@@ -107,21 +107,21 @@ const Contact = () => {
                     <MapPin size={18} className="text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">Mumbai, Maharashtra</p>
-                    <p className="text-xs text-muted-foreground">BKC, Bandra East</p>
+                    <p className="text-sm font-medium text-foreground">B 307, Everest Grande, Shanti Nagar</p>
+                    <p className="text-xs text-muted-foreground">Andheri East, Mumbai - 93</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10">
                     <Phone size={18} className="text-primary" />
                   </div>
-                  <p className="text-sm font-medium text-foreground">+91 22 4000 5000</p>
+                  <p className="text-sm font-medium text-foreground">+91 9967468946</p>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10">
                     <Mail size={18} className="text-primary" />
                   </div>
-                  <p className="text-sm font-medium text-foreground">info@nexus.in</p>
+                  <p className="text-sm font-medium text-foreground">nexus.vcs@bismarckgroup.in</p>
                 </div>
               </div>
             </div>
