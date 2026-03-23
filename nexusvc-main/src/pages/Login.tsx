@@ -7,13 +7,17 @@ import { API_ENDPOINTS } from "@/lib/api-config";
 import Footer from "@/components/Footer";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { auth, googleProvider } from "@/lib/firebase";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
 
 const Login = () => {
     const navigate = useNavigate();
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const [resetEmail, setResetEmail] = useState("");
+    const [resetSent, setResetSent] = useState(false);
+    const [resetLoading, setResetLoading] = useState(false);
 
     const {
         values: formData,
@@ -59,6 +63,20 @@ const Login = () => {
             setError("Google sign-in failed. Please try again.");
         } finally {
             setGoogleLoading(false);
+        }
+    };
+
+    const handleForgotPassword = async () => {
+        if (!resetEmail) return;
+        setResetLoading(true);
+        try {
+            await sendPasswordResetEmail(auth, resetEmail);
+            setResetSent(true);
+        } catch (err) {
+            setError("Could not send reset email. Check the address and try again.");
+            setShowForgotPassword(false);
+        } finally {
+            setResetLoading(false);
         }
     };
 
@@ -194,7 +212,16 @@ const Login = () => {
                             </button>
                         </form>
 
-                        <div className="mt-8 text-center text-sm text-muted-foreground">
+                        <div className="mt-4 text-center">
+                            <button
+                                onClick={() => setShowForgotPassword(true)}
+                                className="text-xs text-muted-foreground hover:text-primary uppercase tracking-widest font-bold transition-colors"
+                            >
+                                Forgot Password?
+                            </button>
+                        </div>
+
+                        <div className="mt-4 text-center text-sm text-muted-foreground">
                             Don't have an account?{" "}
                             <Link to="/signup" className="text-primary hover:underline underline-offset-4">
                                 Create Account
@@ -203,6 +230,67 @@ const Login = () => {
                     </div>
                 </motion.div>
             </main>
+
+            {/* Forgot Password Modal */}
+            {showForgotPassword && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-background border border-white/10 p-8 rounded-sm shadow-2xl w-full max-w-md"
+                    >
+                        {resetSent ? (
+                            <div className="text-center">
+                                <div className="text-4xl mb-4">📬</div>
+                                <h2 className="font-display text-xl font-black uppercase tracking-tight mb-2">
+                                    Check your email!
+                                </h2>
+                                <p className="text-sm text-muted-foreground mb-6">
+                                    Password reset link sent to <span className="text-primary">{resetEmail}</span>
+                                </p>
+                                <button
+                                    onClick={() => { setShowForgotPassword(false); setResetSent(false); setResetEmail(""); }}
+                                    className="w-full bg-primary text-primary-foreground py-3 font-bold text-sm uppercase tracking-widest"
+                                >
+                                    Back to Login
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <h2 className="font-display text-xl font-black uppercase tracking-tight mb-2">
+                                    Reset Password
+                                </h2>
+                                <p className="text-sm text-muted-foreground mb-6 uppercase tracking-widest font-bold">
+                                    Enter your email to receive a reset link
+                                </p>
+                                <div className="space-y-4">
+                                    <input
+                                        type="email"
+                                        value={resetEmail}
+                                        onChange={(e) => setResetEmail(e.target.value)}
+                                        placeholder="email@nexus.com"
+                                        className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-sm"
+                                    />
+                                    <button
+                                        onClick={handleForgotPassword}
+                                        disabled={resetLoading || !resetEmail}
+                                        className="w-full bg-primary text-primary-foreground py-3 font-bold text-sm uppercase tracking-widest disabled:opacity-30"
+                                    >
+                                        {resetLoading ? "Sending..." : "Send Reset Link"}
+                                    </button>
+                                    <button
+                                        onClick={() => setShowForgotPassword(false)}
+                                        className="w-full border border-white/10 py-3 font-bold text-sm uppercase tracking-widest text-muted-foreground hover:text-white transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </motion.div>
+                </div>
+            )}
+
             <Footer />
         </div>
     );
