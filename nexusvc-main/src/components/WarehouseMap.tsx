@@ -57,7 +57,7 @@ export default function WarehouseMap({ listings, centerOn, zoom }: Props) {
             </div>
             <p style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">${w.area} · ${w.type}</p>
             <a href="/listings/${w.id}" style="display:flex;align-items:center;justify-content:center;width:100%;padding:10px;background:#0f172a;color:white;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;text-decoration:none;border-radius:2px">
-              Access Terminal
+              Check Listing
             </a>
           </div>
         `;

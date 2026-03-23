@@ -19,4 +19,5 @@ export const API_ENDPOINTS = {
     USER_WAREHOUSES: `${API_BASE_URL}/user/warehouses`,
     USER_WAREHOUSE_UPDATE: (id: number | string) => `${API_BASE_URL}/user/warehouses/${id}`,
     UPLOAD: `${API_BASE_URL}/public/upload`,
+    GOOGLE_AUTH: `${API_BASE_URL}/auth/google`,
 };
