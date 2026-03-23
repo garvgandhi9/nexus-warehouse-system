@@ -18,4 +18,5 @@ export const API_ENDPOINTS = {
     ADMIN_DELETE_MESSAGE: (id: number | string) => `${API_BASE_URL}/admin/messages/${id}`,
     USER_WAREHOUSES: `${API_BASE_URL}/user/warehouses`,
     USER_WAREHOUSE_UPDATE: (id: number | string) => `${API_BASE_URL}/user/warehouses/${id}`,
+    UPLOAD: `${API_BASE_URL}/public/upload`,
 };

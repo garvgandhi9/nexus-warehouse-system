@@ -9,13 +9,13 @@ cloudinary.config({
 });
 
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
+    cloudinary,
     params: {
-        folder: "warehouse_photos",
-        allowed_formats: ["jpg", "png", "jpeg"]
+        folder: "nexus-warehouses",
+        allowed_formats: ["jpg", "jpeg", "png", "webp"]
     }
 });
 
 const upload = multer({ storage });
 
-module.exports = upload;
+module.exports = { upload, cloudinary };

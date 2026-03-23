@@ -66,6 +66,7 @@ const warehouseSchema = z.object({
     end_month: z.string().optional(),
     end_year: z.string().optional(),
     cluster: z.string().optional(),
+    image_url: z.string().optional(),
 });
 
 const landSchema = z.object({
@@ -86,6 +87,7 @@ const landSchema = z.object({
     longitude: z.string(),
     description: z.string(),
     cluster: z.string().optional(),
+    image_url: z.string().optional(),
 });
 
 type WarehouseForm = z.infer<typeof warehouseSchema>;
@@ -98,14 +100,14 @@ const INITIAL_WAREHOUSE: WarehouseForm = {
     contact_person: "", contact_email: "", contact_phone: "", website: "", city: "", address: "",
     full_address: "", latitude: "19.0760", longitude: "72.8777", temperature_range: "",
     product_suitability: [], term_type: "long_term", term_duration: "", start_month: "",
-    start_year: "", end_month: "", end_year: "", cluster: "",
+    start_year: "", end_month: "", end_year: "", cluster: "", image_url: "",
 };
 
 const INITIAL_LAND: LandForm = {
     type: "land", org_name: "", lister_type: "Owner", land_size: "", rate_sqft: "",
     land_status: "Sanctioned", construction_assistance: false, contact_person: "",
     contact_phone: "", contact_email: "", city: "", address: "", full_address: "",
-    latitude: "19.0760", longitude: "72.8777", description: "", cluster: "",
+    latitude: "19.0760", longitude: "72.8777", description: "", cluster: "", image_url: "",
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -160,6 +162,8 @@ const SubmitWarehouse = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [searchQuery, setSearchQuery] = useState("");
     const [searching, setSearching] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState("");
 
     const [viewState, setViewState] = useState({
         longitude: 72.8777,
@@ -256,6 +260,29 @@ const SubmitWarehouse = () => {
             console.error("Search failed:", err);
         } finally {
             setSearching(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        setUploadError("");
+        try {
+            const formData = new FormData();
+            formData.append("image", file);
+            const res = await fetch(`${API_ENDPOINTS.UPLOAD}`, {
+                method: "POST",
+                body: formData,
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Upload failed");
+            if (subType === "warehouse") setW("image_url", data.url);
+            else setL("image_url", data.url);
+        } catch (err: any) {
+            setUploadError(err.message || "Upload failed");
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -759,10 +786,24 @@ const SubmitWarehouse = () => {
                                         />
                                     </div>
                                     <div className="pt-4">
-                                        <div className="rounded-sm border-2 border-dashed border-border p-12 text-center transition-colors hover:border-primary/50">
-                                            <Camera size={32} className="mx-auto text-muted-foreground mb-4" />
-                                            <p className="text-sm font-semibold text-foreground uppercase tracking-tight">Upload Property Photos</p>
-                                            <p className="mt-2 text-xs text-muted-foreground italic uppercase tracking-widest">Coming Soon</p>
+                                        <div className="space-y-4">
+                                            <label className={labelClass}>Property Photo</label>
+                                            <label className="cursor-pointer rounded-sm border-2 border-dashed border-border p-8 text-center transition-colors hover:border-primary/50 flex flex-col items-center gap-3 block">
+                                                <Camera size={32} className="text-muted-foreground" />
+                                                <p className="text-sm font-semibold text-foreground uppercase tracking-tight">
+                                                    {uploading ? "Uploading..." : "Click to Upload Photo"}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">JPG, PNG or WEBP</p>
+                                                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
+                                            </label>
+                                            {uploadError && <p className="text-red-500 text-xs font-bold uppercase">{uploadError}</p>}
+                                            {(subType === "warehouse" ? warehouseForm.image_url : landForm.image_url) && (
+                                                <img
+                                                    src={subType === "warehouse" ? warehouseForm.image_url : landForm.image_url}
+                                                    alt="Preview"
+                                                    className="w-full aspect-video object-cover rounded-sm border border-border"
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                 </section>
