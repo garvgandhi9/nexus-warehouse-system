@@ -34,7 +34,7 @@ export default function WarehouseMap({ listings, centerOn, zoom }: Props) {
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: "https://demotiles.maplibre.org/style.json",
+      style: "https://tiles.openfreemap.org/styles/bright",
       center: centerOn ? [centerOn[1], centerOn[0]] : [78.9629, 20.5937],
       zoom: zoom || 5,
     });
