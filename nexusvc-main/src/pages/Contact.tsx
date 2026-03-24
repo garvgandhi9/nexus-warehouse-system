@@ -40,14 +40,11 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid()) return;
-
     setLoading(true);
     setError("");
-
     try {
       const isPrime = localStorage.getItem("nexus_prime") === "1";
       const locationState = location.state as { source?: string; context?: string; category?: string } | null;
-
       const payload = {
         ...formData,
         category: locationState?.category || formData.category,
@@ -55,15 +52,12 @@ const Contact = () => {
         context: locationState?.context || "General",
         tier: isPrime ? "Prime" : "Standard"
       };
-
       const response = await fetch(API_ENDPOINTS.CONTACT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         if (data.field) {
           setServerErrors({ [data.field]: data.error });
@@ -72,7 +66,6 @@ const Contact = () => {
         }
         return;
       }
-
       localStorage.removeItem("nexus_prime");
       setSubmitted(true);
     } catch (err) {
@@ -92,36 +85,44 @@ const Contact = () => {
 
             {/* Left */}
             <div className="flex flex-col justify-center">
-              <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Get in Touch</p>
+              <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Tell us what you need</p>
               <h1 className="mt-4 font-display text-4xl font-bold uppercase leading-tight tracking-tight text-foreground sm:text-6xl">
                 Let's Talk
                 <br />
                 <span className="text-gradient">Infrastructure</span>
               </h1>
               <p className="mt-6 max-w-md text-lg text-muted-foreground">
-                Whether you're looking for ready facilities or a custom-built solution, our team is ready to help.
+                Whether you're exploring ready-to-move facilities or planning a custom-built solution, our team is here to guide you. Nexus Prime streamlines logistics conversations; we listen, understand your requirements, and help shape the right strategy for your business.
               </p>
+
               <div className="mt-12 flex flex-col gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10 shrink-0">
                     <MapPin size={18} className="text-primary" />
                   </div>
                   <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Our Address</p>
                     <p className="text-sm font-medium text-foreground">B 307, Everest Grande, Shanti Nagar</p>
-                    <p className="text-xs text-muted-foreground">Andheri East, Mumbai - 93</p>
+                    <p className="text-xs text-muted-foreground">Andheri East, Mumbai – 93</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10 shrink-0">
                     <Phone size={18} className="text-primary" />
                   </div>
-                  <p className="text-sm font-medium text-foreground">+91 9967468946</p>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Phone</p>
+                    <p className="text-sm font-medium text-foreground">+91 9967468946</p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-primary/10 shrink-0">
                     <Mail size={18} className="text-primary" />
                   </div>
-                  <p className="text-sm font-medium text-foreground">nexus.vcs@bismarckgroup.in</p>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Email</p>
+                    <p className="text-sm font-medium text-foreground">nexus.vcs@bismarckgroup.in</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -138,6 +139,10 @@ const Contact = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                  <div className="mb-2">
+                    <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary mb-1">Inquiry Form</p>
+                    <p className="text-sm text-muted-foreground">A strategic partnership begins with a conversation. Share your details and requirements, and we'll connect you with the right solutions.</p>
+                  </div>
 
                   {error && (
                     <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-sm text-red-500 text-xs font-bold uppercase tracking-wider text-center">
@@ -146,19 +151,19 @@ const Contact = () => {
                   )}
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Name</label>
-                    <input name="name" value={formData.name} onChange={handleChange} className={getInputStyles("name")} placeholder="Your name" />
+                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Your Full Name</label>
+                    <input name="name" value={formData.name} onChange={handleChange} className={getInputStyles("name")} placeholder="Your full name" />
                     {getFieldError("name") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("name")}</p>}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Email</label>
+                      <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Business Email</label>
                       <input name="email" value={formData.email} onChange={handleChange} type="email" className={getInputStyles("email")} placeholder="you@company.com" />
                       {getFieldError("email") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("email")}</p>}
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Phone (10 Digits)</label>
+                      <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">10-Digit Contact Number</label>
                       <input name="phone" value={formData.phone} onChange={handleChange} className={getInputStyles("phone")} placeholder="9876543210" />
                       {getFieldError("phone") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("phone")}</p>}
                     </div>
@@ -177,7 +182,7 @@ const Contact = () => {
 
                   <div>
                     <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Message</label>
-                    <textarea name="message" value={formData.message} onChange={handleChange} rows={4} className={getInputStyles("message") + " resize-none"} placeholder="Tell us about your requirements..." />
+                    <textarea name="message" value={formData.message} onChange={handleChange} rows={4} className={getInputStyles("message") + " resize-none"} placeholder="Describe your scale, geography, and specific logistics needs..." />
                     {getFieldError("message") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("message")}</p>}
                   </div>
 

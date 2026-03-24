@@ -204,8 +204,10 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
             <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Portfolio</p>
             <h2 className="mt-3 font-display text-3xl font-bold uppercase tracking-tight text-foreground sm:text-5xl">
               Featured Listings
-              Find Grade A logistics facilities consolidated by us; strategically located, fully compliant, and ready to power your supply chain.
             </h2>
+            <p className="mt-3 text-sm text-muted-foreground max-w-2xl">
+              Find Grade A logistics facilities consolidated by us; strategically located, fully compliant, and ready to power your supply chain.
+            </p>
           </div>
           <Link
             to="/listings"

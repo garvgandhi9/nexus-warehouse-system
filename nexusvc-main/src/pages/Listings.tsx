@@ -49,7 +49,7 @@ const Listings = () => {
         if (selectedCity !== "All") params.append("city", selectedCity);
         if (minArea > 0) params.append("min_area", minArea.toString());
         if (searchQuery) params.append("search", searchQuery);
-        
+
         if (priceCategory === "Under20") {
           params.append("max_rate", "20");
         } else if (priceCategory === "20to40") {
@@ -65,9 +65,9 @@ const Listings = () => {
         const res = await fetch(`${API_ENDPOINTS.WAREHOUSES}?${params.toString()}`, { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        
+
         setTotalPages(json.pages || 0);
-        
+
         const data = json.data || [];
         const formatted = data.map((w: any) => ({
           id: w.id,
@@ -91,7 +91,7 @@ const Listings = () => {
           latitude: w.latitude ? Number(w.latitude) : undefined,
           longitude: w.longitude ? Number(w.longitude) : undefined,
         }));
-        
+
         setApiListings(formatted);
       } catch (err: any) {
         if (err.name === "AbortError") return;
@@ -121,7 +121,7 @@ const Listings = () => {
                 Asset <span className="text-gradient">Listings</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg text-muted-foreground/80 leading-relaxed">
-                Explore our curated network of Grade A logistics facilities and strategic industrial infrastructure across India.
+                Explore our curated network of Grade A logistics facilities and strategic industrial infrastructure across India, designed to give enterprises dependable access to modern, compliant spaces. Each asset is strategically located to enhance connectivity, reduce transit times, and support the evolving demands of supply chains.
               </p>
             </div>
 
@@ -129,22 +129,20 @@ const Listings = () => {
             <div className="flex items-center gap-1 rounded-sm border border-border/50 bg-card p-1.5 z-10 shadow-2xl">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`flex items-center gap-2 rounded-sm px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${
-                  viewMode === "grid"
-                    ? "bg-primary text-white shadow-lg shadow-primary/20"
-                    : "text-muted-foreground hover:text-white"
-                }`}
+                className={`flex items-center gap-2 rounded-sm px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${viewMode === "grid"
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "text-muted-foreground hover:text-white"
+                  }`}
               >
                 <LayoutGrid size={14} />
                 Grid
               </button>
               <button
                 onClick={() => setViewMode("map")}
-                className={`flex items-center gap-2 rounded-sm px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${
-                  viewMode === "map"
-                    ? "bg-primary text-white shadow-lg shadow-primary/20"
-                    : "text-muted-foreground hover:text-white"
-                }`}
+                className={`flex items-center gap-2 rounded-sm px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${viewMode === "map"
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "text-muted-foreground hover:text-white"
+                  }`}
               >
                 <MapIcon size={14} />
                 Map
@@ -259,27 +257,26 @@ const Listings = () => {
                     style={{ transitionDelay: `${(i % ITEMS_PER_PAGE) * 100}ms` }}
                   >
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
-                      <img 
-                        src={l.image} 
-                        alt={l.city} 
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100" 
+                      <img
+                        src={l.image}
+                        alt={l.city}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                       />
                       <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-                        <span className={`inline-flex items-center rounded-sm px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] shadow-2xl backdrop-blur-xl border ${
-                          l.status === "Available" 
-                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
-                            : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                        }`}>
+                        <span className={`inline-flex items-center rounded-sm px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] shadow-2xl backdrop-blur-xl border ${l.status === "Available"
+                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          }`}>
                           {l.status}
                         </span>
                       </div>
                       {l.is_prime && (
                         <div className="absolute top-4 right-4 z-10">
-                           <span className="rounded-sm bg-primary px-2 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white shadow-lg">PRIME</span>
+                          <span className="rounded-sm bg-primary px-2 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white shadow-lg">PRIME</span>
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="p-7">
                       <div className="flex items-center justify-between">
                         <h3 className="font-display text-xl font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">{l.city}</h3>
@@ -290,7 +287,7 @@ const Listings = () => {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
                         <span>{l.area}</span>
                         <span className="h-1 w-1 rounded-full bg-border" />
