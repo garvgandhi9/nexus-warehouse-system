@@ -134,7 +134,7 @@ const NexusPrime = () => {
                                     WHAT IS <span className="text-primary italic">3PL?</span>
                                 </h2>
                                 <p className="mt-8 text-xl leading-relaxed text-muted-foreground">
-                                    Third-Party Logistics (3PL) is the outsourced management of your supply chain operations. Instead of owning trucks, hiring staff, and managing multiple warehouse contracts, you partner with **Nexus Prime**.
+                                    Third-Party Logistics (3PL) is the outsourced management of your supply chain operations. Instead of owning trucks, hiring staff, and managing multiple warehouse contracts, you partner with <b>Nexus Prime</b>.
                                 </p>
                                 <div className="mt-10 grid gap-6">
                                     {[

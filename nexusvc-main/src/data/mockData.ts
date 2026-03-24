@@ -6,11 +6,11 @@ export const cities = [
 ];
 
 export const industries = [
-    { name: "E-Commerce", description: "Fulfillment-ready infrastructure for rapid last-mile delivery" },
-    { name: "FMCG", description: "Temperature-controlled and ambient storage solutions" },
-    { name: "3PL", description: "Multi-client enabled flexible warehousing" },
-    { name: "Pharma", description: "GDP-compliant cold chain and ambient facilities" },
-    { name: "Automotive", description: "Just-in-time ready facilities near manufacturing hubs" },
+    { name: "E-Commerce", description: "Fulfillment-ready hubs for rapid last‑mile delivery." },
+    { name: "FMCG", description: "Temperature‑controlled and ambient storage to keep products moving." },
+    { name: "3PL", description: "Multi‑client enabled facilities that flex with diverse logistics needs." },
+    { name: "Pharma", description: "GDP‑compliant cold chain and ambient solutions for sensitive cargo." },
+    { name: "Automotive", description: "Just‑in‑time facilities positioned near manufacturing hubs." },
 ];
 
 export const metrics = [

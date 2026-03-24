@@ -40,7 +40,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({ onComplete }) => {
                                     <Calculator className="text-primary" />
                                     Nexus ROI & Space Calculator
                                 </h2>
-                                <p className="mt-1 text-sm text-muted-foreground">Calculate potential infrastructure savings with Grade-A optimization.</p>
+                                <p className="mt-1 text-sm text-muted-foreground">See how Grade‑A optimisation translates into real savings. Run the numbers and measure the impact.</p>
                             </div>
 
                             <div className="flex gap-2">

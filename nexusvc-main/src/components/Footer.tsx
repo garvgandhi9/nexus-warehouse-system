@@ -9,7 +9,9 @@ const Footer = () => (
             NEXUS
           </Link>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
-            India's intelligent flexible warehousing and Build-to-Suit infrastructure network. Engineering the backbone of modern logistics.
+            Beyond warehousing, we design ecosystems that keep supply chains agile, resilient, and future‑ready. From intelligent facility networks to compliance‑driven operations, our value lies in connecting every link of logistics with precision and purpose.
+            We don’t just store goods, we enable businesses to move faster, scale smarter, and deliver better. Nexus Value Chain is where infrastructure meets intelligence, creating momentum for modern commerce.
+
           </p>
         </div>
         <div>

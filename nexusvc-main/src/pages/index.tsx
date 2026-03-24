@@ -29,7 +29,7 @@ const Hero = () => {
           <h1
             className={`font-display text-5xl font-bold uppercase leading-[1.05] tracking-tight text-foreground transition-all delay-150 duration-700 sm:text-7xl lg:text-8xl ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
           >
-            Warehousing
+            Warehousing.
             <br />
             Infrastructure.
             <br />
@@ -38,7 +38,7 @@ const Hero = () => {
           <p
             className={`mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground transition-all delay-300 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
-            We create Flexible Warehousing and Build to Suit solutions across India's key logistics corridors by unlocking underutilized industrial space.
+            Nexus Value Chain connects businesses to flexible warehousing and build‑to‑suit solutions across India’s key logistics corridors. By enabling underutilised industrial space, we make growth and efficiency easier to achieve.
           </p>
           <div
             className={`mt-10 flex flex-wrap gap-4 transition-all delay-500 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
@@ -67,9 +67,9 @@ const Hero = () => {
 
 /* ── Features ── */
 const features = [
-  { icon: Warehouse, title: "Flexible Warehousing", desc: "Ready-to-occupy Grade A facilities with flexible lease terms. Scale up or down as your business demands." },
-  { icon: Building2, title: "Build-to-Suit Development", desc: "Custom-designed and constructed facilities tailored to your exact operational specifications." },
-  { icon: Network, title: "Managed Enterprise Network", desc: "Multi-facility management across cities with centralized operations and unified compliance." },
+  { icon: Warehouse, title: "Flexible Warehousing", desc: "Get grade A facilities, ready when you are. Lease terms adjust to your pace, expand during peak demand or streamline when operations shift. The space follows your business rhythm." },
+  { icon: Building2, title: "Build-to-Suit Development", desc: "Nexus Prime offers build‑to‑suit facilities that are designed and constructed around your operational requirements. These cover cold storage, high‑density racking, or specialised compliance needs, ensuring that your infrastructure isn’t generic but aligned with your workflows, scalable for future growth" },
+  { icon: Network, title: "Managed Enterprise Network", desc: "A single framework for multi‑city operations. Centralised management, unified compliance, and seamless coordination keep your facilities working together as one." },
 ];
 
 const FeaturesSection = () => {
@@ -204,6 +204,7 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
             <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Portfolio</p>
             <h2 className="mt-3 font-display text-3xl font-bold uppercase tracking-tight text-foreground sm:text-5xl">
               Featured Listings
+              Find Grade A logistics facilities consolidated by us; strategically located, fully compliant, and ready to power your supply chain.
             </h2>
           </div>
           <Link
@@ -290,7 +291,7 @@ const IndustriesSection = () => {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Sectors</p>
         <h2 className="mt-3 font-display text-3xl font-bold uppercase tracking-tight text-foreground sm:text-5xl">
-          Industries Served
+          Industries We Serve
         </h2>
         <div className="mt-12 grid gap-px bg-border/30 sm:grid-cols-2 lg:grid-cols-5">
           {industries.map((ind, i) => (
@@ -328,7 +329,7 @@ const FinalCTA = () => {
           <span className="text-gradient">Next Facility</span>
         </h2>
         <p className="mx-auto mt-6 max-w-lg text-lg text-muted-foreground">
-          Whether you need ready infrastructure or a custom-built solution, we engineer it.
+          Whether you need infrastructure that’s ready today or a custom‑built solution for tomorrow, Nexus engineers spaces that fit your vision. Start a conversation and explore what’s possible.
         </p>
         <Link
           to="/contact"

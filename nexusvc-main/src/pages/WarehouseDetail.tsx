@@ -239,10 +239,10 @@ const WarehouseDetail = () => {
                     </a>
                   </div>
                   <div className="mt-6 aspect-video w-full rounded-sm border border-border/50 overflow-hidden relative">
-                    <WarehouseMap 
-                      listings={[listing]} 
-                      centerOn={[listing.latitude, listing.longitude]} 
-                      zoom={14} 
+                    <WarehouseMap
+                      listings={[listing]}
+                      centerOn={[listing.latitude, listing.longitude]}
+                      zoom={14}
                     />
                   </div>
                   {listing.full_address && (
