@@ -148,7 +148,7 @@ const NexusPrime = () => {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold uppercase tracking-widest text-foreground">{item.title}</p>
-                                                <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                                                <p className="mt-2 text-sm text-muted-foreground leading-relaxed text-justify">{item.desc}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -189,7 +189,7 @@ const NexusPrime = () => {
                                             <Icon size={28} strokeWidth={1.5} />
                                         </div>
                                         <h3 className="font-display text-xl font-bold uppercase tracking-tight text-foreground">{benefit.title}</h3>
-                                        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{benefit.desc}</p>
+                                        <p className="mt-4 text-sm leading-relaxed text-muted-foreground text-justify">{benefit.desc}</p>
                                     </div>
                                 );
                             })}
