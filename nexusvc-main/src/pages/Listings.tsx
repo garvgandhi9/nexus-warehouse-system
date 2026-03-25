@@ -20,6 +20,7 @@ const Listings = () => {
   const [selectedCity, setSelectedCity] = useState("All");
   const [minArea, setMinArea] = useState(0);
   const [priceCategory, setPriceCategory] = useState("All");
+  const [propertyType, setPropertyType] = useState("ANY");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
@@ -59,6 +60,9 @@ const Listings = () => {
           params.append("min_rate", "40");
         }
 
+        if (propertyType === "Warehouse") params.append("type", "warehouse");
+        if (propertyType === "Land Parcel") params.append("type", "land");
+
         params.append("page", currentPage.toString());
         params.append("limit", ITEMS_PER_PAGE.toString());
 
@@ -72,6 +76,7 @@ const Listings = () => {
         const formatted = data.map((w: any) => ({
           id: w.id,
           city: w.city || "Location",
+          cluster: w.cluster || "",
           area: w.warehouse_code || "-",
           size: w.capacity_type === "pallets"
             ? Number(w.capacity_value).toLocaleString()
@@ -103,11 +108,11 @@ const Listings = () => {
     };
     loadWarehouses();
     return () => controller.abort();
-  }, [selectedCity, minArea, priceCategory, searchQuery, currentPage]);
+  }, [selectedCity, minArea, priceCategory, searchQuery, currentPage, propertyType]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCity, minArea, priceCategory, searchQuery]);
+  }, [selectedCity, minArea, priceCategory, searchQuery, propertyType]);
 
   return (
     <>
@@ -198,6 +203,26 @@ const Listings = () => {
               </div>
 
               <div className="md:col-span-3">
+                <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Property Type</label>
+                <div className="flex w-full rounded-sm border border-border/50 bg-background/50 p-1 mb-6">
+                  {[
+                    { id: "ANY", label: "Any" },
+                    { id: "Warehouse", label: "Warehouse" },
+                    { id: "Land Parcel", label: "Land Parcel" }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setPropertyType(opt.id)}
+                      className={`flex-1 rounded-sm py-2.5 text-[9px] font-bold uppercase tracking-widest transition-all ${propertyType === opt.id
+                        ? 'bg-primary text-white shadow-md'
+                        : 'text-muted-foreground hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+
                 <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Price Level</label>
                 <div className="flex w-full rounded-sm border border-border/50 bg-background/50 p-1">
                   {[
@@ -279,8 +304,10 @@ const Listings = () => {
 
                     <div className="p-7">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-display text-xl font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">{l.city}</h3>
-                        {l.rate && (
+                        <h3 className="font-display text-xl font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">
+                          {l.cluster ? `${l.cluster} , ${l.city}` : l.city}
+                        </h3>
+                        {l.rate && l.status !== "Land Parcel" && (
                           <div className="text-right">
                             <span className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Rate</span>
                             <span className="text-sm font-bold text-emerald-400 tracking-tight">₹{l.rate}/sqft</span>
@@ -289,8 +316,6 @@ const Listings = () => {
                       </div>
 
                       <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/80 flex items-center gap-2">
-                        <span>{l.area}</span>
-                        <span className="h-1 w-1 rounded-full bg-border" />
                         <span>{l.type}</span>
                       </div>
 

@@ -648,361 +648,231 @@ const Admin = () => {
             <motion.div 
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-sm border border-primary/20 bg-[#0F1115] p-0 shadow-[0_0_100px_rgba(0,0,0,1)] no-scrollbar"
+                className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-sm border border-border bg-background p-0 shadow-2xl no-scrollbar"
             >
-                <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-[#0F1115]/80 px-8 py-6 backdrop-blur-xl">
-                    <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">Asset Configuration</p>
-                        <h2 className="mt-1 font-display text-2xl font-bold uppercase tracking-tighter text-white">
-                            Command <span className="text-primary">Panel</span>
-                        </h2>
-                    </div>
-                    <button onClick={() => setIsModalOpen(false)} className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition-all hover:bg-white/5">
-                        <XCircle size={20} className="text-muted-foreground transition-colors group-hover:text-white" />
+                <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border/50 bg-background/90 px-8 py-6 backdrop-blur-xl">
+                    <h2 className="font-display text-2xl font-bold uppercase tracking-tighter text-foreground">
+                        Command Panel
+                    </h2>
+                    <button onClick={() => setIsModalOpen(false)} className="group flex h-10 w-10 items-center justify-center rounded-sm transition-all hover:bg-muted">
+                        <XCircle size={20} className="text-muted-foreground transition-colors group-hover:text-foreground" />
                     </button>
                 </div>
 
                 <div className="p-8">
                     {saveError && (
-                        <div className="mb-8 flex items-center gap-3 border border-red-500/20 bg-red-500/5 p-4 rounded-sm text-red-500 text-[10px] font-bold uppercase tracking-widest shadow-[0_0_30px_rgba(239,68,68,0.1)]">
-                            <XCircle size={16} />
+                        <div className="mb-8 p-4 text-center bg-destructive/10 border border-destructive/20 rounded-sm text-destructive text-[10px] font-black uppercase tracking-[0.3em]">
                             {saveError}
                         </div>
                     )}
 
-                    <form onSubmit={handleSave} className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {/* 0. Admin Controls */}
-                        <div className="space-y-6 lg:col-span-3">
-                            <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                                <div className="flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary">
-                                    <Shield size={16} />
+                    <form onSubmit={handleSave} className="space-y-8">
+                        {/* 1. General Information */}
+                        <section className="rounded-sm border border-border/60 bg-card p-8 space-y-6">
+                            <h2 className="font-display text-lg font-bold uppercase tracking-tight text-foreground border-b border-border/50 pb-4">1. General Information</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Designation Code</label>
+                                    <input name="warehouse_code" value={formData.warehouse_code || ""} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
                                 </div>
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">System Overrides</h3>
-                            </div>
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Designation Code</label>
-                                    <input 
-                                        name="warehouse_code" 
-                                        value={formData.warehouse_code || ""} 
-                                        onChange={handleInputChange} 
-                                        placeholder="NXS-XXXX"
-                                        className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white placeholder:text-white/10 focus:border-primary/50 focus:outline-none transition-all" 
-                                    />
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Priority Order (Clients)</label>
+                                    <input type="number" name="display_order" value={formData.display_order || 0} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Priority Order (Clients)</label>
-                                    <input 
-                                        type="number"
-                                        name="display_order" 
-                                        value={formData.display_order || 0} 
-                                        onChange={handleInputChange} 
-                                        placeholder="0"
-                                        className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" 
-                                    />
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Facility Identity (Org Name)</label>
+                                    <input name="org_name" value={(formData as any).org_name || ""} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Deployment Scale</label>
-                                    <select 
-                                        name="lease_type" 
-                                        value={formData.lease_type || ""} 
-                                        onChange={handleInputChange} 
-                                        className="w-full rounded-sm border border-white/10 bg-[#161a20] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all appearance-none cursor-pointer"
-                                    >
-                                        <option value="" className="bg-[#1a1f26]">Select Type...</option>
-                                        <option value="Full Space" className="bg-[#1a1f26]">Full Scale (1:1)</option>
-                                        <option value="Partial Space" className="bg-[#1a1f26]">Partial Grid</option>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Asset Category</label>
+                                    <select name="category" value={(formData as any).category || ""} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors">
+                                        <option value="">Select category...</option>
+                                        {["Bonded", "Cold Storage", "Dark Store", "FTWZ (Free Trade Warehousing Zone)", "General Grade A", "General Grade B"].map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Contract Horizon</label>
-                                    <select 
-                                        name="term_type" 
-                                        value={formData.term_type || "long_term"} 
-                                        onChange={handleInputChange} 
-                                        className="w-full rounded-sm border border-white/10 bg-[#161a20] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all appearance-none cursor-pointer"
-                                    >
-                                        <option value="long_term" className="bg-[#1a1f26]">Strategic Long-Term</option>
-                                        <option value="short_term" className="bg-[#1a1f26]">Tactical Short-Term</option>
+                            </div>
+                        </section>
+
+                        {/* 2. Lease Terms & Physical Specifications */}
+                        <section className="rounded-sm border border-border/60 bg-card p-8 space-y-6">
+                            <h2 className="font-display text-lg font-bold uppercase tracking-tight text-foreground border-b border-border/50 pb-4">2. Lease Terms & Physical Specifications</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Deployment Scale</label>
+                                    <select name="lease_type" value={formData.lease_type || ""} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors">
+                                        <option value="">Select Type...</option>
+                                        <option value="Full Space">Full Space</option>
+                                        <option value="Partial Space">Partial Space</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Contract Horizon</label>
+                                    <select name="term_type" value={formData.term_type || "long_term"} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors">
+                                        <option value="long_term">Strategic Long-Term</option>
+                                        <option value="short_term">Tactical Short-Term</option>
                                     </select>
                                 </div>
                                 {formData.term_type === "short_term" && (
-                                    <div className="md:col-span-3 pt-2">
-                                        <MonthYearRangePicker
-                                            value={formData.term_duration || ""}
-                                            onChange={(v) => setFormData(prev => ({ ...prev, term_duration: v }))}
-                                        />
+                                    <div className="sm:col-span-2">
+                                        <MonthYearRangePicker value={formData.term_duration || ""} onChange={(v) => setFormData(prev => ({ ...prev, term_duration: v }))} />
                                     </div>
                                 )}
                             </div>
-                        </div>
+                            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Area (Sq Ft) *</label>
+                                    <input type="number" name="area_available" value={formData.area_available || ""} onChange={handleInputChange} className={`w-full rounded-sm border ${getFieldError("area_available") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
+                                    {getFieldError("area_available") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("area_available")}</p>}
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Altitude (ft)</label>
+                                    <input type="number" step="0.5" name="ceiling_height" value={formData.ceiling_height || ""} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Docks</label>
+                                    <input type="number" name="docks" value={formData.docks || ""} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Floor Strength</label>
+                                    <input name="floor_strength" value={formData.floor_strength || ""} onChange={handleInputChange} placeholder="7 MT/sqm" className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rent (₹ / sqft) *</label>
+                                    <input type="number" step="0.5" name="rate" value={formData.rate || ""} onChange={handleInputChange} className={`w-full rounded-sm border ${getFieldError("rate") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
+                                    {getFieldError("rate") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("rate")}</p>}
+                                </div>
+                            </div>
+                        </section>
 
-                        {/* 1. Core Intelligence */}
-                        <div className="space-y-6 lg:col-span-3 mt-4">
-                            <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                                <div className="flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary">
-                                    <Info size={16} />
-                                </div>
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">01. Core Intelligence</h3>
-                            </div>
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Facility Identity (Org Name)</label>
-                                    <input 
-                                        name="org_name" 
-                                        value={(formData as any).org_name || ""} 
-                                        onChange={handleInputChange} 
-                                        placeholder="Entity Name"
-                                        className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white placeholder:text-white/20 focus:border-primary/50 focus:outline-none transition-all" 
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Asset Category</label>
-                                    <select 
-                                        name="category" 
-                                        value={(formData as any).category || ""} 
-                                        onChange={handleInputChange} 
-                                        className="w-full rounded-sm border border-white/10 bg-[#161a20] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all appearance-none cursor-pointer"
-                                    >
-                                        <option value="" className="bg-[#1a1f26]">Classify Infrastructure…</option>
-                                        {["Bonded", "Cold Storage", "Dark Store", "FTWZ (Free Trade Warehousing Zone)", "General Grade A", "General Grade B"].map(c => (
-                                            <option key={c} value={c} className="bg-[#1a1f26]">{c}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">System Analytics & Highlights</label>
-                                <textarea 
-                                    name="description" 
-                                    rows={4} 
-                                    value={(formData as any).description || ""} 
-                                    onChange={handleInputChange as any} 
-                                    placeholder="Describe facility vectors, connectivity logs, and strategic advantages…" 
-                                    className="w-full resize-none rounded-sm border border-white/10 bg-white/[0.03] p-4 text-sm text-white placeholder:text-white/10 focus:border-primary/50 focus:outline-none transition-all" 
-                                />
-                            </div>
-                        </div>
-
-                        {/* 2. Physical Specs */}
-                        <div className="space-y-6 lg:col-span-3 mt-4">
-                            <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                                <div className="flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary">
-                                    <LayoutGrid size={16} />
-                                </div>
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">02. Physical Specifications</h3>
-                            </div>
-                            <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-5">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Mass (Sq Ft)*</label>
-                                    <input 
-                                        type="number" 
-                                        name="area_available" 
-                                        value={formData.area_available || ""} 
-                                        onChange={handleInputChange} 
-                                        className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" 
-                                    />
-                                    {getFieldError("area_available") && <p className="mt-1 text-[9px] font-bold uppercase text-red-500 tracking-tighter">{getFieldError("area_available")}</p>}
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Altitude (ft)</label>
-                                    <input 
-                                        type="number" 
-                                        step="0.5" 
-                                        name="ceiling_height" 
-                                        value={formData.ceiling_height || ""} 
-                                        onChange={handleInputChange} 
-                                        className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" 
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Ingress Nodes</label>
-                                    <input 
-                                        type="number" 
-                                        name="docks" 
-                                        value={formData.docks || ""} 
-                                        onChange={handleInputChange} 
-                                        className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" 
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Load Bearing</label>
-                                    <input 
-                                        name="floor_strength" 
-                                        value={formData.floor_strength || ""} 
-                                        onChange={handleInputChange} 
-                                        placeholder="7 MT/sqm" 
-                                        className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" 
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Economic Index*</label>
-                                    <input 
-                                        type="number" 
-                                        step="0.5" 
-                                        name="rate" 
-                                        value={formData.rate || ""} 
-                                        onChange={handleInputChange} 
-                                        className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-emerald-500/50 focus:outline-none transition-all" 
-                                    />
-                                    {getFieldError("rate") && <p className="mt-1 text-[9px] font-bold uppercase text-red-500 tracking-tighter">{getFieldError("rate")}</p>}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 3. Industries */}
-                        <div className="space-y-3 lg:col-span-3 mt-4">
-                            <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                                <div className="flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary">
-                                    <Building2 size={16} />
-                                </div>
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">03. Network Capability (Industries)</h3>
-                                <button 
-                                    type="button"
-                                    onClick={() => {
-                                        const all = ["FMCG (Fast moving consumer goods)", "Pharma and medical supplies", "Food and beverage", "Chemicals/hazardous goods", "Automotive/spare parts", "Agricultural produce", "Electronics and appliances", "Cosmetics", "Apparel and textiles", "Cold storage", "Packaging material", "E-commerce/Retail goods", "Other"];
-                                        const industries: string[] = (formData as any).industries || [];
-                                        const updated = industries.length === all.length ? [] : all;
-                                        setFormData(prev => ({ ...prev, industries: updated } as any));
-                                    }}
-                                    className="ml-auto text-[9px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary transition-colors"
-                                >
-                                    {((formData as any).industries || []).length === 13 ? "Deselect All" : "Select All"}
-                                </button>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 pt-4">
-                                {["FMCG (Fast moving consumer goods)", "Pharma and medical supplies", "Food and beverage", "Chemicals/hazardous goods", "Automotive/spare parts", "Agricultural produce", "Electronics and appliances", "Cosmetics", "Apparel and textiles", "Cold storage", "Packaging material", "E-commerce/Retail goods", "Other"].map(opt => {
-                                    const industries: string[] = (formData as any).industries || [];
-                                    const checked = industries.includes(opt);
-                                    return (
-                                        <label key={opt} className="flex items-center gap-3 cursor-pointer group">
-                                            <div
-                                                onClick={() => {
+                        {/* 3. Industries & Facilities */}
+                        <section className="rounded-sm border border-border/60 bg-card p-8 space-y-6">
+                            <h2 className="font-display text-lg font-bold uppercase tracking-tight text-foreground border-b border-border/50 pb-4">3. Industries Served & Facilities</h2>
+                            <div className="space-y-8">
+                                <div>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Industries</label>
+                                        <button type="button" onClick={() => {
+                                            const all = ["FMCG (Fast moving consumer goods)", "Pharma and medical supplies", "Food and beverage", "Chemicals/hazardous goods", "Automotive/spare parts", "Agricultural produce", "Electronics and appliances", "Cosmetics", "Apparel and textiles", "Cold storage", "Packaging material", "E-commerce/Retail goods", "Other"];
+                                            const industries = (formData as any).industries || [];
+                                            setFormData(prev => ({ ...prev, industries: industries.length === all.length ? [] : all } as any));
+                                        }} className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary/80 transition-colors">
+                                            {((formData as any).industries || []).length === 13 ? "Deselect All" : "Select All"}
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {["FMCG (Fast moving consumer goods)", "Pharma and medical supplies", "Food and beverage", "Chemicals/hazardous goods", "Automotive/spare parts", "Agricultural produce", "Electronics and appliances", "Cosmetics", "Apparel and textiles", "Cold storage", "Packaging material", "E-commerce/Retail goods", "Other"].map(opt => {
+                                            const industries = (formData as any).industries || [];
+                                            const checked = industries.includes(opt);
+                                            return (
+                                                <div key={opt} className="flex items-center gap-3 cursor-pointer group" onClick={() => {
                                                     const updated = checked ? industries.filter((x: string) => x !== opt) : [...industries, opt];
                                                     setFormData(prev => ({ ...prev, industries: updated } as any));
-                                                }}
-                                                className={`w-4 h-4 rounded-sm border shrink-0 flex items-center justify-center cursor-pointer transition-all ${checked ? "bg-primary border-primary shadow-[0_0_10px_rgba(59,130,246,0.3)]" : "border-white/10 bg-white/5 group-hover:border-white/30"}`}
-                                            >
-                                                {checked && <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 fill-none stroke-white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 4l3 3 5-6" /></svg>}
-                                            </div>
-                                            <span className={`text-[10px] uppercase tracking-wider transition-colors ${checked ? "text-white font-bold" : "text-muted-foreground group-hover:text-white/60"}`}>{opt}</span>
-                                        </label>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* 4. Facilities */}
-                        <div className="space-y-3 lg:col-span-3 mt-4">
-                            <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                                <div className="flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary">
-                                    <Settings size={16} />
+                                                }}>
+                                                    <div className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 transition-colors ${checked ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}>
+                                                        {checked && <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 text-white fill-current"><path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                                                    </div>
+                                                    <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{opt}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">04. Support Protocols (Facilities)</h3>
-                                <button 
-                                    type="button"
-                                    onClick={() => {
-                                        const all = ["Truck parking", "Palletised storage", "Fire Hydrants / Sprinklers", "CCTV cameras", "Office space", "Water supply (Direct or Tanker)", "Handling equipment", "Power backup / Generator", "Washrooms", "Security cabin", "Dock levellers"];
-                                        const facilities: string[] = (formData as any).facilities || [];
-                                        const updated = facilities.length === all.length ? [] : all;
-                                        setFormData(prev => ({ ...prev, facilities: updated } as any));
-                                    }}
-                                    className="ml-auto text-[9px] font-bold uppercase tracking-widest text-primary/60 hover:text-primary transition-colors"
-                                >
-                                    {((formData as any).facilities || []).length === 11 ? "Deselect All" : "Select All"}
-                                </button>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 pt-4">
-                                {["Truck parking", "Palletised storage", "Fire Hydrants / Sprinklers", "CCTV cameras", "Office space", "Water supply (Direct or Tanker)", "Handling equipment", "Power backup / Generator", "Washrooms", "Security cabin", "Dock levellers"].map(opt => {
-                                    const facilities: string[] = (formData as any).facilities || [];
-                                    const checked = facilities.includes(opt);
-                                    return (
-                                        <label key={opt} className="flex items-center gap-3 cursor-pointer group">
-                                            <div
-                                                onClick={() => {
+                                <div className="pt-6 border-t border-border/50">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Facilities</label>
+                                        <button type="button" onClick={() => {
+                                            const all = ["Truck parking", "Palletised storage", "Fire Hydrants / Sprinklers", "CCTV cameras", "Office space", "Water supply (Direct or Tanker)", "Handling equipment", "Power backup / Generator", "Washrooms", "Security cabin", "Dock levellers"];
+                                            const facilities = (formData as any).facilities || [];
+                                            setFormData(prev => ({ ...prev, facilities: facilities.length === all.length ? [] : all } as any));
+                                        }} className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-primary/80 transition-colors">
+                                            {((formData as any).facilities || []).length === 11 ? "Deselect All" : "Select All"}
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {["Truck parking", "Palletised storage", "Fire Hydrants / Sprinklers", "CCTV cameras", "Office space", "Water supply (Direct or Tanker)", "Handling equipment", "Power backup / Generator", "Washrooms", "Security cabin", "Dock levellers"].map(opt => {
+                                            const facilities = (formData as any).facilities || [];
+                                            const checked = facilities.includes(opt);
+                                            return (
+                                                <div key={opt} className="flex items-center gap-3 cursor-pointer group" onClick={() => {
                                                     const updated = checked ? facilities.filter((x: string) => x !== opt) : [...facilities, opt];
                                                     setFormData(prev => ({ ...prev, facilities: updated } as any));
-                                                }}
-                                                className={`w-4 h-4 rounded-sm border shrink-0 flex items-center justify-center cursor-pointer transition-all ${checked ? "bg-primary border-primary shadow-[0_0_10px_rgba(59,130,246,0.3)]" : "border-white/10 bg-white/5 group-hover:border-white/30"}`}
-                                            >
-                                                {checked && <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 fill-none stroke-white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 4l3 3 5-6" /></svg>}
-                                            </div>
-                                            <span className={`text-[10px] uppercase tracking-wider transition-colors ${checked ? "text-white font-bold" : "text-muted-foreground group-hover:text-white/60"}`}>{opt}</span>
-                                        </label>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* 5. Contact */}
-                        <div className="space-y-6 lg:col-span-3 mt-4">
-                            <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                                <div className="flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary">
-                                    <User size={16} />
-                                </div>
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">05. Contact & Deployment Location</h3>
-                            </div>
-                            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Concerned Person</label>
-                                    <input name="source_name" value={formData.source_name || ""} onChange={handleInputChange} className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" placeholder="Full name" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Contact Vector (Phone)*</label>
-                                    <input name="source_contact" value={formData.source_contact || ""} onChange={handleInputChange} className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" placeholder="10 digits" maxLength={10} />
-                                    {getFieldError("source_contact") && <p className="mt-1 text-[9px] font-bold uppercase text-red-500 tracking-tighter">{getFieldError("source_contact")}</p>}
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Communication Node (Email)</label>
-                                    <input name="source_email" value={formData.source_email || ""} onChange={handleInputChange} className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" placeholder="email@company.com" />
-                                    {getFieldError("source_email") && <p className="mt-1 text-[9px] font-bold uppercase text-red-500 tracking-tighter">{getFieldError("source_email")}</p>}
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Digital Link (Port/Web)</label>
-                                    <input name="source_designation" value={formData.source_designation || ""} onChange={handleInputChange} className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" placeholder="https://…" />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Physical Coordinates (Address)</label>
-                                    <input name="address" value={(formData as any).address || ""} onChange={handleInputChange} placeholder="Full Deployment Address" className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" />
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Latitude</label>
-                                        <input type="number" step="any" name="latitude" value={formData.latitude || ""} onChange={handleInputChange} placeholder="0.0000" className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Longitude</label>
-                                        <input type="number" step="any" name="longitude" value={formData.longitude || ""} onChange={handleInputChange} placeholder="0.0000" className="w-full rounded-sm border border-white/10 bg-white/[0.03] p-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all" />
+                                                }}>
+                                                    <div className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 transition-colors ${checked ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}>
+                                                        {checked && <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 text-white fill-current"><path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                                                    </div>
+                                                    <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{opt}</span>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </section>
 
-                        {/* Footer / Submit */}
-                        <div className="mt-12 flex justify-end gap-4 lg:col-span-3 border-t border-white/5 pt-8">
-                            <button 
-                                type="button" 
-                                onClick={() => setIsModalOpen(false)} 
-                                className="rounded-sm border border-white/10 px-8 py-3 text-xs font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-white/5 hover:text-white"
-                            >
-                                Abort Mission
+                        {/* 4. Contact & Location */}
+                        <section className="rounded-sm border border-border/60 bg-card p-8 space-y-6">
+                            <h2 className="font-display text-lg font-bold uppercase tracking-tight text-foreground border-b border-border/50 pb-4">4. Contact & Location</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source Name</label>
+                                    <input name="source_name" value={formData.source_name || ""} onChange={handleInputChange} placeholder="Full name" className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source Contact *</label>
+                                    <input name="source_contact" value={formData.source_contact || ""} onChange={handleInputChange} maxLength={10} placeholder="10 digits" className={`w-full rounded-sm border ${getFieldError("source_contact") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
+                                    {getFieldError("source_contact") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("source_contact")}</p>}
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source Email</label>
+                                    <input name="source_email" type="email" value={formData.source_email || ""} onChange={handleInputChange} placeholder="email@company.com" className={`w-full rounded-sm border ${getFieldError("source_email") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
+                                    {getFieldError("source_email") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("source_email")}</p>}
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source Designation (Link/Web)</label>
+                                    <input name="source_designation" value={formData.source_designation || ""} onChange={handleInputChange} placeholder="https://..." className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">City *</label>
+                                    <input name="city" value={formData.city || ""} onChange={handleInputChange} placeholder="e.g. Mumbai" className={`w-full rounded-sm border ${getFieldError("city") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
+                                    {getFieldError("city") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("city")}</p>}
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Address (Coordinates)</label>
+                                    <input name="address" value={(formData as any).address || ""} onChange={handleInputChange} placeholder="Full Address" className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Latitude</label>
+                                    <input type="number" step="any" name="latitude" value={formData.latitude || ""} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Longitude</label>
+                                    <input type="number" step="any" name="longitude" value={formData.longitude || ""} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 5. Description & Photos */}
+                        <section className="rounded-sm border border-border/60 bg-card p-8 space-y-6">
+                            <h2 className="font-display text-lg font-bold uppercase tracking-tight text-foreground border-b border-border/50 pb-4">5. Description</h2>
+                            <div>
+                                <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Introduction / Notes</label>
+                                <textarea name="description" rows={4} value={(formData as any).description || ""} onChange={handleInputChange as any} placeholder="Describe facility vectors, connectivity logs, and strategic advantages…" className="w-full resize-none rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                            </div>
+                        </section>
+
+                        <div className="flex justify-end gap-4 border-t border-border/10 pt-8">
+                            <button type="button" onClick={() => setIsModalOpen(false)} className="rounded-sm border border-border px-8 py-3 text-xs font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted hover:text-foreground">
+                                Abort
                             </button>
-                            <button
-                                disabled={!isFormValid()}
-                                type="submit"
-                                className="rounded-sm bg-primary px-10 py-3 text-xs font-black uppercase tracking-[0.2em] text-primary-foreground shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all hover:bg-primary/90 disabled:opacity-20 disabled:cursor-not-allowed"
-                            >
-                                {editingWarehouse ? "Update Asset" : "Deploy Network Node"}
+                            <button disabled={!isFormValid()} type="submit" className="rounded-sm bg-primary px-10 py-3 text-xs font-black uppercase tracking-[0.2em] text-primary-foreground shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all hover:bg-primary/90 disabled:opacity-20 disabled:cursor-not-allowed">
+                                {editingWarehouse ? "Update Listing" : "Submit Listing"}
                             </button>
                         </div>
                     </form>
                 </div>
             </motion.div>
         </div>
-    )}
-    </div>
+    )}    </div>
   );
 };
 

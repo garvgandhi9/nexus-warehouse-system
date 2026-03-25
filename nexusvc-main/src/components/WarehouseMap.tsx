@@ -34,7 +34,25 @@ export default function WarehouseMap({ listings, centerOn, zoom }: Props) {
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: "https://tiles.openfreemap.org/styles/bright",
+      style: {
+        version: 8,
+        sources: {
+          "satellite-hybrid": {
+            type: "raster",
+            tiles: ["https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"],
+            tileSize: 256,
+          },
+        },
+        layers: [
+          {
+            id: "satellite-hybrid",
+            type: "raster",
+            source: "satellite-hybrid",
+            minzoom: 0,
+            maxzoom: 22,
+          },
+        ],
+      },
       center: centerOn ? [centerOn[1], centerOn[0]] : [78.9629, 20.5937],
       zoom: zoom || 5,
     });

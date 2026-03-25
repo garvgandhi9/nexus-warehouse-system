@@ -120,13 +120,16 @@ function CheckboxGroup({ options, selected, onChange }: { options: string[]; sel
     const toggle = (opt: string) => {
         onChange(selected.includes(opt) ? selected.filter(x => x !== opt) : [...selected, opt]);
     };
+    const isAllSelected = options.length > 0 && selected.length === options.length;
+    const toggleAll = () => {
+        onChange(isAllSelected ? [] : [...options]);
+    };
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {options.map(opt => (
-                <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                <div key={opt} className="flex items-center gap-3 cursor-pointer group" onClick={() => toggle(opt)}>
                     <div
-                        onClick={() => toggle(opt)}
-                        className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 transition-colors cursor-pointer ${selected.includes(opt) ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}
+                        className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 transition-colors ${selected.includes(opt) ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}
                     >
                         {selected.includes(opt) && (
                             <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 text-white fill-current">
@@ -135,8 +138,20 @@ function CheckboxGroup({ options, selected, onChange }: { options: string[]; sel
                         )}
                     </div>
                     <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{opt}</span>
-                </label>
+                </div>
             ))}
+            <div className="flex items-center gap-3 cursor-pointer group" onClick={toggleAll}>
+                <div
+                    className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 transition-colors ${isAllSelected ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}
+                >
+                    {isAllSelected && (
+                        <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 text-white fill-current">
+                            <path d="M1 4l3 3 5-6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    )}
+                </div>
+                <span className="text-sm text-primary font-medium group-hover:text-primary/80 transition-colors italic">All of the above</span>
+            </div>
         </div>
     );
 }
@@ -625,7 +640,7 @@ const SubmitWarehouse = () => {
                                             <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6">
                                                 <div className="space-y-2 flex-1">
                                                     <h3 className="font-display text-xl font-bold uppercase tracking-tight text-foreground">Nexus Prime Upgrade</h3>
-                                                    <p className="text-sm text-muted-foreground leading-relaxed">Let our expert team manage everything. Find best tenants faster.</p>
+                                                    <p className="text-sm text-muted-foreground leading-relaxed">Let our expert 3PL team manage everything.</p>
                                                 </div>
                                                 <div className="flex items-center gap-3 shrink-0">
                                                     <button type="button" onClick={() => setW("is_prime", true)} className={`px-6 py-2 rounded-sm text-sm font-bold uppercase tracking-wider transition-all border ${warehouseForm.is_prime ? 'bg-primary border-primary text-primary-foreground' : 'bg-background border-border'}`}>Join Now</button>
@@ -745,10 +760,6 @@ const SubmitWarehouse = () => {
                                                     className={`${inputClass} ${errors.land_size ? "border-red-500" : ""}`}
                                                 />
                                                 {errors.land_size && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.land_size}</p>}
-                                            </div>
-                                            <div>
-                                                <label className={labelClass}>Expected Rent / SFT</label>
-                                                <input type="number" value={landForm.rate_sqft} onChange={e => setL("rate_sqft", e.target.value)} placeholder="e.g. 15" className={inputClass} />
                                             </div>
                                             <div>
                                                 <label className={labelClass}>Land Status *</label>
