@@ -130,29 +130,7 @@ const Listings = () => {
               </p>
             </div>
 
-            {/* View Mode Toggle */}
-            <div className="flex items-center gap-1 rounded-sm border border-border/50 bg-card p-1.5 z-10 shadow-2xl">
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`flex items-center gap-2 rounded-sm px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${viewMode === "grid"
-                  ? "bg-primary text-white shadow-lg shadow-primary/20"
-                  : "text-muted-foreground hover:text-white"
-                  }`}
-              >
-                <LayoutGrid size={14} />
-                Grid
-              </button>
-              <button
-                onClick={() => setViewMode("map")}
-                className={`flex items-center gap-2 rounded-sm px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${viewMode === "map"
-                  ? "bg-primary text-white shadow-lg shadow-primary/20"
-                  : "text-muted-foreground hover:text-white"
-                  }`}
-              >
-                <MapIcon size={14} />
-                Map
-              </button>
-            </div>
+
           </div>
 
           {/* Filter Bar */}
@@ -203,24 +181,53 @@ const Listings = () => {
               </div>
 
               <div className="md:col-span-3">
-                <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Property Type</label>
-                <div className="flex w-full rounded-sm border border-border/50 bg-background/50 p-1 mb-6">
-                  {[
-                    { id: "ANY", label: "Any" },
-                    { id: "Warehouse", label: "Warehouse" },
-                    { id: "Land Parcel", label: "Land Parcel" }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => setPropertyType(opt.id)}
-                      className={`flex-1 rounded-sm py-2.5 text-[9px] font-bold uppercase tracking-widest transition-all ${propertyType === opt.id
-                        ? 'bg-primary text-white shadow-md'
-                        : 'text-muted-foreground hover:text-white hover:bg-white/5'
-                        }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                  <div>
+                    <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Property Type</label>
+                    <div className="flex w-full rounded-sm border border-border/50 bg-background/50 p-1">
+                      {[
+                        { id: "ANY", label: "Any" },
+                        { id: "Warehouse", label: "Warehouse" },
+                        { id: "Land Parcel", label: "Land Parcel" }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          onClick={() => setPropertyType(opt.id)}
+                          className={`flex-1 rounded-sm py-2.5 text-[9px] font-bold uppercase tracking-widest transition-all ${propertyType === opt.id
+                            ? 'bg-primary text-white shadow-md'
+                            : 'text-muted-foreground hover:text-white hover:bg-white/5'
+                            }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">View Mode</label>
+                    <div className="flex w-full items-center rounded-sm border border-border/50 bg-background/50 p-1">
+                      <button
+                        onClick={() => setViewMode("grid")}
+                        className={`flex-1 flex justify-center items-center gap-2 rounded-sm py-2.5 text-[9px] font-bold uppercase tracking-[0.2em] transition-all ${viewMode === "grid"
+                          ? "bg-primary text-white shadow-md shadow-primary/20"
+                          : "text-muted-foreground hover:text-white hover:bg-white/5"
+                          }`}
+                      >
+                        <LayoutGrid size={14} />
+                        Grid
+                      </button>
+                      <button
+                        onClick={() => setViewMode("map")}
+                        className={`flex-1 flex justify-center items-center gap-2 rounded-sm py-2.5 text-[9px] font-bold uppercase tracking-[0.2em] transition-all ${viewMode === "map"
+                          ? "bg-primary text-white shadow-md shadow-primary/20"
+                          : "text-muted-foreground hover:text-white hover:bg-white/5"
+                          }`}
+                      >
+                        <MapIcon size={14} />
+                        Map
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Price Level</label>

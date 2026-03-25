@@ -1,6 +1,7 @@
 const warehouseModel = require("../models/warehouseModel");
 const messageModel = require("../models/messageModel");
 const jwt = require("jsonwebtoken");
+const pool = require("../db");
 
 const JWT_SECRET = process.env.JWT_SECRET || "nexus-fallback-secret-key";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -124,7 +125,8 @@ const publicController = {
 
     async getAvailableCities(req, res) {
         try {
-            const cities = await warehouseModel.getCities();
+            const result = await pool.query("SELECT DISTINCT city FROM warehouses WHERE status = 'approved' ORDER BY city ASC");
+            const cities = result.rows.map(row => row.city);
             res.json({ success: true, data: cities });
         } catch (err) {
             console.error("[PUBLIC CONTROLLER] getAvailableCities failed:", err.message);
