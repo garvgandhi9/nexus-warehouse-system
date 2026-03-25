@@ -280,12 +280,19 @@ const Admin = () => {
         const method = editingWarehouse ? "PUT" : "POST";
 
         try {
+            console.log("[ADMIN DEBUG] Sending payload to:", url);
+            console.log("[ADMIN DEBUG] Payload:", formData);
+            
             const res = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json", "Authorization": token },
                 body: JSON.stringify(formData),
             });
             const data = await res.json();
+            
+            console.log("[ADMIN DEBUG] Status:", res.status);
+            console.log("[ADMIN DEBUG] Response Body:", data);
+
             if (!res.ok) {
                 setSaveError(data.error || "Failed to save warehouse. Please try again.");
                 return;
@@ -925,7 +932,22 @@ const Admin = () => {
                             <button type="button" onClick={() => setIsModalOpen(false)} className="rounded-sm border border-border px-8 py-3 text-xs font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted hover:text-foreground">
                                 Abort
                             </button>
-                            <button disabled={!isFormValid()} type="submit" className="rounded-sm bg-primary px-10 py-3 text-xs font-black uppercase tracking-[0.2em] text-primary-foreground shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all hover:bg-primary/90 disabled:opacity-20 disabled:cursor-not-allowed">
+                            <button 
+                                type="submit" 
+                                onClick={() => {
+                                    console.log("[ADMIN DEBUG] isFormValid():", isFormValid());
+                                    if (!isFormValid()) {
+                                        console.log("[ADMIN DEBUG] Data:", formData);
+                                        console.log("[ADMIN DEBUG] Validation Rules:", {
+                                            city: !!formData.city,
+                                            area: !!formData.area_available,
+                                            rate: !!formData.rate,
+                                            contact: !!formData.source_contact
+                                        });
+                                    }
+                                }}
+                                className="rounded-sm bg-primary px-10 py-3 text-xs font-black uppercase tracking-[0.2em] text-primary-foreground shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all hover:bg-primary/90"
+                            >
                                 {editingWarehouse ? "Update Listing" : "Submit Listing"}
                             </button>
                         </div>
