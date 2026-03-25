@@ -37,6 +37,7 @@ interface Warehouse {
     min_lease: string;
     deposit: string;
     docks: number;
+    cluster?: string;
 }
 
 interface UserInfo {
@@ -935,6 +936,10 @@ const Admin = () => {
                                     <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">City *</label>
                                     <input name="city" value={formData.city || ""} onChange={handleInputChange} placeholder="e.g. Mumbai" className={`w-full rounded-sm border ${getFieldError("city") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
                                     {getFieldError("city") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("city")}</p>}
+                                </div>
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cluster</label>
+                                    <input name="cluster" value={(formData as any).cluster || ""} onChange={handleInputChange} placeholder="e.g. MHAPE, BHIWANDI" className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
                                 </div>
                                 <div>
                                     <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Address (Coordinates)</label>

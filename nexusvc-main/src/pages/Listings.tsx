@@ -312,7 +312,7 @@ const Listings = () => {
                     <div className="p-7">
                       <div className="flex items-center justify-between">
                         <h3 className="font-display text-xl font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">
-                          {l.cluster ? `${l.cluster} , ${l.city}` : l.city}
+                          {l.cluster ? `${l.cluster}, ${l.city}` : l.city}
                         </h3>
                         {l.rate && l.status !== "Land Parcel" && (
                           <div className="text-right">
