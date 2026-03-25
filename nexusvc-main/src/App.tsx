@@ -31,11 +31,29 @@ const ScrollToTop = () => {
 
 const App = () => {
   useEffect(() => {
-    // Clear all auth data ONLY on initial site load/refresh as per user request
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    sessionStorage.removeItem("admin_token");
-    sessionStorage.removeItem("token");
+    // Session Cleanup Logic
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        // Decode middle part of JWT (payload) using base64 decoding (atob)
+        const base64Url = token.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/"); // Convert base64url to base64
+        const jsonPayload = decodeURIComponent(atob(base64).split("").map(c => 
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        
+        const payload = JSON.parse(jsonPayload);
+        const now = Date.now() / 1000;
+        
+        if (payload.exp && now >= payload.exp) {
+          console.warn("[APP] Token expired. Clearing auth data.");
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+        }
+      } catch (err) {
+        console.error("[APP] Failed to parse or check token expiry:", err);
+      }
+    }
   }, []);
 
   return (

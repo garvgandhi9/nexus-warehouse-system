@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
@@ -180,30 +180,9 @@ const SubmitWarehouse = () => {
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState("");
 
-    const [viewState, setViewState] = useState({
-        longitude: 72.8777,
-        latitude: 19.0760,
-        zoom: 11,
-        bearing: 0,
-        pitch: 0,
-        padding: { top: 0, bottom: 0, left: 0, right: 0 },
-        width: 0,
-        height: 0
-    });
-    const [markerPos, setMarkerPos] = useState({
-        longitude: 72.8777,
-        latitude: 19.0760
-    });
-
+    const [markerPos, setMarkerPos] = useState({ longitude: 72.8777, latitude: 19.0760 });
     const setW = (key: keyof WarehouseForm, value: any) => setWarehouseForm(prev => ({ ...prev, [key]: value }));
     const setL = (key: keyof LandForm, value: any) => setLandForm(prev => ({ ...prev, [key]: value }));
-
-    useEffect(() => {
-        const lat = parseFloat(subType === 'warehouse' ? warehouseForm.latitude : landForm.latitude) || markerPos.latitude;
-        const lng = parseFloat(subType === 'warehouse' ? warehouseForm.longitude : landForm.longitude) || markerPos.longitude;
-        setMarkerPos({ latitude: lat, longitude: lng });
-        setViewState(prev => ({ ...prev, latitude: lat, longitude: lng }));
-    }, [warehouseForm.latitude, warehouseForm.longitude, landForm.latitude, landForm.longitude, subType]);
 
     const updateLocation = (lat: number, lng: number) => {
         if (subType === "warehouse") {
@@ -212,38 +191,76 @@ const SubmitWarehouse = () => {
             setLandForm(prev => ({ ...prev, latitude: lat.toString(), longitude: lng.toString() }));
         }
         setMarkerPos({ latitude: lat, longitude: lng });
-        setViewState(prev => ({ ...prev, latitude: lat, longitude: lng }));
         reverseGeocode(lat, lng);
     };
 
-    const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY;
-    const mapStyleUrl: any = MAPTILER_KEY
-        ? `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`
-        : {
-            version: 8,
-            sources: {
-                'raster-tiles': {
-                    type: 'raster',
-                    tiles: [
-                        'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-                        'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-                        'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-                        'https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-                    ],
-                    tileSize: 256,
-                    attribution: '&copy; OpenStreetMap &copy; CARTO'
-                }
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<maplibregl.Map | null>(null);
+    const markerRef = useRef<maplibregl.Marker | null>(null);
+
+    useEffect(() => {
+        if (!mapContainerRef.current || !subType) return;
+        
+        const map = new maplibregl.Map({
+            container: mapContainerRef.current,
+            style: {
+                version: 8,
+                sources: {
+                    "satellite-hybrid": {
+                        type: "raster",
+                        tiles: ["https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"],
+                        tileSize: 256,
+                    },
+                },
+                layers: [
+                    {
+                        id: "satellite-hybrid",
+                        type: "raster",
+                        source: "satellite-hybrid",
+                        minzoom: 0,
+                        maxzoom: 22,
+                    },
+                ],
             },
-            layers: [
-                {
-                    id: 'simple-tiles',
-                    type: 'raster',
-                    source: 'raster-tiles',
-                    minzoom: 0,
-                    maxzoom: 22
-                }
-            ]
+            center: [markerPos.longitude, markerPos.latitude],
+            zoom: 12
+        });
+
+        mapInstanceRef.current = map;
+
+        const marker = new maplibregl.Marker({ draggable: true })
+            .setLngLat([markerPos.longitude, markerPos.latitude])
+            .addTo(map);
+        
+        markerRef.current = marker;
+
+        marker.on('dragend', () => {
+            const lngLat = marker.getLngLat();
+            updateLocation(lngLat.lat, lngLat.lng);
+        });
+
+        map.on('click', (e) => {
+            const { lng, lat } = e.lngLat;
+            marker.setLngLat([lng, lat]);
+            updateLocation(lat, lng);
+        });
+
+        return () => {
+            map.remove();
+            mapInstanceRef.current = null;
         };
+    }, [subType]);
+
+    useEffect(() => {
+        if (mapInstanceRef.current && markerRef.current) {
+            const lat = parseFloat(subType === 'warehouse' ? warehouseForm.latitude : landForm.latitude);
+            const lng = parseFloat(subType === 'warehouse' ? warehouseForm.longitude : landForm.longitude);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                markerRef.current.setLngLat([lng, lat]);
+                mapInstanceRef.current.easeTo({ center: [lng, lat], duration: 500 });
+            }
+        }
+    }, [warehouseForm.latitude, warehouseForm.longitude, landForm.latitude, landForm.longitude, subType]);
 
     const reverseGeocode = async (lat: number, lng: number) => {
         try {
@@ -262,19 +279,37 @@ const SubmitWarehouse = () => {
         if (!searchQuery.trim()) return;
         setSearching(true);
         try {
+            // 1. Try Coordinate Parsing (Lat, Lng)
+            const coordMatch = searchQuery.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+            if (coordMatch) {
+                const lat = parseFloat(coordMatch[1]);
+                const lng = parseFloat(coordMatch[2]);
+                updateLocation(lat, lng);
+                setSearching(false);
+                return;
+            }
+
+            // 2. Try Google Maps URL Parsing
+            const googleMapsMatch = searchQuery.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+            if (googleMapsMatch) {
+                const lat = parseFloat(googleMapsMatch[1]);
+                const lng = parseFloat(googleMapsMatch[2]);
+                updateLocation(lat, lng);
+                setSearching(false);
+                return;
+            }
+
+            // 3. Fallback to Text Search (OSM)
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=in`);
             const data = await res.json();
             if (data?.length > 0) {
                 const { lat, lon, display_name } = data[0];
                 const newLat = parseFloat(lat);
                 const newLng = parseFloat(lon);
-                if (subType === "warehouse") {
-                    setWarehouseForm(prev => ({ ...prev, latitude: lat, longitude: lon, full_address: display_name }));
-                } else {
-                    setLandForm(prev => ({ ...prev, latitude: lat, longitude: lon, full_address: display_name }));
-                }
-                setMarkerPos({ latitude: newLat, longitude: newLng });
-                setViewState(prev => ({ ...prev, latitude: newLat, longitude: newLng, zoom: 15 }));
+                
+                updateLocation(newLat, newLng); // Efficiently updates form, marker, and geocoding
+                if (subType === "warehouse") setW("full_address", display_name);
+                else setL("full_address", display_name);
             }
         } catch (err) {
             console.error("Search failed:", err);
@@ -476,46 +511,7 @@ const SubmitWarehouse = () => {
                 </div>
 
                 <div className="h-[400px] w-full rounded-sm border border-border overflow-hidden z-0 bg-[#0F172A]">
-                    <Map
-                        viewState={viewState}
-                        mapLib={maplibregl}
-                        mapStyle={{
-                            version: 8,
-                            sources: {
-                                "satellite": {
-                                    type: "raster",
-                                    tiles: ["https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"],
-                                    tileSize: 256,
-                                },
-                            },
-                            layers: [
-                                {
-                                    id: "satellite",
-                                    type: "raster",
-                                    source: "satellite",
-                                    minzoom: 0,
-                                    maxzoom: 22,
-                                },
-                            ],
-                        }}
-                        style={{ width: '100%', height: '400px' }}
-                        onMove={(evt: any) => setViewState(evt.viewState)}
-                        onClick={(e: any) => {
-                            const { lng, lat } = e.lngLat;
-                            updateLocation(lat, lng);
-                        }}
-                    >
-                        <Marker
-                            longitude={markerPos.longitude}
-                            latitude={markerPos.latitude}
-                            anchor="center"
-                            draggable={true}
-                            onDragEnd={(e: any) => {
-                                const { lng, lat } = e.lngLat;
-                                updateLocation(lat, lng);
-                            }}
-                        />
-                    </Map>
+                    <div ref={mapContainerRef} className="h-full w-full" />
                 </div>
 
                 <div className="p-4 bg-muted/30 border border-border/50 rounded-sm space-y-2">
