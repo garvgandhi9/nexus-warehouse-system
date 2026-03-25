@@ -60,6 +60,7 @@ const publicController = {
     async submitNewWarehouse(req, res) {
         try {
             const data = req.body;
+            console.log("[PUBLIC DEBUG] submitNewWarehouse payload received:", data);
 
             if (!data.city || !data.city.trim()) {
                 return res.status(400).json({ success: false, error: "City is required", field: "city" });

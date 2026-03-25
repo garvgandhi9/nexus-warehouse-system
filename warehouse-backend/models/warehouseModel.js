@@ -161,10 +161,10 @@ const warehouseModel = {
           is_prime, category, ceiling_height, docks, floor_strength,
           term_type, term_duration, description, industries, facilities,
           contact_person, contact_email, contact_phone, capacity_value, capacity_type,
-          lister_type, website, user_id
+          lister_type, website, user_id, image_url
         ) VALUES (
           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,
-          $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27
+          $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29
         ) RETURNING *`;
 
             const num = (v) => (v === "" || v === undefined ? null : Number(v));
@@ -209,7 +209,8 @@ const warehouseModel = {
                 data.lister_type,
                 data.website,
 
-                userId
+                userId,
+                data.image_url
             ];
 
             const result = await pool.query(query, values);
@@ -225,8 +226,8 @@ const warehouseModel = {
         if (!userId) throw new Error("INVALID_USER_ID");
         try {
             const result = await pool.query(
-                "UPDATE warehouses SET org_name=$1, city=$2, full_address=$3, status='pending' WHERE id=$4 AND user_id=$5 RETURNING *",
-                [data.org_name, data.city?.trim(), data.full_address || data.address, id, userId]
+                "UPDATE warehouses SET org_name=$1, city=$2, full_address=$3, image_url=$4, status='pending' WHERE id=$5 AND user_id=$6 RETURNING *",
+                [data.org_name, data.city?.trim(), data.full_address || data.address, data.image_url, id, userId]
             );
             return result.rows[0] || null;
         } catch (err) {
@@ -249,17 +250,20 @@ const warehouseModel = {
                     contact_person=$20, contact_email=$21, contact_phone=$22, capacity_value=$23, capacity_type=$24,
                     lister_type=$25, website=$26, lease_type=$27, display_order=$28, source_name=$29, 
                     source_contact=$30, source_email=$31, source_designation=$32, nearest_port=$33, 
-                    nearest_airport=$34, listing_mode=$35
-                WHERE id=$36 RETURNING *`,
+                    nearest_airport=$34, listing_mode=$35, image_url=$36
+                WHERE id=$37 RETURNING *`,
                 [
                     data.warehouse_code, data.org_name, data.city?.trim(), data.full_address || data.address,
                     num(data.latitude), num(data.longitude), num(data.area_available), num(data.rate), data.status || 'Available',
                     data.is_prime || false, data.category, num(data.ceiling_height), num(data.docks), data.floor_strength,
                     data.term_type, data.term_duration, data.description, data.industries, data.facilities,
                     data.contact_person, data.contact_email, data.contact_phone, num(data.capacity_value), data.capacity_type,
-                    data.lister_type, data.website, data.lease_type, num(data.display_order) || 0, data.source_name,
-                    data.source_contact, data.source_email, data.source_designation, data.nearest_port,
-                    data.nearest_airport, data.listing_mode,
+                    data.lister_type, data.website, data.lease_type, num(data.display_order) || 0, 
+                    data.source_name || data.contact_person, 
+                    data.source_contact || data.contact_phone, 
+                    data.source_email || data.contact_email, 
+                    data.source_designation, data.nearest_port,
+                    data.nearest_airport, data.listing_mode, data.image_url,
                     id
                 ]
             );
@@ -284,11 +288,11 @@ const warehouseModel = {
                     contact_person, contact_email, contact_phone, capacity_value, capacity_type,
                     lister_type, website, lease_type, display_order, source_name,
                     source_contact, source_email, source_designation, nearest_port,
-                    nearest_airport, listing_mode
+                    nearest_airport, listing_mode, image_url
                 ) VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,
                     $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,
-                    $31,$32,$33,$34,$35
+                    $31,$32,$33,$34,$35,$36,$37
                 ) RETURNING *`;
 
             const values = [
@@ -297,9 +301,12 @@ const warehouseModel = {
                 data.is_prime || false, data.category, num(data.ceiling_height), num(data.docks), data.floor_strength,
                 data.term_type, data.term_duration, data.description, data.industries, data.facilities,
                 data.contact_person, data.contact_email, data.contact_phone, num(data.capacity_value), data.capacity_type,
-                data.lister_type, data.website, data.lease_type, num(data.display_order) || 0, data.source_name,
-                data.source_contact, data.source_email, data.source_designation, data.nearest_port,
-                data.nearest_airport, data.listing_mode
+                data.lister_type, data.website, data.lease_type, num(data.display_order) || 0, 
+                data.source_name || data.contact_person, 
+                data.source_contact || data.contact_phone, 
+                data.source_email || data.contact_email, 
+                data.source_designation, data.nearest_port,
+                data.nearest_airport, data.listing_mode, data.image_url
             ];
             const result = await pool.query(query, values);
             return result.rows[0];

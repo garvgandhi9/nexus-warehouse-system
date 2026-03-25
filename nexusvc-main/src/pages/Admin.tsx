@@ -3,30 +3,25 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { API_ENDPOINTS } from "@/lib/api-config";
-import { Plus, Edit2, Trash2, Search, Building2, User, Phone, CheckCircle, XCircle, ArrowDownToLine, ArrowUpDown, Shield, Clock, Map as MapIcon, LayoutGrid, Globe, Info, Settings } from "lucide-react";
+import { Plus, Check, Edit2, Trash2, Search, Building2, User, Phone, CheckCircle, XCircle, ArrowDownToLine, ArrowUpDown, Shield, Clock, Map as MapIcon, LayoutGrid, Globe, Info, Settings } from "lucide-react";
 import { useFormValidation } from "@/hooks/useFormValidation";
 import { MonthYearRangePicker } from "@/components/MonthYearRangePicker";
 
 
 interface Warehouse {
     id: number;
-    warehouse_code: string;
-    city: string;
-    area_available: number;
-    rate: number;
-    min_lease: string;
-    deposit: string;
-    docks: number;
     ceiling_height: number;
     nearest_port: string;
     nearest_airport: string;
     listing_mode: string;
     status: string;
     lease_type?: string;
-    source_name: string;
-    source_contact: string;
-    source_email?: string;
-    source_designation: string;
+    contact_person?: string;
+    contact_phone?: string;
+    contact_email?: string;
+    city: string;
+    address?: string;
+    full_address?: string;
     latitude?: number;
     longitude?: number;
     term_type?: string;
@@ -35,6 +30,13 @@ interface Warehouse {
     amenities?: string[];
     display_order?: number;
     created_at?: string;
+    image_url?: string;
+    warehouse_code: string;
+    area_available: number;
+    rate: number;
+    min_lease: string;
+    deposit: string;
+    docks: number;
 }
 
 interface UserInfo {
@@ -74,6 +76,8 @@ const Admin = () => {
     const [editingUser, setEditingUser] = useState<UserInfo | null>(null);
     const [userFormData, setUserFormData] = useState({ name: "", email: "", is_admin: false });
     const [activeTab, setActiveTab] = useState<"warehouses" | "users" | "pending" | "messages">("warehouses");
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState("");
 
     const {
         values: formData,
@@ -88,8 +92,8 @@ const Admin = () => {
         city: { required: true },
         area_available: { required: true },
         rate: { required: true },
-        source_contact: { required: true, isPhone: true },
-        source_email: { isEmail: true }
+        contact_phone: { required: true, isPhone: true },
+        contact_email: { isEmail: true }
     });
 
     useEffect(() => {
@@ -313,11 +317,11 @@ const Admin = () => {
 
     const exportToCSV = () => {
         if (filteredWarehouses.length === 0) return;
-        const headers = ["ID", "Code", "City", "Area (SqFt)", "Rate (Rs)", "Docks", "Ceiling Height", "Status", "Source Name", "Source Contact", "Date Added"];
+        const headers = ["ID", "Code", "City", "Area (SqFt)", "Rate (Rs)", "Docks", "Ceiling Height", "Status", "Contact Person", "Phone", "Date Added"];
         const rows = filteredWarehouses.map(w => [
             w.id, w.warehouse_code || '', w.city || '', w.area_available || '',
             w.rate || '', w.docks || '', w.ceiling_height || '', w.status || '',
-            `"${w.source_name || ''}"`, w.source_contact || '', w.created_at || ''
+            `"${w.contact_person || ''}"`, w.contact_phone || '', w.created_at || ''
         ]);
         const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
         const link = document.createElement("a");
@@ -328,12 +332,34 @@ const Admin = () => {
         document.body.removeChild(link);
     };
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        setUploadError("");
+        try {
+            const formDataPayload = new FormData();
+            formDataPayload.append("image", file);
+            const res = await fetch(`${API_ENDPOINTS.UPLOAD}`, {
+                method: "POST",
+                body: formDataPayload,
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Upload failed");
+            setFormData(prev => ({ ...prev, image_url: data.url }));
+        } catch (err: any) {
+            setUploadError(err.message || "Upload failed");
+        } finally {
+            setUploading(false);
+        }
+    };
+
     let filteredWarehouses = warehouses.filter(w => {
         const searchMatch =
             w.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             w.warehouse_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            w.source_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            w.source_contact?.toLowerCase().includes(searchTerm.toLowerCase());
+            w.contact_person?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            w.contact_phone?.toLowerCase().includes(searchTerm.toLowerCase());
         const statusMatch = statusFilter.length === 0 || (w.lease_type && statusFilter.includes(w.lease_type));
         if (activeTab === "pending") return w.status === "pending" && statusMatch && searchMatch;
         if (activeTab === "warehouses") return w.status !== "pending" && statusMatch && searchMatch;
@@ -593,6 +619,7 @@ const Admin = () => {
                                 <table className="w-full text-left text-sm">
                                     <thead className="border-b border-border/50 bg-muted/20 text-xs uppercase tracking-wider text-muted-foreground">
                                         <tr>
+                                            <th className="whitespace-nowrap px-6 py-4 font-semibold">Asset Photo</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Code</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Location</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Specs</th>
@@ -606,6 +633,15 @@ const Admin = () => {
                                     <tbody className="divide-y divide-border/30">
                                         {filteredWarehouses.map((w) => (
                       <tr key={w.id} className="transition-colors hover:bg-muted/10">
+                        <td className="whitespace-nowrap px-6 py-4">
+                          <div className="h-12 w-20 overflow-hidden rounded-sm border border-border/50 bg-muted/20">
+                            {w.image_url ? (
+                              <img src={w.image_url} alt="Warehouse" className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-[8px] font-black uppercase tracking-tighter text-muted-foreground/30">No Image</div>
+                            )}
+                          </div>
+                        </td>
                         <td className="whitespace-nowrap px-6 py-4">
                           <div className="font-mono text-xs font-medium text-primary">{w.warehouse_code}</div>
                           <div className="mt-2 flex items-center">
@@ -646,9 +682,9 @@ const Admin = () => {
                           <div className="mt-1 text-muted-foreground">{w.min_lease} (Dep: {w.deposit})</div>
                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
-                          <div className="flex items-center gap-2 text-sm text-white"><User size={12} className="text-primary" /> {w.source_name || 'System'}</div>
-                          <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground"><Phone size={10} /> {w.source_contact || 'N/A'}</div>
-                          <div className="mt-0.5 text-[10px] uppercase tracking-wider text-primary/70">{w.source_designation}</div>
+                          <div className="flex items-center gap-2 text-sm text-white"><User size={12} className="text-primary" /> {w.contact_person || 'System'}</div>
+                          <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground"><Phone size={10} /> {w.contact_phone || 'N/A'}</div>
+                          <div className="mt-0.5 text-[10px] uppercase tracking-wider text-primary/70">{w.contact_email}</div>
                         </td>
                         <td className="whitespace-nowrap px-6 py-4 text-right">
                           <div className="flex justify-end gap-2">
@@ -882,22 +918,18 @@ const Admin = () => {
                             <h2 className="font-display text-lg font-bold uppercase tracking-tight text-foreground border-b border-border/50 pb-4">4. Contact & Location</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source Name</label>
-                                    <input name="source_name" value={formData.source_name || ""} onChange={handleInputChange} placeholder="Full name" className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Contact Person</label>
+                                    <input name="contact_person" value={formData.contact_person || ""} onChange={handleInputChange} placeholder="Full name" className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
                                 </div>
                                 <div>
-                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source Contact *</label>
-                                    <input name="source_contact" value={formData.source_contact || ""} onChange={handleInputChange} maxLength={10} placeholder="10 digits" className={`w-full rounded-sm border ${getFieldError("source_contact") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
-                                    {getFieldError("source_contact") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("source_contact")}</p>}
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Phone *</label>
+                                    <input name="contact_phone" value={formData.contact_phone || ""} onChange={handleInputChange} maxLength={10} placeholder="10 digits" className={`w-full rounded-sm border ${getFieldError("contact_phone") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
+                                    {getFieldError("contact_phone") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("contact_phone")}</p>}
                                 </div>
                                 <div>
-                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source Email</label>
-                                    <input name="source_email" type="email" value={formData.source_email || ""} onChange={handleInputChange} placeholder="email@company.com" className={`w-full rounded-sm border ${getFieldError("source_email") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
-                                    {getFieldError("source_email") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("source_email")}</p>}
-                                </div>
-                                <div>
-                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source Designation (Link/Web)</label>
-                                    <input name="source_designation" value={formData.source_designation || ""} onChange={handleInputChange} placeholder="https://..." className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</label>
+                                    <input name="contact_email" type="email" value={formData.contact_email || ""} onChange={handleInputChange} placeholder="email@company.com" className={`w-full rounded-sm border ${getFieldError("contact_email") ? "border-red-500" : "border-border"} bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors`} />
+                                    {getFieldError("contact_email") && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{getFieldError("contact_email")}</p>}
                                 </div>
                                 <div>
                                     <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">City *</label>
@@ -921,10 +953,35 @@ const Admin = () => {
 
                         {/* 5. Description & Photos */}
                         <section className="rounded-sm border border-border/60 bg-card p-8 space-y-6">
-                            <h2 className="font-display text-lg font-bold uppercase tracking-tight text-foreground border-b border-border/50 pb-4">5. Description</h2>
-                            <div>
-                                <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Introduction / Notes</label>
-                                <textarea name="description" rows={4} value={(formData as any).description || ""} onChange={handleInputChange as any} placeholder="Describe facility vectors, connectivity logs, and strategic advantages…" className="w-full resize-none rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                            <h2 className="font-display text-lg font-bold uppercase tracking-tight text-foreground border-b border-border/50 pb-4">5. Description & Photos</h2>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div>
+                                    <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Introduction / Notes</label>
+                                    <textarea name="description" rows={5} value={(formData as any).description || ""} onChange={handleInputChange as any} placeholder="Describe facility vectors, connectivity logs, and strategic advantages…" className="w-full resize-none rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors" />
+                                </div>
+                                <div className="space-y-4">
+                                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Property Visual Identity</label>
+                                    <label className="cursor-pointer rounded-sm border-2 border-dashed border-border p-6 text-center transition-all hover:border-primary/50 flex flex-col items-center gap-3 bg-muted/5">
+                                        <Plus size={24} className="text-muted-foreground" />
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-foreground">
+                                            {uploading ? "Uploading..." : "Click to Upload Photo"}
+                                        </p>
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
+                                    </label>
+                                    {uploadError && <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider">{uploadError}</p>}
+                                    {formData.image_url && (
+                                        <div className="relative group rounded-sm overflow-hidden border border-border">
+                                            <img src={formData.image_url} alt="Preview" className="w-full aspect-video object-cover" />
+                                            <button 
+                                                type="button" 
+                                                onClick={() => setFormData(prev => ({ ...prev, image_url: "" }))}
+                                                className="absolute top-2 right-2 bg-black/60 p-1.5 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <Trash2 size={12} />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </section>
 
@@ -935,15 +992,8 @@ const Admin = () => {
                             <button 
                                 type="submit" 
                                 onClick={() => {
-                                    console.log("[ADMIN DEBUG] isFormValid():", isFormValid());
                                     if (!isFormValid()) {
                                         console.log("[ADMIN DEBUG] Data:", formData);
-                                        console.log("[ADMIN DEBUG] Validation Rules:", {
-                                            city: !!formData.city,
-                                            area: !!formData.area_available,
-                                            rate: !!formData.rate,
-                                            contact: !!formData.source_contact
-                                        });
                                     }
                                 }}
                                 className="rounded-sm bg-primary px-10 py-3 text-xs font-black uppercase tracking-[0.2em] text-primary-foreground shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all hover:bg-primary/90"
@@ -957,67 +1007,45 @@ const Admin = () => {
         </div>
     )}
 
-    {/* User Edit Modal */}
+    {/* User Management Modal */}
     {isUserModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-4 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 px-4 backdrop-blur-md">
             <motion.div 
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="w-full max-w-lg rounded-sm border border-border bg-background p-0 shadow-2xl"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full max-w-lg rounded-sm border border-border bg-background p-8 shadow-2xl"
             >
-                <div className="flex items-center justify-between border-b border-border/50 bg-background/90 px-8 py-6 backdrop-blur-xl">
-                    <h2 className="font-display text-2xl font-bold uppercase tracking-tighter text-foreground">
-                        User Profile Adjustment
-                    </h2>
-                    <button onClick={() => setIsUserModalOpen(false)} className="group flex h-10 w-10 items-center justify-center rounded-sm transition-all hover:bg-muted">
-                        <XCircle size={20} className="text-muted-foreground transition-colors group-hover:text-foreground" />
+                <div className="flex items-center justify-between mb-8">
+                    <h2 className="font-display text-xl font-bold uppercase tracking-tight text-foreground">User Protocol</h2>
+                    <button onClick={() => setIsUserModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+                        <XCircle size={20} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSaveUser} className="p-8 space-y-6">
+                <form onSubmit={handleSaveUser} className="space-y-6">
                     <div>
-                        <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Full Name</label>
-                        <input 
-                            value={userFormData.name} 
-                            onChange={e => setUserFormData(prev => ({ ...prev, name: e.target.value }))}
-                            className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground focus:border-primary focus:outline-none transition-colors" 
-                            required
-                        />
+                        <label className="block mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Identity Name</label>
+                        <input value={userFormData.name} onChange={e => setUserFormData(prev => ({ ...prev, name: e.target.value }))} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground focus:border-primary focus:outline-none transition-colors" />
                     </div>
                     <div>
-                        <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Network Email</label>
-                        <input 
-                            type="email" 
-                            value={userFormData.email} 
-                            onChange={e => setUserFormData(prev => ({ ...prev, email: e.target.value }))}
-                            className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground focus:border-primary focus:outline-none transition-colors" 
-                            required
-                        />
+                        <label className="block mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Digital Signature (Email)</label>
+                        <input type="email" value={userFormData.email} onChange={e => setUserFormData(prev => ({ ...prev, email: e.target.value }))} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground focus:border-primary focus:outline-none transition-colors" />
                     </div>
-                    <div className="flex items-center gap-4 py-2">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground cursor-pointer flex items-center gap-3">
-                            <input 
-                                type="checkbox" 
-                                checked={userFormData.is_admin} 
-                                onChange={e => setUserFormData(prev => ({ ...prev, is_admin: e.target.checked }))}
-                                className="h-4 w-4 bg-primary rounded border-border"
-                            />
-                            System Administrator Status
-                        </label>
+                    <div className="flex items-center gap-3 py-2 cursor-pointer group" onClick={() => setUserFormData(prev => ({ ...prev, is_admin: !prev.is_admin }))}>
+                        <div className={`w-5 h-5 rounded-sm border flex items-center justify-center transition-colors ${userFormData.is_admin ? "bg-primary border-primary shadow-[0_0_10px_rgba(59,130,246,0.4)]" : "border-border group-hover:border-primary/50"}`}>
+                            {userFormData.is_admin && <Check size={14} className="text-white" />}
+                        </div>
+                        <span className="text-xs font-bold uppercase tracking-widest text-foreground">Grant Administrative Clearance</span>
                     </div>
 
-                    <div className="flex justify-end gap-4 border-t border-border/10 pt-6 mt-6">
-                        <button type="button" onClick={() => setIsUserModalOpen(false)} className="rounded-sm border border-border px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted hover:text-foreground">
-                            Cancel
-                        </button>
-                        <button type="submit" className="rounded-sm bg-primary px-8 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-primary-foreground transition-all hover:bg-primary/90">
-                            Save Changes
-                        </button>
+                    <div className="flex justify-end pt-4">
+                        <button type="submit" className="rounded-sm bg-primary px-8 py-3 text-[10px] font-black uppercase tracking-widest text-primary-foreground shadow-lg hover:shadow-primary/20 transition-all">Execute Update</button>
                     </div>
                 </form>
             </motion.div>
         </div>
     )}
+
     </div>
   );
 };
