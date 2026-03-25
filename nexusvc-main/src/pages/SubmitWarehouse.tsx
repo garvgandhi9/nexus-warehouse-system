@@ -475,22 +475,40 @@ const SubmitWarehouse = () => {
                     </button>
                 </div>
 
-                <div className="h-[400px] w-full rounded-sm border border-border overflow-hidden z-0 bg-white">
+                <div className="h-[400px] w-full rounded-sm border border-border overflow-hidden z-0 bg-[#0F172A]">
                     <Map
                         viewState={viewState}
                         mapLib={maplibregl}
-                        mapStyle={`https://api.maptiler.com/maps/streets-v2/style.json?key=${import.meta.env.VITE_MAPTILER_API_KEY}`}
+                        mapStyle={{
+                            version: 8,
+                            sources: {
+                                "satellite": {
+                                    type: "raster",
+                                    tiles: ["https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"],
+                                    tileSize: 256,
+                                },
+                            },
+                            layers: [
+                                {
+                                    id: "satellite",
+                                    type: "raster",
+                                    source: "satellite",
+                                    minzoom: 0,
+                                    maxzoom: 22,
+                                },
+                            ],
+                        }}
                         style={{ width: '100%', height: '400px' }}
                         onMove={(evt: any) => setViewState(evt.viewState)}
                         onClick={(e: any) => {
-                            const [lng, lat] = e.lngLat;
+                            const { lng, lat } = e.lngLat;
                             updateLocation(lat, lng);
                         }}
                     >
                         <Marker
                             longitude={markerPos.longitude}
                             latitude={markerPos.latitude}
-                            anchor="bottom"
+                            anchor="center"
                             draggable={true}
                             onDragEnd={(e: any) => {
                                 const { lng, lat } = e.lngLat;
