@@ -125,7 +125,7 @@ const Listings = () => {
               <h1 className="mt-4 font-display text-4xl font-bold uppercase tracking-tight text-white sm:text-6xl lg:text-7xl">
                 Asset <span className="text-gradient">Listings</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg text-muted-foreground/80 leading-relaxed">
+              <p className="mt-6 max-w-full text-lg text-justify text-muted-foreground/80 leading-relaxed">
                 Explore our curated network of Grade A logistics facilities and strategic industrial infrastructure across India, designed to give enterprises dependable access to modern, compliant spaces. Each asset is strategically located to enhance connectivity, reduce transit times, and support the evolving demands of supply chains.
               </p>
             </div>
