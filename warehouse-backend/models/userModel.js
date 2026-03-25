@@ -40,6 +40,31 @@ const userModel = {
             console.error("[USER MODEL] getAll failed:", err.message);
             throw err;
         }
+    },
+
+    async update(id, data) {
+        if (!id || isNaN(id)) throw new Error("INVALID_ID");
+        try {
+            const { name, email, is_admin } = data;
+            const result = await pool.query(
+                "UPDATE users SET name=$1, email=$2, is_admin=$3 WHERE id=$4 RETURNING id, name, email, is_admin, created_at",
+                [name.trim(), email.toLowerCase().trim(), is_admin, id]
+            );
+            return result.rows[0];
+        } catch (err) {
+            console.error("[USER MODEL] update failed:", err.message);
+            throw err;
+        }
+    },
+
+    async delete(id) {
+        if (!id || isNaN(id)) throw new Error("INVALID_ID");
+        try {
+            await pool.query("DELETE FROM users WHERE id = $1", [id]);
+        } catch (err) {
+            console.error("[USER MODEL] delete failed:", err.message);
+            throw err;
+        }
     }
 };
 

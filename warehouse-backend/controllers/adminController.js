@@ -23,6 +23,34 @@ const adminController = {
         }
     },
 
+    async updateUser(req, res) {
+        try {
+            const { id } = req.params;
+            const updated = await userModel.update(id, req.body);
+            if (!updated) {
+                return res.status(404).json({ success: false, error: "User not found" });
+            }
+            res.json({ success: true, data: updated, message: `User ${id} updated successfully` });
+        } catch (err) {
+            console.error("[ADMIN CONTROLLER] updateUser failed:", err.message);
+            res.status(500).json({ success: false, error: "Failed to update user. Please try again." });
+        }
+    },
+
+    async deleteUser(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id || isNaN(id)) {
+                return res.status(400).json({ success: false, error: "Invalid user ID" });
+            }
+            await userModel.delete(id);
+            res.json({ success: true, message: `User ${id} deleted successfully` });
+        } catch (err) {
+            console.error("[ADMIN CONTROLLER] deleteUser failed:", err.message);
+            res.status(500).json({ success: false, error: "Failed to delete user. Please try again." });
+        }
+    },
+
     async getAdminMessages(req, res) {
         try {
             const messages = await messageModel.getAll();

@@ -70,6 +70,9 @@ const Admin = () => {
     const [saveError, setSaveError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null);
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState<UserInfo | null>(null);
+    const [userFormData, setUserFormData] = useState({ name: "", email: "", is_admin: false });
     const [activeTab, setActiveTab] = useState<"warehouses" | "users" | "pending" | "messages">("warehouses");
 
     const {
@@ -201,6 +204,53 @@ const Admin = () => {
         } catch (err) {
             console.error("Delete failed", err);
             alert("Failed to delete message. Please try again.");
+        }
+    };
+
+    const handleDeleteUser = async (id: number) => {
+        if (!confirm("Are you sure you want to delete this user?")) return;
+        const token = sessionStorage.getItem("admin_token");
+        if (!token) return;
+        try {
+            const res = await fetch(API_ENDPOINTS.ADMIN_DELETE_USER(id), {
+                method: "DELETE",
+                headers: { Authorization: token },
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            setUsers(prev => prev.filter(u => u.id !== id));
+        } catch (err) {
+            console.error("Delete failed", err);
+            alert("Failed to delete user. Please try again.");
+        }
+    };
+
+    const handleOpenUserModal = (user: UserInfo) => {
+        setEditingUser(user);
+        setUserFormData({ name: user.name, email: user.email, is_admin: user.is_admin });
+        setIsUserModalOpen(true);
+    };
+
+    const handleSaveUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const token = sessionStorage.getItem("admin_token");
+        if (!token || !editingUser) return;
+
+        try {
+            const res = await fetch(API_ENDPOINTS.ADMIN_UPDATE_USER(editingUser.id), {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", "Authorization": token },
+                body: JSON.stringify(userFormData),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.error || "Failed to update user.");
+                return;
+            }
+            setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, ...userFormData } : u));
+            setIsUserModalOpen(false);
+        } catch (err) {
+            console.error("Save error", err);
+            alert("Connection failed.");
         }
     };
 
@@ -405,7 +455,8 @@ const Admin = () => {
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">User Identity</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Security Level</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">System Entry</th>
-                                            <th className="whitespace-nowrap px-6 py-4 font-semibold text-right">Reference ID</th>
+                                            <th className="whitespace-nowrap px-6 py-4 font-semibold">Reference ID</th>
+                                            <th className="whitespace-nowrap px-6 py-4 font-semibold text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/30">
@@ -442,8 +493,18 @@ const Admin = () => {
                                                         {new Date(user.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                                                     </div>
                                                 </td>
-                                                <td className="whitespace-nowrap px-6 py-6 text-right font-mono text-[10px] text-muted-foreground">
+                                                <td className="whitespace-nowrap px-6 py-6 font-mono text-[10px] text-muted-foreground">
                                                     #{user.id.toString().padStart(4, '0')}
+                                                </td>
+                                                <td className="whitespace-nowrap px-6 py-6 text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <button onClick={() => handleOpenUserModal(user)} className="rounded bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20">
+                                                            <Edit2 size={14} />
+                                                        </button>
+                                                        <button onClick={() => handleDeleteUser(user.id)} className="rounded bg-destructive/10 p-2 text-destructive transition-colors hover:bg-destructive/20">
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
@@ -872,7 +933,70 @@ const Admin = () => {
                 </div>
             </motion.div>
         </div>
-    )}    </div>
+    )}
+
+    {/* User Edit Modal */}
+    {isUserModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-4 backdrop-blur-md">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="w-full max-w-lg rounded-sm border border-border bg-background p-0 shadow-2xl"
+            >
+                <div className="flex items-center justify-between border-b border-border/50 bg-background/90 px-8 py-6 backdrop-blur-xl">
+                    <h2 className="font-display text-2xl font-bold uppercase tracking-tighter text-foreground">
+                        User Profile Adjustment
+                    </h2>
+                    <button onClick={() => setIsUserModalOpen(false)} className="group flex h-10 w-10 items-center justify-center rounded-sm transition-all hover:bg-muted">
+                        <XCircle size={20} className="text-muted-foreground transition-colors group-hover:text-foreground" />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSaveUser} className="p-8 space-y-6">
+                    <div>
+                        <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Full Name</label>
+                        <input 
+                            value={userFormData.name} 
+                            onChange={e => setUserFormData(prev => ({ ...prev, name: e.target.value }))}
+                            className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground focus:border-primary focus:outline-none transition-colors" 
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Network Email</label>
+                        <input 
+                            type="email" 
+                            value={userFormData.email} 
+                            onChange={e => setUserFormData(prev => ({ ...prev, email: e.target.value }))}
+                            className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground focus:border-primary focus:outline-none transition-colors" 
+                            required
+                        />
+                    </div>
+                    <div className="flex items-center gap-4 py-2">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground cursor-pointer flex items-center gap-3">
+                            <input 
+                                type="checkbox" 
+                                checked={userFormData.is_admin} 
+                                onChange={e => setUserFormData(prev => ({ ...prev, is_admin: e.target.checked }))}
+                                className="h-4 w-4 bg-primary rounded border-border"
+                            />
+                            System Administrator Status
+                        </label>
+                    </div>
+
+                    <div className="flex justify-end gap-4 border-t border-border/10 pt-6 mt-6">
+                        <button type="button" onClick={() => setIsUserModalOpen(false)} className="rounded-sm border border-border px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted hover:text-foreground">
+                            Cancel
+                        </button>
+                        <button type="submit" className="rounded-sm bg-primary px-8 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-primary-foreground transition-all hover:bg-primary/90">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </motion.div>
+        </div>
+    )}
+    </div>
   );
 };
 

@@ -12,6 +12,8 @@ export const API_ENDPOINTS = {
     ADMIN_LOGIN: `${API_BASE_URL}/auth/admin/login`,
     ADMIN_WAREHOUSES: `${API_BASE_URL}/admin/warehouses`,
     ADMIN_USERS: `${API_BASE_URL}/admin/users`,
+    ADMIN_UPDATE_USER: (id: number | string) => `${API_BASE_URL}/admin/users/${id}`,
+    ADMIN_DELETE_USER: (id: number | string) => `${API_BASE_URL}/admin/users/${id}`,
     ADMIN_MESSAGES: `${API_BASE_URL}/admin/messages`,
     ADMIN_APPROVE: (id: number | string) => `${API_BASE_URL}/admin/approve/${id}`,
     ADMIN_DELETE: (id: number | string) => `${API_BASE_URL}/admin/delete/${id}`,
