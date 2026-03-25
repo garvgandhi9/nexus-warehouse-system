@@ -528,7 +528,7 @@ const SubmitWarehouse = () => {
         return (
             <div className="min-h-screen bg-background text-foreground flex flex-col">
                 <Navbar />
-                <main className="flex-1 flex items-center justify-center p-6 text-center">
+                <main className="flex-1 flex items-center justify-center pt-32 pb-20 px-6 text-center">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -550,7 +550,7 @@ const SubmitWarehouse = () => {
     return (
         <div className="min-h-screen bg-background text-foreground flex flex-col">
             <Navbar />
-            <main className="flex-1 pt-28 pb-20">
+            <main className="flex-1 pt-32 pb-20">
                 <div className="mx-auto max-w-4xl px-6 lg:px-8">
                     {!subType ? (
                         <div className="py-12">
