@@ -10,6 +10,7 @@ const WarehouseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [listing, setListing] = useState<any>(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isPrimeActive, setIsPrimeActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,6 +36,7 @@ const WarehouseDetail = () => {
         const formatted = {
           id: data.id,
           city: data.city || "Location",
+          cluster: data.cluster || "",
           warehouse_code: data.warehouse_code || `#${data.id}`,
           area: data.warehouse_code || "-",
           size: data.capacity_type === "pallets"
@@ -135,7 +137,10 @@ const WarehouseDetail = () => {
             <ArrowLeft size={14} /> Back to Listings
           </Link>
 
-          <div className="mt-8 aspect-[21/9] overflow-hidden rounded-sm">
+          <div 
+            className="mt-8 aspect-[21/9] overflow-hidden rounded-sm cursor-zoom-in transition-transform hover:scale-[1.01] active:scale-[0.99]"
+            onClick={() => setIsImageModalOpen(true)}
+          >
             <img src={listing.image} alt={`${listing.city} warehouse`} className="h-full w-full object-cover" />
           </div>
 
@@ -177,7 +182,7 @@ const WarehouseDetail = () => {
               )}
 
               <h1 className="mt-4 font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl text-foreground">
-                {listing.city}
+                {listing.cluster ? `${listing.cluster}, ${listing.city}` : listing.city}
               </h1>
               <p className="mt-1 flex items-center gap-2 text-lg text-muted-foreground">
                 <MapPin size={16} className="text-primary" /> {listing.area}
@@ -187,7 +192,7 @@ const WarehouseDetail = () => {
               </p>
 
               {listing.description && (
-                <p className="mt-8 text-base leading-relaxed text-muted-foreground">{listing.description}</p>
+                <p className="mt-8 text-base leading-relaxed text-muted-foreground whitespace-pre-wrap">{listing.description}</p>
               )}
 
               {(() => {
@@ -296,6 +301,28 @@ const WarehouseDetail = () => {
           </div>
         </section>
         <Footer />
+
+        {/* Image Modal */}
+        {isImageModalOpen && (
+          <div 
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 md:p-10 backdrop-blur-sm animate-in fade-in duration-300 cursor-zoom-out"
+            onClick={() => setIsImageModalOpen(false)}
+          >
+            <div className="relative h-full w-full flex items-center justify-center">
+              <img 
+                src={listing.image} 
+                alt="Enlarged view" 
+                className="max-h-full max-w-full object-contain shadow-2xl animate-in zoom-in-95 duration-300" 
+              />
+              <button 
+                className="absolute top-0 right-0 p-4 text-white/50 hover:text-white transition-colors"
+                onClick={(e) => { e.stopPropagation(); setIsImageModalOpen(false); }}
+              >
+                <div className="h-10 w-10 border border-white/20 rounded-full flex items-center justify-center hover:bg-white/10">✕</div>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Prime Modal */}
         {isPrimeActive && (
