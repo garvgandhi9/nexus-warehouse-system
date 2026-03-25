@@ -184,6 +184,11 @@ const SubmitWarehouse = () => {
         longitude: 72.8777,
         latitude: 19.0760,
         zoom: 11,
+        bearing: 0,
+        pitch: 0,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        width: 0,
+        height: 0
     });
     const [markerPos, setMarkerPos] = useState({
         longitude: 72.8777,
@@ -727,7 +732,29 @@ const SubmitWarehouse = () => {
                                         </section>
 
                                         <section className={sectionClass}>
-                                            <h2 className={sectionTitle}>3. Industries Served & Facilities</h2>
+                                            <h2 className={sectionTitle}>3. Physical Specifications & Facilities</h2>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-6 border-b border-border/50">
+                                                <div>
+                                                    <label className={labelClass}>Ceiling height (in feet)</label>
+                                                    <input 
+                                                        type="number" 
+                                                        value={warehouseForm.ceiling_height} 
+                                                        onChange={e => setW("ceiling_height", e.target.value)} 
+                                                        placeholder="e.g. 30" 
+                                                        className={inputClass} 
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className={labelClass}>Number of docks</label>
+                                                    <input 
+                                                        type="number" 
+                                                        value={warehouseForm.docks} 
+                                                        onChange={e => setW("docks", e.target.value)} 
+                                                        placeholder="e.g. 10" 
+                                                        className={inputClass} 
+                                                    />
+                                                </div>
+                                            </div>
                                             <div className="space-y-8">
                                                 <CheckboxGroup options={INDUSTRIES} selected={warehouseForm.industries} onChange={v => setW("industries", v)} />
                                                 <div className="pt-6 border-t border-border/50">
