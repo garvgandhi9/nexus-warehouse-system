@@ -156,7 +156,7 @@ const warehouseModel = {
 
             const query = `
         INSERT INTO warehouses (
-          warehouse_code, org_name, city, address, full_address,
+          warehouse_code, org_name, city, full_address,
           latitude, longitude, area_available, rate, status,
           is_prime, category, ceiling_height, docks, floor_strength,
           term_type, term_duration, description, industries, facilities,
@@ -164,7 +164,7 @@ const warehouseModel = {
           lister_type, website, user_id
         ) VALUES (
           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,
-          $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28
+          $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27
         ) RETURNING *`;
 
             const num = (v) => (v === "" || v === undefined ? null : Number(v));
@@ -173,8 +173,7 @@ const warehouseModel = {
                 warehouseCode,
                 data.org_name,
                 data.city?.trim(),
-                data.address,
-                data.full_address,
+                data.full_address || data.address,
 
                 num(data.latitude),
                 num(data.longitude),
@@ -226,8 +225,8 @@ const warehouseModel = {
         if (!userId) throw new Error("INVALID_USER_ID");
         try {
             const result = await pool.query(
-                "UPDATE warehouses SET org_name=$1, city=$2, address=$3, status='pending' WHERE id=$4 AND user_id=$5 RETURNING *",
-                [data.org_name, data.city?.trim(), data.address, id, userId]
+                "UPDATE warehouses SET org_name=$1, city=$2, full_address=$3, status='pending' WHERE id=$4 AND user_id=$5 RETURNING *",
+                [data.org_name, data.city?.trim(), data.full_address || data.address, id, userId]
             );
             return result.rows[0] || null;
         } catch (err) {
@@ -243,17 +242,17 @@ const warehouseModel = {
 
             const result = await pool.query(
                 `UPDATE warehouses SET 
-                    warehouse_code=$1, org_name=$2, city=$3, address=$4, full_address=$5,
-                    latitude=$6, longitude=$7, area_available=$8, rate=$9, status=$10,
-                    is_prime=$11, category=$12, ceiling_height=$13, docks=$14, floor_strength=$15,
-                    term_type=$16, term_duration=$17, description=$18, industries=$19, facilities=$20,
-                    contact_person=$21, contact_email=$22, contact_phone=$23, capacity_value=$24, capacity_type=$25,
-                    lister_type=$26, website=$27, lease_type=$28, display_order=$29, source_name=$30, 
-                    source_contact=$31, source_email=$32, source_designation=$33, nearest_port=$34, 
-                    nearest_airport=$35, listing_mode=$36
-                WHERE id=$37 RETURNING *`,
+                    warehouse_code=$1, org_name=$2, city=$3, full_address=$4,
+                    latitude=$5, longitude=$6, area_available=$7, rate=$8, status=$9,
+                    is_prime=$10, category=$11, ceiling_height=$12, docks=$13, floor_strength=$14,
+                    term_type=$15, term_duration=$16, description=$17, industries=$18, facilities=$19,
+                    contact_person=$20, contact_email=$21, contact_phone=$22, capacity_value=$23, capacity_type=$24,
+                    lister_type=$25, website=$26, lease_type=$27, display_order=$28, source_name=$29, 
+                    source_contact=$30, source_email=$31, source_designation=$32, nearest_port=$33, 
+                    nearest_airport=$34, listing_mode=$35
+                WHERE id=$36 RETURNING *`,
                 [
-                    data.warehouse_code, data.org_name, data.city?.trim(), data.address, data.full_address,
+                    data.warehouse_code, data.org_name, data.city?.trim(), data.full_address || data.address,
                     num(data.latitude), num(data.longitude), num(data.area_available), num(data.rate), data.status || 'Available',
                     data.is_prime || false, data.category, num(data.ceiling_height), num(data.docks), data.floor_strength,
                     data.term_type, data.term_duration, data.description, data.industries, data.facilities,
@@ -278,7 +277,7 @@ const warehouseModel = {
 
             const query = `
                 INSERT INTO warehouses (
-                    warehouse_code, org_name, city, address, full_address,
+                    warehouse_code, org_name, city, full_address,
                     latitude, longitude, area_available, rate, status,
                     is_prime, category, ceiling_height, docks, floor_strength,
                     term_type, term_duration, description, industries, facilities,
@@ -289,11 +288,11 @@ const warehouseModel = {
                 ) VALUES (
                     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,
                     $16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,
-                    $31,$32,$33,$34,$35,$36
+                    $31,$32,$33,$34,$35
                 ) RETURNING *`;
 
             const values = [
-                warehouseCode, data.org_name, data.city?.trim(), data.address, data.full_address,
+                warehouseCode, data.org_name, data.city?.trim(), data.full_address || data.address,
                 num(data.latitude), num(data.longitude), num(data.area_available), num(data.rate), data.status || 'Available',
                 data.is_prime || false, data.category, num(data.ceiling_height), num(data.docks), data.floor_strength,
                 data.term_type, data.term_duration, data.description, data.industries, data.facilities,
