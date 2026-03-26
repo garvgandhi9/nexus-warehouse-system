@@ -11,7 +11,7 @@ import Map, { Marker } from 'react-map-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const CATEGORIES = ["General Grade A", "General Grade B", "Bonded", "Cold Storage", "Dark Store", "FTWZ (Free Trade Warehousing Zone)"];
+const CATEGORIES = ["General Grade A", "General Grade B", "Bonded", "Cold Storage", "Dark Store", "Shared Warehouse", "FTWZ (Free Trade Warehousing Zone)"];
 const INDUSTRIES = [
     "FMCG (Fast moving consumer goods)", "Pharma and medical supplies", "Food and beverage",
     "Chemicals/hazardous goods", "Automotive/spare parts", "Agricultural produce",

@@ -792,7 +792,7 @@ const Admin = () => {
                                     <label className="block mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Asset Category</label>
                                     <select name="category" value={(formData as any).category || ""} onChange={handleInputChange} className="w-full rounded-sm border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors">
                                         <option value="">Select category...</option>
-                                        {["Bonded", "Cold Storage", "Dark Store", "FTWZ (Free Trade Warehousing Zone)", "General Grade A", "General Grade B"].map(c => <option key={c} value={c}>{c}</option>)}
+                                        {["Bonded", "Cold Storage", "Dark Store", "Shared Warehouse", "FTWZ (Free Trade Warehousing Zone)", "General Grade A", "General Grade B"].map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
                             </div>
