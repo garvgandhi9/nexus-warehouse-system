@@ -22,14 +22,27 @@ const warehouseModel = {
                 max_rate,
                 category,
                 search,
+                type,
                 page = 1,
                 limit = 12
             } = filters;
 
-            let query = "SELECT * FROM warehouses WHERE status = 'Available'";
-            let countQuery = "SELECT COUNT(*) FROM warehouses WHERE status = 'Available'";
+            let query = "SELECT * FROM warehouses WHERE 1=1";
+            let countQuery = "SELECT COUNT(*) FROM warehouses WHERE 1=1";
             const params = [];
             let paramIndex = 1;
+
+            if (type === "land") {
+                query += " AND status = 'Land Parcel'";
+                countQuery += " AND status = 'Land Parcel'";
+            } else if (type === "warehouse") {
+                query += " AND status = 'Available'";
+                countQuery += " AND status = 'Available'";
+            } else {
+                // If no type filter, show both Approved Warehouses AND Land Parcels
+                query += " AND (status = 'Available' OR status = 'Land Parcel')";
+                countQuery += " AND (status = 'Available' OR status = 'Land Parcel')";
+            }
 
             if (city && city !== "All") {
                 params.push(`%${city.trim()}%`);
@@ -349,7 +362,7 @@ const warehouseModel = {
     async getCities() {
         try {
             const result = await pool.query(
-                "SELECT DISTINCT city FROM warehouses WHERE status = 'Available' AND city IS NOT NULL ORDER BY city ASC"
+                "SELECT DISTINCT city FROM warehouses WHERE status IN ('Available', 'Land Parcel') AND city IS NOT NULL ORDER BY city ASC"
             );
             return result.rows.map(r => r.city);
         } catch (err) {

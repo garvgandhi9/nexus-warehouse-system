@@ -200,7 +200,7 @@ const SubmitWarehouse = () => {
 
     useEffect(() => {
         if (!mapContainerRef.current || !subType) return;
-        
+
         const map = new maplibregl.Map({
             container: mapContainerRef.current,
             style: {
@@ -231,7 +231,7 @@ const SubmitWarehouse = () => {
         const marker = new maplibregl.Marker({ draggable: true })
             .setLngLat([markerPos.longitude, markerPos.latitude])
             .addTo(map);
-        
+
         markerRef.current = marker;
 
         marker.on('dragend', () => {
@@ -306,7 +306,7 @@ const SubmitWarehouse = () => {
                 const { lat, lon, display_name } = data[0];
                 const newLat = parseFloat(lat);
                 const newLng = parseFloat(lon);
-                
+
                 updateLocation(newLat, newLng); // Efficiently updates form, marker, and geocoding
                 if (subType === "warehouse") setW("full_address", display_name);
                 else setL("full_address", display_name);
@@ -392,9 +392,13 @@ const SubmitWarehouse = () => {
                 payload = { ...landForm, tier: "Standard", status: "Land Parcel" };
             }
 
+            const token = localStorage.getItem("token");
             const response = await fetch(API_ENDPOINTS.SUBMIT, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    ...(token ? { "Authorization": token } : {})
+                },
                 body: JSON.stringify(payload),
             });
 
@@ -750,22 +754,22 @@ const SubmitWarehouse = () => {
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-6 border-b border-border/50">
                                                 <div>
                                                     <label className={labelClass}>Ceiling height (in feet)</label>
-                                                    <input 
-                                                        type="number" 
-                                                        value={warehouseForm.ceiling_height} 
-                                                        onChange={e => setW("ceiling_height", e.target.value)} 
-                                                        placeholder="e.g. 30" 
-                                                        className={inputClass} 
+                                                    <input
+                                                        type="number"
+                                                        value={warehouseForm.ceiling_height}
+                                                        onChange={e => setW("ceiling_height", e.target.value)}
+                                                        placeholder="e.g. 30"
+                                                        className={inputClass}
                                                     />
                                                 </div>
                                                 <div>
                                                     <label className={labelClass}>Number of docks</label>
-                                                    <input 
-                                                        type="number" 
-                                                        value={warehouseForm.docks} 
-                                                        onChange={e => setW("docks", e.target.value)} 
-                                                        placeholder="e.g. 10" 
-                                                        className={inputClass} 
+                                                    <input
+                                                        type="number"
+                                                        value={warehouseForm.docks}
+                                                        onChange={e => setW("docks", e.target.value)}
+                                                        placeholder="e.g. 10"
+                                                        className={inputClass}
                                                     />
                                                 </div>
                                             </div>

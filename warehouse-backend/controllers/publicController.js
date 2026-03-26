@@ -9,14 +9,15 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const publicController = {
     async getPublicWarehouses(req, res) {
         try {
-            const { city, min_area, max_rate, min_rate, category, search, page, limit } = req.query;
+            const { city, min_area, max_rate, min_rate, category, search, page, limit, type } = req.query;
             const result = await warehouseModel.getPublic({ 
                 city, 
                 min_area, 
                 max_rate, 
                 min_rate,
                 category, 
-                search, 
+                search,
+                type,
                 page: parseInt(page) || 1, 
                 limit: parseInt(limit) || 12 
             });
@@ -126,7 +127,7 @@ const publicController = {
 
     async getAvailableCities(req, res) {
         try {
-            const result = await pool.query("SELECT DISTINCT city FROM warehouses WHERE status = 'approved' ORDER BY city ASC");
+            const result = await pool.query("SELECT DISTINCT city FROM warehouses WHERE status IN ('Available', 'Land Parcel') ORDER BY city ASC");
             const cities = result.rows.map(row => row.city);
             res.json({ success: true, data: cities });
         } catch (err) {

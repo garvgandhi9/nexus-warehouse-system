@@ -277,9 +277,9 @@ const Dashboard = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-6">
-                                                    {w.status === "Available" ? (
+                                                    {(w.status === "Available" || w.status === "Land Parcel") ? (
                                                         <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-emerald-500 border border-emerald-500/20">
-                                                            <CheckCircle2 size={10} /> Live
+                                                            <CheckCircle2 size={10} /> {w.status === "Land Parcel" ? "LAND PARCEL" : "LIVE"}
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-amber-500 border border-amber-500/20">
