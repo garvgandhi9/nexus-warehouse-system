@@ -130,7 +130,7 @@ const Listings = () => {
           <div className="mt-10 rounded-sm border border-border/30 bg-card/50 backdrop-blur-md p-8 shadow-sm">
             <div className="grid gap-8 md:grid-cols-3">
               <div>
-                <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Live Search</label>
+                <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Location</label>
                 <div className="relative">
                   <input
                     placeholder="Ref, Code, or Info..."
