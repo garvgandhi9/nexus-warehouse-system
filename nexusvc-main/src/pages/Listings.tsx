@@ -19,7 +19,7 @@ const Listings = () => {
 
   const [selectedCity, setSelectedCity] = useState("All");
   const [minArea, setMinArea] = useState(0);
-  const [priceCategory, setPriceCategory] = useState("All");
+  const [maxPrice, setMaxPrice] = useState(0);
   const [propertyType, setPropertyType] = useState("ANY");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,14 +51,7 @@ const Listings = () => {
         if (minArea > 0) params.append("min_area", minArea.toString());
         if (searchQuery) params.append("search", searchQuery);
 
-        if (priceCategory === "Under20") {
-          params.append("max_rate", "20");
-        } else if (priceCategory === "20to40") {
-          params.append("min_rate", "20");
-          params.append("max_rate", "40");
-        } else if (priceCategory === "Over40") {
-          params.append("min_rate", "40");
-        }
+        if (maxPrice > 0) params.append("max_rate", maxPrice.toString());
 
         if (propertyType === "Warehouse") params.append("type", "warehouse");
         if (propertyType === "Land Parcel") params.append("type", "land");
@@ -108,11 +101,11 @@ const Listings = () => {
     };
     loadWarehouses();
     return () => controller.abort();
-  }, [selectedCity, minArea, priceCategory, searchQuery, currentPage, propertyType]);
+  }, [selectedCity, minArea, maxPrice, searchQuery, currentPage, propertyType]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCity, minArea, priceCategory, searchQuery, propertyType]);
+  }, [selectedCity, minArea, maxPrice, searchQuery, propertyType]);
 
   return (
     <>
@@ -137,23 +130,6 @@ const Listings = () => {
           <div className="mt-10 rounded-sm border border-border/30 bg-card/50 backdrop-blur-md p-8 shadow-sm">
             <div className="grid gap-8 md:grid-cols-3">
               <div>
-                <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Location</label>
-                <div className="relative">
-                  <input
-                    list="city-options-list"
-                    placeholder="Search city..."
-                    value={selectedCity === "All" ? "" : selectedCity}
-                    onChange={e => setSelectedCity(e.target.value || "All")}
-                    className="w-full rounded-sm border border-border/50 bg-background/50 p-3.5 text-sm text-foreground focus:border-primary/50 focus:outline-none transition-all"
-                  />
-                  <datalist id="city-options-list">
-                    <option value="All" />
-                    {citiesList.filter(c => c !== "All").map(c => <option key={c} value={c} />)}
-                  </datalist>
-                </div>
-              </div>
-
-              <div>
                 <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Live Search</label>
                 <div className="relative">
                   <input
@@ -166,7 +142,7 @@ const Listings = () => {
                 </div>
               </div>
 
-              <div className="md:col-span-1">
+              <div>
                 <div className="mb-3 flex justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
                   <label>Capacity</label>
                   <span className="text-white">{minArea > 0 ? `${minArea.toLocaleString()} sqft` : 'Any'}</span>
@@ -176,6 +152,20 @@ const Listings = () => {
                   min="0" max="500000" step="10000"
                   value={minArea}
                   onChange={e => setMinArea(Number(e.target.value))}
+                  className="w-full accent-primary h-1.5 rounded-full bg-border/30"
+                />
+              </div>
+
+              <div>
+                <div className="mb-3 flex justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                  <label>Max Price</label>
+                  <span className="text-white">{maxPrice > 0 ? `₹${maxPrice}/sqft` : 'Any'}</span>
+                </div>
+                <input
+                  type="range"
+                  min="0" max="100" step="5"
+                  value={maxPrice}
+                  onChange={e => setMaxPrice(Number(e.target.value))}
                   className="w-full accent-primary h-1.5 rounded-full bg-border/30"
                 />
               </div>
@@ -230,26 +220,6 @@ const Listings = () => {
                   </div>
                 </div>
 
-                <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Price Level</label>
-                <div className="flex w-full rounded-sm border border-border/50 bg-background/50 p-1">
-                  {[
-                    { id: "All", label: "Any" },
-                    { id: "Under20", label: "< ₹20" },
-                    { id: "20to40", label: "₹20-40" },
-                    { id: "Over40", label: "> ₹40" }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      onClick={() => setPriceCategory(opt.id)}
-                      className={`flex-1 rounded-sm py-2.5 text-[9px] font-bold uppercase tracking-widest transition-all ${priceCategory === opt.id
-                        ? 'bg-primary text-white shadow-md'
-                        : 'text-muted-foreground hover:text-white hover:bg-white/5'
-                        }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
               </div>
             </div>
           </div>
