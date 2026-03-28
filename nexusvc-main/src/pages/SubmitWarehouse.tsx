@@ -228,7 +228,7 @@ const SubmitWarehouse = () => {
 
         mapInstanceRef.current = map;
 
-        const marker = new maplibregl.Marker({ draggable: true })
+        const marker = new maplibregl.Marker({ draggable: true, color: "#ef4444" })
             .setLngLat([markerPos.longitude, markerPos.latitude])
             .addTo(map);
 
@@ -457,14 +457,12 @@ const SubmitWarehouse = () => {
                 </div>
                 <div>
                     <label className={labelClass}>City *</label>
-                    <select
+                    <input
                         value={subType === 'warehouse' ? warehouseForm.city : landForm.city}
                         onChange={e => subType === 'warehouse' ? setW("city", e.target.value) : setL("city", e.target.value)}
+                        placeholder="e.g. Mumbai, Pune, Delhi NCR"
                         className={`${inputClass} ${errors.city ? "border-red-500" : ""}`}
-                    >
-                        <option value="">Select city…</option>
-                        {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
+                    />
                     {errors.city && <p className="mt-1 text-[10px] font-bold uppercase text-red-500">{errors.city}</p>}
                 </div>
                 <div>
