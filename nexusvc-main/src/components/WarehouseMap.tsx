@@ -81,7 +81,7 @@ export default function WarehouseMap({ listings, centerOn, zoom }: Props) {
         `;
 
         const popup = new maplibregl.Popup({ offset: 25 }).setDOMContent(popupEl);
-        new maplibregl.Marker()
+        new maplibregl.Marker({ color: "#ef4444" })
           .setLngLat([w.longitude!, w.latitude!])
           .setPopup(popup)
           .addTo(map);
