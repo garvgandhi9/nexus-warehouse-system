@@ -23,7 +23,7 @@ const FACILITIES = [
     "Office space", "Water supply (Direct or Tanker)", "Handling equipment",
     "Power backup / Generator", "Washrooms", "Security cabin",
 ];
-const CITIES = ["Mumbai", "Nashik", "Pune", "Delhi NCR", "Bangalore", "Chennai", "Hyderabad", "Ahmedabad", "Kolkata", "Other"];
+const CITIES = ["Mumbai", "Nashik", "Pune", "Delhi NCR", "Bangalore", "Chennai", "Hyderabad", "Ahmedabad", "Kolkata", "Gujarat", "Other"];
 const CLUSTERS = ["Bhiwandi", "Panvel", "Chakan", "Hosur", "Talegaon", "Dombivli", "Navi Mumbai", "Pimpri-Chinchwad", "Mahape", "Kundli"];
 const listerTypeOptions = ["Owner", "3pl op", "Broker", "Business"] as const;
 const landStatusOptions = ["Sanctioned", "Under Development"] as const;
@@ -395,7 +395,7 @@ const SubmitWarehouse = () => {
             const token = localStorage.getItem("token");
             const response = await fetch(API_ENDPOINTS.SUBMIT, {
                 method: "POST",
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     ...(token ? { "Authorization": token } : {})
                 },
