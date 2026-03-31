@@ -184,9 +184,7 @@ const WarehouseDetail = () => {
               <h1 className="mt-4 font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl text-foreground">
                 {listing.cluster ? `${listing.cluster}, ${listing.city}` : listing.city}
               </h1>
-              <p className="mt-1 flex items-center gap-2 text-lg text-muted-foreground">
-                <MapPin size={16} className="text-primary" /> {listing.area}
-              </p>
+
               <p className="mt-2 font-display text-3xl font-bold text-foreground">
                 {listing.size} <span className="text-base font-normal text-muted-foreground">{listing.unit}</span>
               </p>
