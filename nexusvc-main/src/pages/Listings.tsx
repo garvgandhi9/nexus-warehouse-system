@@ -149,7 +149,7 @@ const Listings = () => {
                 </div>
                 <input
                   type="range"
-                  min="0" max="500000" step="10000"
+                  min="0" max="200000" step="10000"
                   value={minArea}
                   onChange={e => setMinArea(Number(e.target.value))}
                   className="w-full accent-primary h-1.5 rounded-full bg-border/30"
