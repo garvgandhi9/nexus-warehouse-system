@@ -5,56 +5,51 @@ import Footer from "@/components/Footer";
 import ROICalculator from "@/components/ROICalculator";
 import { useScrollAnimation, useCountUp } from "@/hooks/useScrollAnimation";
 import { API_ENDPOINTS } from "@/lib/api-config";
-import { industries, metrics } from "@/data/mockData";
-import { ArrowRight, Warehouse, Building2, Network, Search } from "lucide-react";
+import { ArrowRight, Warehouse, Building2, Network } from "lucide-react";
 
 /* ── Hero ── */
 const Hero = () => {
   const { ref, isVisible } = useScrollAnimation(0.1);
   return (
-    <section className="relative flex min-h-screen items-center overflow-hidden pt-24">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-mesh" />
-      <div className="absolute inset-0 bg-grid opacity-20" />
-      <div className="absolute -right-20 top-0 h-full w-1/2 bg-gradient-to-bl from-primary/8 via-transparent to-transparent" />
-      <div className="absolute bottom-0 left-0 h-px w-2/3 bg-gradient-to-r from-primary/40 to-transparent" />
+    <section className="relative flex min-h-screen items-center overflow-hidden pt-24 bg-[#0b1f2a]">
+      {/* Background image & overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-luminosity"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1600&q=80')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0b1f2a]/95 via-[#0b1f2a]/80 to-[#0b1f2a]/40" />
 
-      <div ref={ref} className="relative mx-auto max-w-7xl px-6 py-32 lg:px-8">
+      <div ref={ref} className="relative mx-auto max-w-7xl px-6 py-32 lg:px-8 w-full">
         <div className="max-w-4xl">
           <p
-            className={`mb-6 font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
+            className={`mb-6 font-display text-xs font-semibold uppercase tracking-[0.3em] text-gray-300 transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
-            INDIA’S FLEXIBLE WAREHOUSING NETWORK
+            INDIA'S FLEXIBLE WAREHOUSING NETWORK
           </p>
           <h1
-            className={`font-display text-5xl font-bold uppercase leading-[1.05] tracking-tight text-foreground transition-all delay-150 duration-700 sm:text-7xl lg:text-8xl ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+            className={`font-display text-5xl font-bold uppercase leading-[1.1] tracking-tight text-white transition-all delay-150 duration-700 sm:text-6xl lg:text-[5.5rem] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
           >
-            Warehousing.
-            <br />
-            Infrastructure.
-            <br />
-            <span className="text-gradient">On Demand.</span>
+            WAREHOUSING.<br />INFRASTRUCTURE.<br />ON DEMAND.
           </h1>
           <p
-            className={`mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground transition-all delay-300 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
+            className={`mt-6 max-w-xl text-base leading-relaxed text-gray-300 transition-all delay-300 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
-            Nexus Value Chain connects businesses to flexible warehousing and build‑to‑suit solutions across India’s key logistics corridors. By enabling underutilised industrial space, we make growth and efficiency easier to achieve.
+            We create Flexible Warehousing and Build To Suit solutions across India's key logistics corridors by unlocking underutilized industrial space.
           </p>
           <div
             className={`mt-10 flex flex-wrap gap-4 transition-all delay-500 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
             <Link
               to="/listings"
-              className="group flex items-center gap-2 rounded-sm bg-primary px-8 py-4 font-display text-sm font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
+              className="group flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-8 py-4 font-display text-sm font-bold uppercase tracking-wider text-[#0b1f2a] transition-all hover:shadow-lg hover:shadow-cyan-400/25"
             >
-              Explore listings
-              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+              EXPLORE LISTINGS &gt;
             </Link>
             <Link
               to="/nexus-prime"
-              className="rounded-sm border border-border px-8 py-4 font-display text-sm font-semibold uppercase tracking-wider text-foreground transition-all hover:border-primary/50 hover:text-primary"
+              className="rounded-full border border-gray-400 px-8 py-4 font-display text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-white hover:text-[#0b1f2a]"
             >
-              Nexus Prime
+              NEXUS PRIME
             </Link>
           </div>
         </div>
@@ -63,53 +58,23 @@ const Hero = () => {
   );
 };
 
-
-
-/* ── Features ── */
-const features = [
-  { icon: Warehouse, title: "Flexible Warehousing", desc: "Get grade A facilities, ready when you are. Lease terms adjust to your pace, expand during peak demand or streamline when operations shift. The space follows your business rhythm." },
-  { icon: Building2, title: "Build-to-Suit Development", desc: "Nexus Prime offers build‑to‑suit facilities that are designed and constructed around your operational requirements. These cover cold storage, high‑density racking, or specialised compliance needs, ensuring that your infrastructure isn’t generic but aligned with your workflows, scalable for future growth" },
-  { icon: Network, title: "Managed Enterprise Network", desc: "A single framework for multi‑city operations. Centralised management, unified compliance, and seamless coordination keep your facilities working together as one." },
+/* ── Metrics ── */
+const newMetrics = [
+  { value: 2.5, suffix: "M+", label: "Sq Ft. Networked" },
+  { value: 18, suffix: "", label: "Enterprise Clients" },
+  { value: 12, suffix: "", label: "Cities" },
+  { value: 100, suffix: "%", label: "Grade A Compliant" },
 ];
 
-const FeaturesSection = () => {
-  const { ref, isVisible } = useScrollAnimation();
-  return (
-    <section ref={ref} className="py-32">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid gap-6 md:grid-cols-3">
-          {features.map((f, i) => (
-            <div
-              key={f.title}
-              className={`group rounded-sm border border-border/50 bg-card p-10 transition-all duration-700 hover:border-primary/30 hover:glow-blue-sm ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-                }`}
-              style={{ transitionDelay: `${i * 150}ms` }}
-            >
-              <f.icon size={32} className="text-primary" strokeWidth={1.5} />
-              <h3 className="mt-6 font-display text-xl font-bold uppercase tracking-tight text-foreground">
-                {f.title}
-              </h3>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
-              <div className="mt-6 h-px w-12 bg-primary/30 transition-all group-hover:w-20 group-hover:bg-primary" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-/* ── Metrics ── */
-const MetricItem = ({ metric, isActive }: { metric: typeof metrics[0]; isActive: boolean }) => {
+const MetricItem = ({ metric, isActive }: { metric: typeof newMetrics[0]; isActive: boolean }) => {
   const count = useCountUp(metric.value, 2000, 0, isActive);
   const display = metric.value % 1 !== 0 ? count.toFixed(1) : Math.round(count).toString();
   return (
-    <div className="text-center">
-      <div className="font-display text-5xl font-bold text-white sm:text-6xl lg:text-7xl">
-        {display}
-        <span className="text-white">{metric.suffix}</span>
+    <div className="text-center px-4">
+      <div className="font-display text-4xl font-bold text-white sm:text-5xl lg:text-5xl mb-2">
+        {display}<span className="text-white">{metric.suffix}</span>
       </div>
-      <p className="mt-3 text-sm uppercase tracking-widest text-primary">{metric.label}</p>
+      <p className="text-xs uppercase tracking-widest text-[#0b1f2a] font-medium">{metric.label}</p>
     </div>
   );
 };
@@ -117,12 +82,51 @@ const MetricItem = ({ metric, isActive }: { metric: typeof metrics[0]; isActive:
 const MetricsSection = () => {
   const { ref, isVisible } = useScrollAnimation(0.3);
   return (
-    <section ref={ref} className="relative overflow-hidden py-32">
-      <div className="absolute inset-0 bg-mesh" />
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-12 lg:grid-cols-4">
-          {metrics.map((m) => (
+    <section ref={ref} className="bg-[#66a3b6] py-12">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-y-10 gap-x-8 lg:grid-cols-4 divide-x-0 lg:divide-x divide-white/20">
+          {newMetrics.map((m) => (
             <MetricItem key={m.label} metric={m} isActive={isVisible} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ── Features ── */
+const features = [
+  { icon: Warehouse, title: "Flexible Warehousing", desc: "Ready-to-occupy Grade A facilities with flexible lease terms. Scale up or down as your business demands." },
+  { icon: Building2, title: "Build-to-Suit Development", desc: "Custom-designed and constructed facilities tailored to your exact operational specifications." },
+  { icon: Network, title: "Managed Enterprise Network", desc: "Multi-facility management across cities with centralized operations and unified compliance." },
+];
+
+const FeaturesSection = () => {
+  const { ref, isVisible } = useScrollAnimation();
+  return (
+    <section ref={ref} className="bg-[#112431] py-32 relative">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-12 md:grid-cols-3">
+          {features.map((f, i) => (
+            <div
+              key={f.title}
+              className={`group relative pt-6 transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+              style={{ transitionDelay: `${i * 150}ms` }}
+            >
+              <div className="relative w-full h-full rounded-tl-xl rounded-br-xl rounded-tr-[4rem] rounded-bl-[4rem] bg-[#112431] border border-white/20 p-8 pt-10 pb-12 shadow-xl">
+
+                {/* The Blue Icon Box */}
+                <div className="absolute top-[-2rem] right-[1rem] w-[4.5rem] h-[4.5rem] rounded-[1.25rem] bg-gradient-to-br from-[#80c8d4] to-[#458092] flex items-center justify-center z-20 shadow-md">
+                  <f.icon size={32} className="text-white drop-shadow-sm" strokeWidth={1.5} />
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 text-center flex flex-col items-center mt-4">
+                  <h3 className="font-display text-[1.1rem] text-white tracking-wide mb-3">{f.title}</h3>
+                  <p className="text-[12px] leading-relaxed text-gray-300 max-w-[260px]">{f.desc}</p>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -137,14 +141,6 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
   const listingsRef = React.useRef<HTMLElement>(null);
   const { ref, isVisible } = useScrollAnimation();
   const [apiListings, setApiListings] = useState<any[]>([]);
-
-  // Filter States
-  const [selectedCity, setSelectedCity] = useState("All");
-  const [minArea, setMinArea] = useState(0);
-  const [priceCategory, setPriceCategory] = useState("All"); // "All", "Under20", "20to40", "Over40"
-
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -165,183 +161,137 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
           status: "Available",
           image: w.image_url || "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
         }));
+
+        if (formatted.length === 0) throw new Error("Empty DB");
         setApiListings(formatted);
       } catch (err: any) {
         if (err.name === "AbortError") return;
-        console.error("Failed to fetch featured warehouses:", err);
+        console.error("Failed to fetch featured warehouses, rendering dummy layout:", err);
+        // Fallback dummy data if backend is empty
+        setApiListings([
+          {
+            id: 1, city: "MUMBAI", cluster: "WP-1004 - GENERAL GRADE B", size: "250,000", rate: "28",
+            image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
+          },
+          {
+            id: 2, city: "NASHIK", cluster: "WP-1005 - GENERAL GRADE B", size: "3,000", rate: "25",
+            image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
+          },
+          {
+            id: 3, city: "MUMBAI", cluster: "WP-1001 - GENERAL GRADE A", size: "15,000", rate: "32",
+            image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
+          }
+        ]);
       }
     };
     loadFeatured();
     return () => controller.abort();
   }, []);
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCity, minArea, priceCategory]);
-
-  // Sync with calculated ROI constraints
-  useEffect(() => {
-    if (calculatedArea > 0) {
-      setMinArea(calculatedArea);
-      if (listingsRef.current) {
-        listingsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-  }, [calculatedArea]);
-
-  const handleCitySelect = (cityName: string) => {
-    setSelectedCity(cityName);
-    if (listingsRef.current) {
-      listingsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   return (
-    <section ref={listingsRef} className="py-32">
-      <div ref={ref} className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section ref={listingsRef} className="bg-gradient-to-r from-[#70b1be] to-[#3a6d7f] pt-24 pb-0">
+      <div ref={ref} className="mx-auto max-w-7xl px-6 lg:px-8 mb-12">
         <div className="flex flex-col gap-6 md:flex-row md:items-end justify-between">
           <div>
-            <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Portfolio</p>
-            <h2 className="mt-3 font-display text-3xl font-bold uppercase tracking-tight text-foreground sm:text-5xl">
+            <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2">Portfolio</p>
+            <h2 className="font-display text-[2.75rem] font-bold uppercase tracking-widest text-white mb-4">
               Featured Listings
             </h2>
-            <p className="mt-3 text-sm text-muted-foreground max-w-2xl">
-              Find Grade A logistics facilities consolidated by us; strategically located, fully compliant, and ready to power your supply chain.
+            <p className="text-[13px] leading-relaxed text-white/90 max-w-3xl">
+              Find Grade A logistics facilities consolidated by us, strategically located, fully compliant, and ready to power your supply chain.
             </p>
           </div>
           <Link
             to="/listings"
-            className="hidden items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:flex shrink-0"
+            className="flex items-center gap-2 text-[13px] font-bold text-white transition-colors hover:text-white/80 shrink-0 mb-[6px]"
           >
-            View All <ArrowRight size={14} />
+            View All &gt;
           </Link>
         </div>
+      </div>
 
-
-
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 pb-16">
+        <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-3">
           {apiListings.map((l, i) => (
             <Link
               to={`/listings/${l.id}`}
               key={l.id}
-              className={`group overflow-hidden rounded-sm border border-border/50 bg-card transition-all duration-700 hover:border-primary/30 hover:glow-blue-sm ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-                }`}
+              className={`group relative overflow-hidden transition-all duration-700 border-r border-[#0b1f2a] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
               style={{ transitionDelay: `${(i % ITEMS_PER_PAGE) * 100}ms` }}
             >
-              <div className="aspect-[16/10] overflow-hidden">
+              <div className="aspect-[3/4] md:aspect-[3/4] overflow-hidden bg-[#0a1a24]">
                 <img
                   src={l.image}
                   alt={`${l.city} warehouse`}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 mix-blend-luminosity brightness-75"
                   loading="lazy"
                 />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-500" />
               </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
-                    {l.cluster ? `${l.cluster} , ${l.city}` : l.city}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    {l.rate && (
-                      <span className="text-xs font-bold text-emerald-400">₹{l.rate}/sqft</span>
-                    )}
-                    <span className={`rounded-sm px-2 py-1 text-[10px] font-semibold uppercase tracking-wider ${l.status === "Available" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                      }`}>
-                      {l.status}
-                    </span>
-                  </div>
-                </div>
 
-                <p className="mt-3 font-display text-2xl font-bold text-foreground">
-                  {l.size} <span className="text-sm font-normal text-muted-foreground">{l.unit}</span>
-                </p>
+              <div className="absolute top-6 left-6 right-6">
+                <h3 className="font-display text-3xl font-bold uppercase tracking-tight text-white mb-1">
+                  {l.city}
+                </h3>
+                <div className="text-[10px] uppercase text-white/80 font-medium tracking-wide leading-relaxed">
+                  WH TYPE - <br />
+                  {l.cluster}
+                  <br />
+                  <span className="text-cyan-400 font-bold block mt-1">RATE<br />₹{l.rate}/sqft</span>
+                </div>
+              </div>
+
+              <div className="absolute bottom-6 left-6 flex items-end h-32">
+                <div className="relative h-full flex items-end pb-8">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-white -rotate-90 origin-bottom-left absolute left-0 bottom-14 whitespace-nowrap">CAPACITY</span>
+                  <p className="font-display text-4xl font-bold text-white ml-6 leading-none">
+                    {l.size}
+                  </p>
+                  <span className="text-[10px] text-white -rotate-90 block absolute right-[-24px] bottom-[30px] font-bold">SQ FT</span>
+                </div>
+              </div>
+
+              <div className="absolute bottom-6 right-6 h-10 w-10 rounded-full border border-white/40 flex items-center justify-center backdrop-blur-md">
+                <ArrowRight size={16} className="text-white" />
               </div>
             </Link>
           ))}
         </div>
-
-        {/* Removed pagination as featured is limited to 6 items */}
-
-        {apiListings.length === 0 && (
-          <div className="mt-8 mb-4 text-center">
-            <span className="inline-block px-4 py-1 rounded-full bg-primary/5 text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 border border-primary/10">
-              No featured infrastructure found
-            </span>
-          </div>
-        )}
-
-        {apiListings.length === 0 && (
-          <div className="mt-12 py-12 text-center text-muted-foreground border border-border/50 rounded-sm bg-card/50">
-            Synchronising infrastructure network...
-          </div>
-        )}
-
-        <Link
-          to="/listings"
-          className="mt-10 flex items-center justify-center gap-2 text-sm font-medium text-primary sm:hidden"
-        >
-          View All Listings <ArrowRight size={14} />
-        </Link>
       </div>
     </section>
   );
 };
 
 /* ── Industries ── */
+const industriesNew = [
+  { name: "E-COMMERCE", description: "Fulfillment-ready hubs for rapid last-mile delivery." },
+  { name: "FMCG", description: "Temperature-controlled and ambient storage to keep products moving." },
+  { name: "3PL", description: "Multi-client enabled facilities that flex with diverse logistics needs." },
+  { name: "PHARMA", description: "GDP-compliant cold chain and ambient solutions for sensitive cargo." },
+  { name: "AUTOMOTIVE", description: "Just-in-time facilities positioned near manufacturing hubs." },
+];
+
 const IndustriesSection = () => {
   const { ref, isVisible } = useScrollAnimation();
   return (
-    <section ref={ref} className="border-t border-border/50 py-32">
+    <section ref={ref} className="bg-gradient-to-r from-[#70b1be] to-[#3a6d7f] py-24 shadow-inner">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Sectors</p>
-        <h2 className="mt-3 font-display text-3xl font-bold uppercase tracking-tight text-foreground sm:text-5xl">
-          Industries We Serve
+        <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2">Sectors</p>
+        <h2 className="font-display text-[2.75rem] font-bold uppercase tracking-widest text-white mb-16">
+          INDUSTRIES WE SERVE
         </h2>
-        <div className="mt-12 grid gap-px bg-border/30 sm:grid-cols-2 lg:grid-cols-5">
-          {industries.map((ind, i) => (
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-0">
+          {industriesNew.map((ind, i) => (
             <div
               key={ind.name}
-              className={`bg-background p-8 transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-                }`}
+              className={`transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"} ${i > 0 ? "lg:border-l lg:border-white/20 lg:pl-8" : "lg:pr-8"}`}
               style={{ transitionDelay: `${i * 100}ms` }}
             >
-              <h3 className="font-display text-lg font-bold uppercase tracking-tight text-foreground">{ind.name}</h3>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{ind.description}</p>
+              <h3 className="font-display text-[13px] font-extrabold uppercase tracking-widest text-white mb-3">{ind.name}</h3>
+              <p className="text-[13px] leading-relaxed text-white/90 max-w-[200px]">{ind.description}</p>
             </div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-};
-
-/* ── Final CTA ── */
-const FinalCTA = () => {
-  const { ref, isVisible } = useScrollAnimation();
-  return (
-    <section ref={ref} className="relative overflow-hidden py-40">
-      <div className="absolute inset-0 bg-mesh" />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-      <div className="absolute -left-20 top-0 h-full w-1/3 bg-gradient-to-br from-primary/6 via-transparent to-transparent" />
-      <div
-        className={`relative mx-auto max-w-3xl px-6 text-center transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
-      >
-        <h2 className="font-display text-4xl font-bold uppercase leading-tight tracking-tight text-foreground sm:text-6xl">
-          Let's Build Your
-          <br />
-          <span className="text-gradient">Next Facility</span>
-        </h2>
-        <p className="mx-auto mt-6 max-w-lg text-lg text-muted-foreground">
-          Whether you need infrastructure that’s ready today or a custom‑built solution for tomorrow, Nexus engineers spaces that fit your vision. Start a conversation and explore what’s possible.
-        </p>
-        <Link
-          to="/contact"
-          className="mt-10 inline-flex items-center gap-2 rounded-sm bg-primary px-10 py-4 font-display text-sm font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
-        >
-          Start a Conversation <ArrowRight size={16} />
-        </Link>
       </div>
     </section>
   );
@@ -352,19 +302,20 @@ const Index = () => {
   const [calculatedArea, setCalculatedArea] = useState<number>(0);
 
   return (
-    <>
+    <div className="bg-[#0b1f2a] min-h-screen">
       <Navbar />
       <main>
         <Hero />
-        <FeaturesSection />
         <MetricsSection />
+        <FeaturesSection />
         <ListingsPreview calculatedArea={calculatedArea} />
-        <ROICalculator onComplete={(sqFt) => setCalculatedArea(sqFt)} />
+        <div className="bg-[#112431] pb-32 pt-16">
+          <ROICalculator onComplete={(sqFt) => setCalculatedArea(sqFt)} />
+        </div>
         <IndustriesSection />
-        <FinalCTA />
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

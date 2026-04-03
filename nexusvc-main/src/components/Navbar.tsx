@@ -50,135 +50,121 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-6 left-1/2 z-50 -translate-x-1/2 rounded-full border border-primary/40 bg-background/60 backdrop-blur-2xl shadow-[0_0_40px_rgba(0,0,0,0.3)] transition-all duration-500 max-w-[95vw]">
-      <div className="flex h-14 items-center px-4 sm:px-6 gap-2 sm:gap-6">
-        {/* Brand */}
-        <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="font-display text-base font-black tracking-tighter text-foreground shrink-0 pr-4 border-r border-primary/10 hover:text-primary transition-colors">
-          NEXUS
-        </Link>
+    <div className="fixed top-8 left-0 right-0 z-50 flex items-center justify-between px-8 sm:px-12 md:px-16 pointer-events-none">
+      {/* Brand / Logo - Outside the pill */}
+      <Link 
+        to="/" 
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
+        className="pointer-events-auto flex items-center group transition-all duration-300 translate-y-2"
+      >
+        <img 
+          src="/logo.png" 
+          alt="NEXUS" 
+          className="h-11 w-auto opacity-100 transition-opacity"
+          onError={(e) => {
+            // Fallback to text if logo.png isn't found yet
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.parentElement!.insertAdjacentHTML('beforeend', '<span class="font-display text-xl font-black tracking-tighter text-foreground group-hover:text-primary transition-colors">NEXUS</span>');
+          }}
+        />
+      </Link>
 
-        {/* Desktop links */}
-        <div className="hidden items-center gap-6 md:flex">
-          <div className="flex items-center gap-5">
+      {/* Navigation Pill */}
+      <nav className="pointer-events-auto rounded-full border border-white/10 bg-[#0A0B10]/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_25px_rgba(34,211,238,0.15)] transition-all duration-500">
+        <div className="flex h-12 items-center px-6 gap-6">
+          {/* Desktop links */}
+          <div className="hidden items-center gap-6 md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-primary ${location.pathname === link.to ? "text-primary" : "text-muted-foreground"
+                className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-primary ${location.pathname === link.to ? "text-primary" : "text-muted-foreground/80"
                   }`}
               >
                 {link.label}
               </Link>
             ))}
+            
             <Link
               to={isLoggedIn ? (isAdmin ? "/admin" : "/submit") : "/login"}
-              className="text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-primary text-muted-foreground"
+              className="text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-primary text-muted-foreground/80"
             >
-              + Add Listing
+              Add Listing
             </Link>
-          </div>
 
-          <div className="h-6 w-px bg-primary/10 mx-1" />
+            <div className="h-4 w-px bg-white/10 mx-1" />
 
-          <div className="flex items-center gap-4">
             {isLoggedIn ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-5">
                 <Link
                   to={isAdmin ? "/admin" : "/dashboard"}
-                  className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-primary ${location.pathname === (isAdmin ? "/admin" : "/dashboard") ? "text-primary" : "text-muted-foreground"}`}
+                  className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-primary ${location.pathname === (isAdmin ? "/admin" : "/dashboard") ? "text-primary" : "text-muted-foreground/80"}`}
                 >
-                  {isAdmin ? <Shield size={14} className="opacity-70 text-primary" /> : <LayoutDashboard size={14} className="opacity-70" />}
-                  <span>{isAdmin ? "Admin Console" : "Dashboard"}</span>
+                  {isAdmin ? <Shield size={14} className="text-primary" /> : <LayoutDashboard size={14} />}
+                  <span>Dashboard</span>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-red-500 transition-colors"
-                  title="Logout"
+                  className="text-muted-foreground/60 hover:text-red-500 transition-colors"
                 >
                   <LogOut size={14} />
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-4">
-                <Link
-                  to="/login"
-                  className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-primary ${location.pathname === "/login" ? "text-primary" : "text-muted-foreground"}`}
-                >
-                  <span>Log In</span>
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-primary ${location.pathname === "/login" ? "text-primary" : "text-muted-foreground/80"}`}
+              >
+                Log In
+              </Link>
             )}
           </div>
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setOpen(!open)}
+            className="text-foreground md:hidden p-2"
+            aria-label="Toggle menu"
+          >
+            {open ? <X size={18} /> : <Menu size={18} />}
+          </button>
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="text-foreground md:hidden ml-auto p-2"
-          aria-label="Toggle menu"
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-
-      {/* Mobile menu */}
-      {open && (
-        <div className="absolute top-16 left-0 right-0 rounded-2xl border border-primary/40 bg-background/98 backdrop-blur-2xl md:hidden overflow-hidden shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="flex flex-col p-4 gap-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                onClick={() => setOpen(false)}
-                className={`rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-primary/10 ${location.pathname === link.to ? "text-primary bg-primary/5" : "text-muted-foreground"
-                  }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <Link
-              to={isLoggedIn ? (isAdmin ? "/admin" : "/submit") : "/login"}
-              onClick={() => setOpen(false)}
-              className="rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-primary/10 text-muted-foreground"
-            >
-              + Add Listing
-            </Link>
-
-            <div className="h-px bg-primary/10 my-2" />
-
-            {isLoggedIn ? (
-              <>
+        {/* Mobile menu - anchored to the pill */}
+        {open && (
+          <div className="absolute top-[calc(100%+12px)] right-0 min-w-[240px] rounded-[24px] border border-white/10 bg-[#0A0B10]/95 backdrop-blur-3xl md:hidden overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300 origin-top-right">
+            <div className="flex flex-col p-4 gap-1">
+              {navLinks.map((link) => (
                 <Link
-                  to={isAdmin ? "/admin" : "/dashboard"}
+                  key={link.to}
+                  to={link.to}
                   onClick={() => setOpen(false)}
-                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-primary/10 ${location.pathname === (isAdmin ? "/admin" : "/dashboard") ? "text-primary bg-primary/5" : "text-muted-foreground"
+                  className={`rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] transition-all hover:bg-white/5 ${location.pathname === link.to ? "text-primary bg-white/5" : "text-muted-foreground"
                     }`}
                 >
-                  {isAdmin ? <Shield size={16} /> : <LayoutDashboard size={16} />}
-                  {isAdmin ? "Admin Command Center" : "Dashboard"}
+                  {link.label}
                 </Link>
-                <button
-                  onClick={() => { handleLogout(); setOpen(false); }}
-                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:bg-red-500/10 hover:text-red-500 text-left transition-colors"
-                >
-                  <LogOut size={16} /> Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  onClick={() => setOpen(false)}
-                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-primary/10 ${location.pathname === "/login" ? "text-primary bg-primary/5" : "text-muted-foreground"}`}
-                >
-                  Log In
-                </Link>
-              </>
-            )}
+              ))}
+              <div className="h-px bg-white/5 my-2" />
+              <Link
+                to={isLoggedIn ? (isAdmin ? "/admin" : "/submit") : "/login"}
+                onClick={() => setOpen(false)}
+                className="rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground hover:bg-white/5"
+              >
+                + Add Listing
+              </Link>
+              <Link
+                to="/login"
+                onClick={() => setOpen(false)}
+                className="rounded-xl px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground hover:bg-white/5"
+              >
+                Log In
+              </Link>
+            </div>
           </div>
-        </div>
-      )}
-    </nav>
+        )}
+      </nav>
+    </div>
   );
 };
 

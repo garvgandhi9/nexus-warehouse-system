@@ -100,7 +100,7 @@ const Admin = () => {
     useEffect(() => {
         const token = sessionStorage.getItem("admin_token");
         if (!token) {
-            navigate("/admin/login");
+            navigate("/login");
             return;
         }
         const controller = new AbortController();
@@ -118,7 +118,7 @@ const Admin = () => {
             });
             if (res.status === 401 || res.status === 403) {
                 sessionStorage.removeItem("admin_token");
-                navigate("/admin/login");
+                navigate("/login");
                 return;
             }
             if (!res.ok) throw new Error(`HTTP ${res.status}`);

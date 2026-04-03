@@ -125,14 +125,14 @@ const NexusPrime = () => {
                 </section>
 
                 {/* 3PL Section */}
-                <section ref={whatIs3PLRef} className="border-y border-border/50 bg-card/30 py-32 backdrop-blur-sm">
+                <section ref={whatIs3PLRef} className="bg-gradient-to-r from-[#70b1be] to-[#3a6d7f] py-32 shadow-inner text-white">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
                             <div className={`transition-all duration-1000 ${whatIs3PLVis ? "translate-x-0 opacity-100" : "-translate-x-12 opacity-0"}`}>
-                                <h2 className="font-display text-4xl font-black uppercase tracking-tighter text-foreground sm:text-6xl">
-                                    WHAT IS <span className="text-primary italic">3PL?</span>
+                                <h2 className="font-display text-4xl font-black uppercase tracking-tighter text-white sm:text-6xl">
+                                    WHAT IS <span className="text-[#a4dbe4] italic">3PL?</span>
                                 </h2>
-                                <p className="mt-8 text-xl leading-relaxed text-muted-foreground">
+                                <p className="mt-8 text-xl leading-relaxed text-white/90">
                                     Third-Party Logistics (3PL) is about outsourcing supply chain operations to a partner who can manage them end-to-end. With <b>Nexus Prime</b>, you gain a streamlined way to handle storage, movement, and compliance, without the burden of trucks, staff, or multiple contracts.
                                 </p>
                                 <div className="mt-10 grid gap-6">
@@ -143,23 +143,23 @@ const NexusPrime = () => {
                                         { title: "Compliance-as-a-Service", desc: "Every facility in the Nexus Prime network is Grade A compliant, so you don't have to worry about audits, certifications, or regulatory gaps. Compliance is built into the service." },
                                     ].map((item, i) => (
                                         <div key={i} className="flex gap-4">
-                                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary shrink-0 mt-1">
+                                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-white shrink-0 mt-1 shadow-sm">
                                                 <ArrowRight size={14} />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-bold uppercase tracking-widest text-foreground">{item.title}</p>
-                                                <p className="mt-2 text-sm text-muted-foreground leading-relaxed text-justify">{item.desc}</p>
+                                                <p className="text-sm font-bold uppercase tracking-widest text-white">{item.title}</p>
+                                                <p className="mt-2 text-sm text-white/80 leading-relaxed text-justify">{item.desc}</p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                            <div className={`relative rounded-2xl border border-primary/20 bg-background p-2 transition-all duration-1000 ${whatIs3PLVis ? "translate-x-0 opacity-100" : "translate-x-12 opacity-0"}`}>
-                                <div className="aspect-video overflow-hidden rounded-xl bg-muted shadow-2xl">
+                            <div className={`relative rounded-2xl border border-white/20 bg-white/5 p-2 transition-all duration-1000 backdrop-blur-md ${whatIs3PLVis ? "translate-x-0 opacity-100" : "translate-x-12 opacity-0"}`}>
+                                <div className="aspect-video overflow-hidden rounded-xl bg-black/20 shadow-2xl">
                                     <img
                                         src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&q=80"
                                         alt="Nexus Prime Operations"
-                                        className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                                        className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                                     />
                                 </div>
                             </div>

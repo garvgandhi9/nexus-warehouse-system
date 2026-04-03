@@ -27,20 +27,19 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({ onComplete }) => {
     const totalSavings = (baseSqFt - optimizedSqFt) * monthlySavingsPerSqFt * duration;
 
     return (
-        <section className="py-24 border-b border-border/50">
+        <section className="py-24 border-b border-white/10">
             <div className="mx-auto max-w-4xl px-6 lg:px-8">
-                <div className="rounded-sm border border-border/50 bg-card p-8 shadow-xl relative overflow-hidden">
+                <div className="rounded-tl-2xl rounded-br-2xl rounded-tr-[10rem] rounded-bl-[10rem] border border-white/10 bg-[#112431] p-12 shadow-2xl relative overflow-hidden">
                     {/* Subtle background glow */}
-                    <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-primary/5 blur-[100px]" />
+                    <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-cyan-400/5 blur-[100px]" />
 
-                    <div className="relative z-10">
-                        <div className="mb-8 flex items-center justify-between border-b border-border/50 pb-6">
+                    <div className="relative z-10 px-4">
+                        <div className="mb-10 flex items-center justify-between border-b border-white/5 pb-8">
                             <div>
-                                <h2 className="font-display text-2xl font-bold uppercase tracking-tight flex items-center gap-3">
-                                    <Calculator className="text-primary" />
+                                <h2 className="text-3xl font-semibold tracking-wide text-white">
                                     Nexus ROI & Space Calculator
                                 </h2>
-                                <p className="mt-1 text-sm text-muted-foreground">See how Grade‑A optimisation translates into real savings. Run the numbers and measure the impact.</p>
+                                <p className="mt-3 text-[13px] leading-relaxed text-gray-300 max-w-xl">See how Grade-A optimisation translates into real savings.<br />Run the numbers and measure the impact.</p>
                             </div>
 
                             <div className="flex gap-2">
@@ -53,43 +52,43 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({ onComplete }) => {
                             </div>
                         </div>
 
-                        <div className="min-h-[250px] flex flex-col justify-center">
+                        <div className="min-h-[250px] flex flex-col justify-center px-4">
                             {/* Step 1: Capacity */}
                             {step === 1 && (
                                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <h3 className="text-lg font-semibold uppercase tracking-wider mb-6">Step 1: Define Capacity Requirement</h3>
+                                    <h3 className="text-[1.1rem] font-medium tracking-wide text-white mb-6 uppercase">Step 1: Define Capacity Requirement</h3>
 
-                                    <div className="mb-6 flex rounded-sm border border-border bg-background p-1 w-fit">
+                                    <div className="mb-8 flex gap-2 w-fit">
                                         <button
                                             onClick={() => setUnit("Pallets")}
-                                            className={`flex items-center gap-2 rounded-sm px-6 py-2.5 text-sm font-medium transition-colors ${unit === "Pallets" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                                            className={`rounded-full px-6 py-2 text-[10px] uppercase font-bold tracking-widest transition-all ${unit === "Pallets" ? "bg-gradient-to-r from-[#7bc0cd] to-[#4c8491] text-white shadow-lg" : "border border-white/20 text-gray-400 hover:border-white/40"}`}
                                         >
-                                            <Package size={16} /> Pallet Positions
+                                            Pallet Positions
                                         </button>
                                         <button
                                             onClick={() => setUnit("Sq Ft")}
-                                            className={`flex items-center gap-2 rounded-sm px-6 py-2.5 text-sm font-medium transition-colors ${unit === "Sq Ft" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                                            className={`rounded-full px-6 py-2 text-[10px] uppercase font-bold tracking-widest transition-all ${unit === "Sq Ft" ? "bg-gradient-to-r from-[#7bc0cd] to-[#4c8491] text-white shadow-lg" : "border border-white/20 text-gray-400 hover:border-white/40"}`}
                                         >
-                                            <Ruler size={16} /> Square Feet
+                                            Square Feet
                                         </button>
                                     </div>
 
                                     <div className="mb-8">
                                         <input
                                             type="number"
-                                            placeholder={`Enter total ${unit}...`}
+                                            placeholder={`Enter Total ${unit}...`}
                                             value={capacity}
                                             onChange={(e) => setCapacity(e.target.value)}
-                                            className="w-full max-w-sm rounded-sm border border-border bg-background p-4 text-xl font-display focus:border-primary focus:outline-none"
+                                            className="w-full max-w-md rounded-sm border border-white/20 bg-transparent p-3 text-[15px] text-white placeholder:text-gray-400 focus:border-[#7bc0cd] focus:outline-none"
                                         />
                                     </div>
 
                                     <button
                                         onClick={handleNext}
                                         disabled={!capacity || Number(capacity) <= 0}
-                                        className="flex items-center gap-2 rounded-sm bg-primary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+                                        className="rounded-full bg-gradient-to-r from-[#80c8d4] to-[#458092] px-8 py-3 text-sm font-medium tracking-wider text-white transition-all hover:brightness-110 disabled:opacity-50"
                                     >
-                                        Continue <ArrowRight size={16} />
+                                        CONTINUE &gt;
                                     </button>
                                 </div>
                             )}
@@ -122,13 +121,13 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({ onComplete }) => {
                                     <div className="flex gap-4">
                                         <button
                                             onClick={() => setStep(1)}
-                                            className="rounded-sm border border-border bg-card px-8 py-3 text-sm font-semibold uppercase tracking-wider text-foreground transition-all hover:bg-muted"
+                                            className="rounded-full border border-white/20 bg-white/5 backdrop-blur-sm px-8 py-3 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-white/10"
                                         >
                                             Back
                                         </button>
                                         <button
                                             onClick={handleNext}
-                                            className="flex items-center gap-2 rounded-sm bg-primary px-8 py-3 text-sm font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:bg-primary/90"
+                                            className="flex items-center gap-2 rounded-full bg-cyan-400 px-8 py-3 text-sm font-bold uppercase tracking-wider text-[#0b1f2a] transition-all hover:bg-cyan-300"
                                         >
                                             Calculate ROI <TrendingUp size={16} />
                                         </button>
@@ -182,13 +181,13 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({ onComplete }) => {
                                     <div className="mt-10 flex flex-wrap gap-4 items-center border-t border-border/50 pt-8">
                                         <button
                                             onClick={() => onComplete(optimizedSqFt)}
-                                            className="flex items-center gap-2 rounded-sm bg-primary px-8 py-4 font-display text-sm font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
+                                            className="flex items-center gap-2 rounded-full bg-cyan-400 px-8 py-4 font-display text-sm font-bold uppercase tracking-wider text-[#0b1f2a] transition-all hover:shadow-lg hover:shadow-cyan-400/25"
                                         >
                                             View Recommended Warehouses <ArrowRight size={16} />
                                         </button>
                                         <button
                                             onClick={() => { setStep(1); setCapacity(""); }}
-                                            className="rounded-sm border border-border px-8 py-4 text-sm font-semibold uppercase tracking-wider transition-all hover:bg-muted"
+                                            className="rounded-full border border-white/20 bg-white/5 backdrop-blur-sm px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-white/10"
                                         >
                                             Recalculate
                                         </button>

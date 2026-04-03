@@ -15,19 +15,13 @@ export default {
   	extend: {
   		fontFamily: {
   			sans: [
+  				'Plus Jakarta Sans',
+  				'Inter',
   				'Roboto',
-  				'ui-sans-serif',
-  				'system-ui',
-  				'-apple-system',
-  				'BlinkMacSystemFont',
-  				'Segoe UI',
-  				'Helvetica Neue',
-  				'Arial',
-  				'Noto Sans',
   				'sans-serif'
   			],
   			display: [
-  				'Space Grotesk',
+  				'Outfit',
   				'sans-serif'
   			],
   			serif: [

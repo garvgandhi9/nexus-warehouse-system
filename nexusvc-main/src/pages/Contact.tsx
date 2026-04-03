@@ -86,12 +86,12 @@ const Contact = () => {
             {/* Left */}
             <div className="flex flex-col justify-center">
               <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Tell us what you need</p>
-              <h1 className="mt-4 font-display text-4xl font-bold uppercase leading-tight tracking-tight text-foreground sm:text-6xl">
+              <h1 className="mt-4 font-display text-[3.5rem] md:text-[4.5rem] font-bold uppercase leading-[0.9] tracking-tighter text-white">
                 Let's Talk
                 <br />
-                <span className="text-gradient">Infrastructure</span>
+                <span className="text-[#a4dbe4]">Infrastructure</span>
               </h1>
-              <p className="mt-6 max-w-md text-lg text-muted-foreground">
+              <p className="mt-8 max-w-lg text-[13px] leading-relaxed text-gray-400 font-medium text-justify">
                 Whether you're exploring ready-to-move facilities or planning a custom-built solution, our team is here to guide you. Nexus Prime streamlines logistics conversations; we listen, understand your requirements, and help shape the right strategy for your business.
               </p>
 
@@ -128,7 +128,11 @@ const Contact = () => {
             </div>
 
             {/* Right — Form */}
-            <div className="rounded-sm border border-border/50 bg-card p-8 lg:p-10">
+            <div className="rounded-tl-2xl rounded-br-2xl rounded-tr-[10rem] rounded-bl-[10rem] border border-white/10 bg-[#112431] p-12 shadow-2xl relative overflow-hidden">
+              {/* Subtle background glow */}
+              <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-cyan-400/5 blur-[100px]" />
+
+              <div className="relative z-10 px-4">
               {submitted ? (
                 <div className="flex h-full flex-col items-center justify-center text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -151,51 +155,83 @@ const Contact = () => {
                   )}
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Your Full Name</label>
-                    <input name="name" value={formData.name} onChange={handleChange} className={getInputStyles("name")} placeholder="Your full name" />
+                    <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-[#7bc0cd]">Your Full Name</label>
+                    <input 
+                      name="name" 
+                      value={formData.name} 
+                      onChange={handleChange} 
+                      className="w-full rounded-sm border border-white/20 bg-transparent p-3 text-[15px] text-white placeholder:text-gray-500 focus:border-[#7bc0cd] focus:outline-none transition-all" 
+                      placeholder="Your full name" 
+                    />
                     {getFieldError("name") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("name")}</p>}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Business Email</label>
-                      <input name="email" value={formData.email} onChange={handleChange} type="email" className={getInputStyles("email")} placeholder="you@company.com" />
+                      <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-[#7bc0cd]">Business Email</label>
+                      <input 
+                        name="email" 
+                        value={formData.email} 
+                        onChange={handleChange} 
+                        type="email" 
+                        className="w-full rounded-sm border border-white/20 bg-transparent p-3 text-[15px] text-white placeholder:text-gray-500 focus:border-[#7bc0cd] focus:outline-none transition-all" 
+                        placeholder="you@company.com" 
+                      />
                       {getFieldError("email") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("email")}</p>}
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">10-Digit Contact Number</label>
-                      <input name="phone" value={formData.phone} onChange={handleChange} className={getInputStyles("phone")} placeholder="9876543210" />
+                      <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-[#7bc0cd]">10-Digit Contact Number</label>
+                      <input 
+                        name="phone" 
+                        value={formData.phone} 
+                        onChange={handleChange} 
+                        className="w-full rounded-sm border border-white/20 bg-transparent p-3 text-[15px] text-white placeholder:text-gray-500 focus:border-[#7bc0cd] focus:outline-none transition-all" 
+                        placeholder="9876543210" 
+                      />
                       {getFieldError("phone") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("phone")}</p>}
                     </div>
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Requirement Category</label>
-                    <select name="category" value={formData.category} onChange={handleChange} className={getInputStyles("category")}>
-                      <option value="">Select type</option>
+                    <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-[#7bc0cd]">Requirement Category</label>
+                    <select 
+                      name="category" 
+                      value={formData.category} 
+                      onChange={handleChange} 
+                      className="w-full rounded-sm border border-white/20 bg-transparent p-3 text-[15px] text-white placeholder:text-gray-500 focus:border-[#7bc0cd] focus:outline-none transition-all appearance-none"
+                    >
+                      <option value="" className="bg-[#112431]">Select type</option>
                       {requirementTypes.map((t) => (
-                        <option key={t} value={t}>{t}</option>
+                        <option key={t} value={t} className="bg-[#112431]">{t}</option>
                       ))}
                     </select>
                     {getFieldError("category") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("category")}</p>}
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-muted-foreground">Message</label>
-                    <textarea name="message" value={formData.message} onChange={handleChange} rows={4} className={getInputStyles("message") + " resize-none"} placeholder="Describe your scale, geography, and specific logistics needs..." />
+                    <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-[#7bc0cd]">Message</label>
+                    <textarea 
+                      name="message" 
+                      value={formData.message} 
+                      onChange={handleChange} 
+                      rows={4} 
+                      className="w-full rounded-sm border border-white/20 bg-transparent p-3 text-[15px] text-white placeholder:text-gray-500 focus:border-[#7bc0cd] focus:outline-none transition-all resize-none" 
+                      placeholder="Describe your scale, geography, and specific logistics needs..." 
+                    />
                     {getFieldError("message") && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-red-500">{getFieldError("message")}</p>}
                   </div>
 
                   <button
                     disabled={!isFormValid() || loading}
                     type="submit"
-                    className="mt-2 flex items-center justify-center gap-2 rounded-sm bg-primary px-6 py-4 font-display text-sm font-semibold uppercase tracking-wider text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="mt-6 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#80c8d4] to-[#458092] px-8 py-3.5 font-display text-sm font-bold uppercase tracking-widest text-white transition-all hover:shadow-lg hover:shadow-cyan-400/20 hover:brightness-110 disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     {loading ? "Sending..." : isFormValid() ? "Send Message" : "Complete Form"}
                     <Send size={16} />
                   </button>
                 </form>
               )}
+              </div>
             </div>
           </div>
         </section>
