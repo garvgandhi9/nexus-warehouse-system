@@ -137,7 +137,7 @@ const FeaturesSection = () => {
 /* ── Listings Preview ── */
 const ITEMS_PER_PAGE = 3;
 
-const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) => {
+const ListingsPreview = ({ calculatedArea = 0, onClearFilter }: { calculatedArea?: number; onClearFilter?: () => void }) => {
   const listingsRef = React.useRef<HTMLElement>(null);
   const { ref, isVisible } = useScrollAnimation();
   const [apiListings, setApiListings] = useState<any[]>([]);
@@ -146,7 +146,7 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
     const controller = new AbortController();
     const loadFeatured = async () => {
       try {
-        const res = await fetch(`${API_ENDPOINTS.WAREHOUSES}?page=1&limit=3`, { signal: controller.signal });
+        const res = await fetch(`${API_ENDPOINTS.WAREHOUSES}?page=1&limit=20`, { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         const data = json.data || [];
@@ -156,6 +156,7 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
           cluster: w.cluster || "",
           area: w.warehouse_code || "-",
           size: w.area_available ? Number(w.area_available).toLocaleString() : "0",
+          numericSize: Number(w.area_available || 0),
           unit: "sq ft",
           rate: w.rate,
           status: "Available",
@@ -170,15 +171,15 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
         // Fallback dummy data if backend is empty
         setApiListings([
           {
-            id: 1, city: "MUMBAI", cluster: "WP-1004 - GENERAL GRADE B", size: "250,000", rate: "28",
+            id: 1, city: "MUMBAI", cluster: "WP-1004 - GENERAL GRADE B", size: "250,000", numericSize: 250000, rate: "28",
             image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
           },
           {
-            id: 2, city: "NASHIK", cluster: "WP-1005 - GENERAL GRADE B", size: "3,000", rate: "25",
+            id: 2, city: "NASHIK", cluster: "WP-1005 - GENERAL GRADE B", size: "3,000", numericSize: 3000, rate: "25",
             image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
           },
           {
-            id: 3, city: "MUMBAI", cluster: "WP-1001 - GENERAL GRADE A", size: "15,000", rate: "32",
+            id: 3, city: "MUMBAI", cluster: "WP-1001 - GENERAL GRADE A", size: "15,000", numericSize: 15000, rate: "32",
             image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
           }
         ]);
@@ -188,74 +189,114 @@ const ListingsPreview = ({ calculatedArea = 0 }: { calculatedArea?: number }) =>
     return () => controller.abort();
   }, []);
 
+  // Scroll logic when calculatedArea is provided
+  useEffect(() => {
+    if (calculatedArea > 0 && listingsRef.current) {
+      setTimeout(() => {
+        listingsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, [calculatedArea]);
+
+  const filteredListings = calculatedArea > 0
+    ? apiListings.filter(l => l.numericSize >= calculatedArea * 0.6 && l.numericSize <= calculatedArea * 1.8)
+    : apiListings.slice(0, 3); // Default to first 3
+
   return (
-    <section ref={listingsRef} className="bg-gradient-to-r from-[#70b1be] to-[#3a6d7f] pt-24 pb-0">
+    <section ref={listingsRef} className="bg-gradient-to-r from-[#70b1be] to-[#3a6d7f] pt-24 pb-0 scroll-mt-24">
       <div ref={ref} className="mx-auto max-w-7xl px-6 lg:px-8 mb-12">
         <div className="flex flex-col gap-6 md:flex-row md:items-end justify-between">
           <div>
-            <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2">Portfolio</p>
+            <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2">
+              {calculatedArea > 0 ? `Optimization Recommendations` : `Portfolio`}
+            </p>
             <h2 className="font-display text-[2.75rem] font-bold uppercase tracking-widest text-white mb-4">
-              Featured Listings
+              {calculatedArea > 0 ? `${calculatedArea.toLocaleString()} SQ FT Solutions` : `Featured Listings`}
             </h2>
             <p className="text-[13px] leading-relaxed text-white/90 max-w-3xl">
-              Find Grade A logistics facilities consolidated by us, strategically located, fully compliant, and ready to power your supply chain.
+              {calculatedArea > 0
+                ? "Based on your optimization requirements, here are the most efficient Grade-A spaces that match your scale."
+                : "Find Grade A logistics facilities consolidated by us, strategically located, fully compliant, and ready to power your supply chain."
+              }
             </p>
           </div>
-          <Link
-            to="/listings"
-            className="flex items-center gap-2 text-[13px] font-bold text-white transition-colors hover:text-white/80 shrink-0 mb-[6px]"
-          >
-            View All &gt;
-          </Link>
+          <div className="flex items-center gap-4">
+            {calculatedArea > 0 && (
+              <button
+                onClick={onClearFilter}
+                className="flex items-center gap-2 text-[13px] font-bold text-white transition-opacity hover:opacity-75 shrink-0 mb-[6px] border border-white/20 rounded-full px-4 py-1"
+              >
+                Clear Selection
+              </button>
+            )}
+            <Link
+              to="/listings"
+              className="flex items-center gap-2 text-[13px] font-bold text-white transition-colors hover:text-white/80 shrink-0 mb-[6px]"
+            >
+              View All &gt;
+            </Link>
+          </div>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8 pb-16">
         <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-3">
-          {apiListings.map((l, i) => (
-            <Link
-              to={`/listings/${l.id}`}
-              key={l.id}
-              className={`group relative overflow-hidden transition-all duration-700 border-r border-[#0b1f2a] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
-              style={{ transitionDelay: `${(i % ITEMS_PER_PAGE) * 100}ms` }}
-            >
-              <div className="aspect-[3/4] md:aspect-[3/4] overflow-hidden bg-[#0a1a24]">
-                <img
-                  src={l.image}
-                  alt={`${l.city} warehouse`}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 mix-blend-luminosity brightness-75"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-500" />
-              </div>
-
-              <div className="absolute top-6 left-6 right-6">
-                <h3 className="font-display text-3xl font-bold uppercase tracking-tight text-white mb-1">
-                  {l.city}
-                </h3>
-                <div className="text-[10px] uppercase text-white/80 font-medium tracking-wide leading-relaxed">
-                  WH TYPE - <br />
-                  {l.cluster}
-                  <br />
-                  <span className="text-cyan-400 font-bold block mt-1">RATE<br />₹{l.rate}/sqft</span>
+          {filteredListings.length > 0 ? (
+            filteredListings.map((l, i) => (
+              <Link
+                to={`/listings/${l.id}`}
+                key={l.id}
+                className={`group relative overflow-hidden transition-all duration-700 border-r border-[#0b1f2a] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+                style={{ transitionDelay: `${(i % ITEMS_PER_PAGE) * 100}ms` }}
+              >
+                <div className="aspect-[3/4] md:aspect-[3/4] overflow-hidden bg-[#0a1a24]">
+                  <img
+                    src={l.image}
+                    alt={`${l.city} warehouse`}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 mix-blend-luminosity brightness-75"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-500" />
                 </div>
-              </div>
 
-              <div className="absolute bottom-6 left-6 flex items-end h-32">
-                <div className="relative h-full flex items-end pb-8">
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-white -rotate-90 origin-bottom-left absolute left-0 bottom-14 whitespace-nowrap">CAPACITY</span>
-                  <p className="font-display text-4xl font-bold text-white ml-6 leading-none">
-                    {l.size}
-                  </p>
-                  <span className="text-[10px] text-white -rotate-90 block absolute right-[-24px] bottom-[30px] font-bold">SQ FT</span>
+                <div className="absolute top-6 left-6 right-6">
+                  <h3 className="font-display text-3xl font-bold uppercase tracking-tight text-white mb-1">
+                    {l.city}
+                  </h3>
+                  <div className="text-[10px] uppercase text-white/80 font-medium tracking-wide leading-relaxed">
+                    WH TYPE - <br />
+                    {l.cluster}
+                    <br />
+                    <span className="text-cyan-400 font-bold block mt-1">RATE<br />₹{l.rate}/sqft</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="absolute bottom-6 right-6 h-10 w-10 rounded-full border border-white/40 flex items-center justify-center backdrop-blur-md">
-                <ArrowRight size={16} className="text-white" />
-              </div>
-            </Link>
-          ))}
+                <div className="absolute bottom-6 left-6 flex items-end h-32">
+                  <div className="relative h-full flex items-end pb-8">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-white -rotate-90 origin-bottom-left absolute left-0 bottom-14 whitespace-nowrap">CAPACITY</span>
+                    <p className="font-display text-4xl font-bold text-white ml-6 leading-none">
+                      {l.size}
+                    </p>
+                    <span className="text-[10px] text-white -rotate-90 block absolute right-[-24px] bottom-[30px] font-bold">SQ FT</span>
+                  </div>
+                </div>
+
+                <div className="absolute bottom-6 right-6 h-10 w-10 rounded-full border border-white/40 flex items-center justify-center backdrop-blur-md">
+                  <ArrowRight size={16} className="text-white" />
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="col-span-full py-20 text-center border-t border-white/10">
+              <p className="text-white/60 text-lg uppercase tracking-widest">No exact matches for this specific area requirement.</p>
+              <button
+                onClick={onClearFilter}
+                className="mt-4 text-cyan-400 font-bold uppercase text-xs tracking-widest hover:underline"
+              >
+                Reset Filter
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -308,8 +349,11 @@ const Index = () => {
         <Hero />
         <MetricsSection />
         <FeaturesSection />
-        <ListingsPreview calculatedArea={calculatedArea} />
-        <div className="bg-[#112431] pb-32 pt-16">
+        <ListingsPreview 
+          calculatedArea={calculatedArea} 
+          onClearFilter={() => setCalculatedArea(0)} 
+        />
+        <div className="bg-[#112431] pb-32 pt-24">
           <ROICalculator onComplete={(sqFt) => setCalculatedArea(sqFt)} />
         </div>
         <IndustriesSection />
