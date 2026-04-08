@@ -29,17 +29,17 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({ onComplete }) => {
     return (
         <section className="py-24 border-b border-white/10">
             <div className="mx-auto max-w-4xl px-6 lg:px-8">
-                <div className="rounded-tl-2xl rounded-br-2xl rounded-tr-[10rem] rounded-bl-[10rem] border border-white/10 bg-[#112431] p-12 shadow-2xl relative overflow-hidden">
+                <div className="rounded-tl-2xl rounded-br-2xl rounded-tr-[5rem] rounded-bl-[5rem] sm:rounded-tr-[10rem] sm:rounded-bl-[10rem] border border-white/10 bg-[#112431] p-6 sm:p-12 shadow-2xl relative overflow-hidden">
                     {/* Subtle background glow */}
                     <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-cyan-400/5 blur-[100px]" />
 
                     <div className="relative z-10 px-4">
-                        <div className="mb-10 flex items-center justify-between border-b border-white/5 pb-8">
+                        <div className="mb-10 flex flex-col sm:flex-row items-center justify-between border-b border-white/5 pb-8 text-center sm:text-left gap-6">
                             <div>
                                 <h2 className="text-3xl font-semibold tracking-wide text-white">
                                     Nexus ROI & Space Calculator
                                 </h2>
-                                <p className="mt-3 text-[13px] leading-relaxed text-gray-300 max-w-xl">See how Grade-A optimisation translates into real savings.<br />Run the numbers and measure the impact.</p>
+                                <p className="mt-3 text-[13px] leading-relaxed text-gray-300 max-w-xl mx-auto sm:mx-0">See how Grade-A optimisation translates into real savings.<br />Run the numbers and measure the impact.</p>
                             </div>
 
                             <div className="flex gap-2">

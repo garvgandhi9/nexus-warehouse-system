@@ -131,7 +131,7 @@ const Listings = () => {
           <div className="flex items-end justify-between gap-4 flex-wrap mb-12 border-b border-border/10 pb-12">
             <div className="z-10">
               <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Portfolio</p>
-              <h1 className="mt-4 font-display text-4xl font-bold uppercase tracking-tight text-white sm:text-6xl lg:text-7xl">
+              <h1 className="mt-4 font-display text-3xl font-bold uppercase tracking-tight text-white sm:text-6xl lg:text-7xl">
                 Asset <span className="text-gradient">Listings</span>
               </h1>
               <p className="mt-6 max-w-full text-lg text-justify text-muted-foreground/80 leading-relaxed">

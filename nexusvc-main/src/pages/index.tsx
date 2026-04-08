@@ -19,25 +19,25 @@ const Hero = () => {
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0b1f2a]/95 via-[#0b1f2a]/80 to-[#0b1f2a]/40" />
 
-      <div ref={ref} className="relative mx-auto max-w-7xl px-6 py-32 lg:px-8 w-full">
-        <div className="max-w-4xl">
+      <div ref={ref} className="relative mx-auto max-w-7xl px-6 py-32 lg:px-8 w-full flex flex-col items-center text-center sm:items-start sm:text-left">
+        <div className="max-w-4xl w-full">
           <p
-            className={`mb-6 font-display text-xs font-semibold uppercase tracking-[0.3em] text-gray-300 transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
+            className={`mb-6 font-display text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-300 transition-all duration-700 sm:text-xs sm:tracking-[0.3em] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
             INDIA'S FLEXIBLE WAREHOUSING NETWORK
           </p>
           <h1
-            className={`font-display text-5xl font-bold uppercase leading-[1.1] tracking-tight text-white transition-all delay-150 duration-700 sm:text-6xl lg:text-[5.5rem] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+            className={`font-display text-[2rem] font-bold uppercase leading-[1.1] tracking-tight text-white transition-all delay-150 duration-700 sm:text-6xl lg:text-[5.5rem] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
           >
             WAREHOUSING.<br />INFRASTRUCTURE.<br />ON DEMAND.
           </h1>
           <p
-            className={`mt-6 max-w-xl text-base leading-relaxed text-gray-300 transition-all delay-300 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
+            className={`mt-6 max-w-xl mx-auto sm:mx-0 text-sm sm:text-base leading-relaxed text-gray-300 transition-all delay-300 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
             We create Flexible Warehousing and Build To Suit solutions across India's key logistics corridors by unlocking underutilized industrial space.
           </p>
           <div
-            className={`mt-10 flex flex-wrap gap-4 transition-all delay-500 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
+            className={`mt-10 flex flex-wrap justify-center sm:justify-start gap-4 transition-all delay-500 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
             <Link
               to="/listings"
@@ -70,11 +70,11 @@ const MetricItem = ({ metric, isActive }: { metric: typeof newMetrics[0]; isActi
   const count = useCountUp(metric.value, 2000, 0, isActive);
   const display = metric.value % 1 !== 0 ? count.toFixed(1) : Math.round(count).toString();
   return (
-    <div className="text-center px-4">
-      <div className="font-display text-4xl font-bold text-white sm:text-5xl lg:text-5xl mb-2">
+    <div className="text-center px-2">
+      <div className="font-display text-3xl font-bold text-white sm:text-5xl lg:text-5xl mb-2">
         {display}<span className="text-white">{metric.suffix}</span>
       </div>
-      <p className="text-xs uppercase tracking-widest text-[#0b1f2a] font-medium">{metric.label}</p>
+      <p className="text-[10px] uppercase tracking-widest text-[#0b1f2a] font-bold">{metric.label}</p>
     </div>
   );
 };
@@ -210,7 +210,7 @@ const ListingsPreview = ({ calculatedArea = 0, onClearFilter }: { calculatedArea
             <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2">
               {calculatedArea > 0 ? `Optimization Recommendations` : `Portfolio`}
             </p>
-            <h2 className="font-display text-[2.75rem] font-bold uppercase tracking-widest text-white mb-4">
+            <h2 className="font-display text-2xl sm:text-[2.75rem] font-bold uppercase tracking-widest text-white mb-4 leading-tight">
               {calculatedArea > 0 ? `${calculatedArea.toLocaleString()} SQ FT Solutions` : `Featured Listings`}
             </h2>
             <p className="text-[13px] leading-relaxed text-white/90 max-w-3xl">
@@ -317,8 +317,8 @@ const IndustriesSection = () => {
   return (
     <section ref={ref} className="bg-gradient-to-r from-[#70b1be] to-[#3a6d7f] py-24 shadow-inner">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2">Sectors</p>
-        <h2 className="font-display text-[2.75rem] font-bold uppercase tracking-widest text-white mb-16">
+        <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2 text-center sm:text-left">Sectors</p>
+        <h2 className="font-display text-xl sm:text-[2.75rem] font-bold uppercase tracking-widest text-white mb-12 sm:mb-16 text-center sm:text-left">
           INDUSTRIES WE SERVE
         </h2>
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-0">

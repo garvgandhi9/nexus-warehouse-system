@@ -101,7 +101,7 @@ const NexusPrime = () => {
                             <ShieldCheck size={14} className="text-primary" />
                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">The Future of Warehousing</span>
                         </div>
-                        <h1 className="font-display text-6xl font-black uppercase leading-[0.95] tracking-tighter text-foreground sm:text-8xl lg:text-9xl">
+                        <h1 className="font-display text-4xl font-black uppercase leading-[0.95] tracking-tighter text-foreground sm:text-8xl lg:text-9xl">
                             NEXUS <span className="text-gradient">PRIME</span>
                         </h1>
                         <p className="mt-8 mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground font-medium">
@@ -129,7 +129,7 @@ const NexusPrime = () => {
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
                             <div className={`transition-all duration-1000 ${whatIs3PLVis ? "translate-x-0 opacity-100" : "-translate-x-12 opacity-0"}`}>
-                                <h2 className="font-display text-4xl font-black uppercase tracking-tighter text-white sm:text-6xl">
+                                <h2 className="font-display text-2xl font-black uppercase tracking-tighter text-white sm:text-6xl">
                                     WHAT IS <span className="text-[#a4dbe4] italic">3PL?</span>
                                 </h2>
                                 <p className="mt-8 text-xl leading-relaxed text-white/90">

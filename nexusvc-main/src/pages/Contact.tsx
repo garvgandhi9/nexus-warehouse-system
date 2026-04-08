@@ -86,7 +86,7 @@ const Contact = () => {
             {/* Left */}
             <div className="flex flex-col justify-center">
               <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-primary">Tell us what you need</p>
-              <h1 className="mt-4 font-display text-[3.5rem] md:text-[4.5rem] font-bold uppercase leading-[0.9] tracking-tighter text-white">
+              <h1 className="mt-4 font-display text-[2.25rem] md:text-[4.5rem] font-bold uppercase leading-[0.9] tracking-tighter text-white">
                 Let's Talk
                 <br />
                 <span className="text-[#a4dbe4]">Infrastructure</span>

@@ -50,24 +50,26 @@ const Navbar = () => {
   };
 
   return (
-    <div className="fixed top-8 left-0 right-0 z-50 flex items-center justify-between px-8 sm:px-12 md:px-16 pointer-events-none">
-      {/* Brand / Logo - Outside the pill */}
-      <Link 
-        to="/" 
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
-        className="pointer-events-auto flex items-center group transition-all duration-300 translate-y-2"
-      >
-        <img 
-          src="/logo.png" 
-          alt="NEXUS" 
-          className="h-11 w-auto opacity-100 transition-opacity"
-          onError={(e) => {
-            // Fallback to text if logo.png isn't found yet
-            e.currentTarget.style.display = 'none';
-            e.currentTarget.parentElement!.insertAdjacentHTML('beforeend', '<span class="font-display text-xl font-black tracking-tighter text-foreground group-hover:text-primary transition-colors">NEXUS</span>');
-          }}
-        />
-      </Link>
+    <div className="fixed top-6 sm:top-8 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-12 md:px-16 pointer-events-none">
+      {/* Brand / Logo - Now inside a matching pill */}
+      <div className="pointer-events-auto rounded-full border border-white/10 bg-[#0A0B10]/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_25px_rgba(34,211,238,0.15)] transition-all duration-500 px-6 py-2 flex items-center justify-center h-12">
+        <Link 
+          to="/" 
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
+          className="flex items-center group transition-all duration-300"
+        >
+          <img 
+            src="/logo.png" 
+            alt="NEXUS" 
+            className="h-7 w-auto opacity-100 transition-opacity"
+            onError={(e) => {
+              // Fallback to text if logo.png isn't found yet
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.parentElement!.insertAdjacentHTML('beforeend', '<span class="font-display text-lg font-black tracking-tighter text-foreground group-hover:text-primary transition-colors">NEXUS</span>');
+            }}
+          />
+        </Link>
+      </div>
 
       {/* Navigation Pill */}
       <nav className="pointer-events-auto rounded-full border border-white/10 bg-[#0A0B10]/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_25px_rgba(34,211,238,0.15)] transition-all duration-500">

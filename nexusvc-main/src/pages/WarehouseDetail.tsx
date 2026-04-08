@@ -181,7 +181,7 @@ const WarehouseDetail = () => {
                 </div>
               )}
 
-              <h1 className="mt-4 font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl text-foreground">
+              <h1 className="mt-4 font-display text-3xl font-bold uppercase tracking-tight sm:text-5xl text-foreground">
                 {listing.cluster ? `${listing.cluster}, ${listing.city}` : listing.city}
               </h1>
 
@@ -335,7 +335,7 @@ const WarehouseDetail = () => {
                   <span className="inline-flex items-center gap-1.5 rounded-sm border border-purple-500/30 bg-purple-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-purple-400">
                     <Star size={14} className="fill-purple-400" /> PRIME ACTIVE
                   </span>
-                  <h2 className="mt-6 font-display text-3xl font-bold uppercase tracking-tight sm:text-4xl bg-gradient-to-r from-white via-purple-100 to-purple-300 bg-clip-text text-transparent">
+                  <h2 className="mt-6 font-display text-xl font-bold uppercase tracking-tight sm:text-4xl bg-gradient-to-r from-white via-purple-100 to-purple-300 bg-clip-text text-transparent">
                     Unlock Complete 3PL Management
                   </h2>
                   <p className="mx-auto mt-4 max-w-2xl text-sm text-purple-200/60 leading-relaxed">

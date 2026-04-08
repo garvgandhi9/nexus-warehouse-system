@@ -556,7 +556,7 @@ const SubmitWarehouse = () => {
                 <div className="mx-auto max-w-4xl px-6 lg:px-8">
                     {!subType ? (
                         <div className="py-12">
-                            <h1 className="font-display text-4xl font-black uppercase tracking-tighter text-foreground sm:text-6xl text-center mb-16">
+                            <h1 className="font-display text-2xl font-black uppercase tracking-tighter text-foreground sm:text-6xl text-center mb-8 sm:mb-16">
                                 START YOUR <span className="text-gradient">LISTING</span>
                             </h1>
                             <div className="grid gap-8 sm:grid-cols-2">
@@ -610,7 +610,7 @@ const SubmitWarehouse = () => {
                                 <ArrowLeft size={14} /> Back to Selection
                             </button>
 
-                            <h1 className="font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl">
+                            <h1 className="font-display text-2xl font-bold uppercase tracking-tight sm:text-5xl">
                                 Submit {subType === 'warehouse' ? 'a Warehouse' : 'a Land Parcel'}
                             </h1>
                             <p className="mt-4 text-base text-muted-foreground">
