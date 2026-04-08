@@ -253,7 +253,7 @@ const ListingsPreview = ({ calculatedArea = 0, onClearFilter }: { calculatedArea
                   <img
                     src={l.image}
                     alt={`${l.city} warehouse`}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 mix-blend-luminosity brightness-75"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 brightness-90 group-hover:opacity-100 transition-opacity"
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-500" />
