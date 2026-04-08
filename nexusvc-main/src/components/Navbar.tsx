@@ -52,7 +52,7 @@ const Navbar = () => {
   return (
     <div className="fixed top-6 sm:top-8 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-12 md:px-16 pointer-events-none">
       {/* Brand / Logo - Now inside a matching pill */}
-      <div className="pointer-events-auto rounded-full border border-white/10 bg-[#0A0B10]/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_25px_rgba(34,211,238,0.15)] transition-all duration-500 px-6 py-2 flex items-center justify-center h-12">
+      <div className="pointer-events-auto rounded-full border border-white/10 bg-[#0A0B10]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_25px_rgba(34,211,238,0.15)] transition-all duration-500 px-6 py-2 flex items-center justify-center h-12">
         <Link 
           to="/" 
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} 
@@ -72,7 +72,7 @@ const Navbar = () => {
       </div>
 
       {/* Navigation Pill */}
-      <nav className="pointer-events-auto rounded-full border border-white/10 bg-[#0A0B10]/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_25px_rgba(34,211,238,0.15)] transition-all duration-500">
+      <nav className="pointer-events-auto rounded-full border border-white/10 bg-[#0A0B10]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3),0_0_20px_rgba(34,211,238,0.1)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_25px_rgba(34,211,238,0.15)] transition-all duration-500">
         <div className="flex h-12 items-center px-6 gap-6">
           {/* Desktop links */}
           <div className="hidden items-center gap-6 md:flex">

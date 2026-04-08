@@ -315,7 +315,7 @@ const Dashboard = () => {
             </main>
 
             {isEditModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 px-4 backdrop-blur-sm">
                     <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-sm border border-border/50 bg-card p-6 shadow-2xl">
                         <div className="mb-6 flex items-center justify-between border-b border-border/50 pb-4">
                             <h2 className="font-display text-xl font-bold uppercase tracking-widest text-white">

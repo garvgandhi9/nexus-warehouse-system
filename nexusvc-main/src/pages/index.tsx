@@ -15,7 +15,7 @@ const Hero = () => {
       {/* Background image & overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-luminosity"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1600&q=80')" }}
+        style={{ backgroundImage: "url('/stockphoto.jpg')" }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0b1f2a]/95 via-[#0b1f2a]/80 to-[#0b1f2a]/40" />
 
@@ -160,7 +160,7 @@ const ListingsPreview = ({ calculatedArea = 0, onClearFilter }: { calculatedArea
           unit: "sq ft",
           rate: w.rate,
           status: "Available",
-          image: w.image_url || "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
+          image: w.image_url || "/stockphoto.jpg",
         }));
 
         if (formatted.length === 0) throw new Error("Empty DB");
@@ -172,15 +172,15 @@ const ListingsPreview = ({ calculatedArea = 0, onClearFilter }: { calculatedArea
         setApiListings([
           {
             id: 1, city: "MUMBAI", cluster: "WP-1004 - GENERAL GRADE B", size: "250,000", numericSize: 250000, rate: "28",
-            image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
+            image: "/stockphoto.jpg",
           },
           {
             id: 2, city: "NASHIK", cluster: "WP-1005 - GENERAL GRADE B", size: "3,000", numericSize: 3000, rate: "25",
-            image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
+            image: "/stockphoto.jpg",
           },
           {
             id: 3, city: "MUMBAI", cluster: "WP-1001 - GENERAL GRADE A", size: "15,000", numericSize: 15000, rate: "32",
-            image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
+            image: "/stockphoto.jpg",
           }
         ]);
       }

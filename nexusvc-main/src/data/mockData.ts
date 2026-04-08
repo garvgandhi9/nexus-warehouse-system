@@ -37,7 +37,7 @@ export const featuredListings = [
         rate: 22,
         status: "Available",
         is_prime: true,
-        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
+        image: "/stockphoto.jpg",
     },
     {
         id: "blr-prime-02",
@@ -48,7 +48,7 @@ export const featuredListings = [
         rate: 28,
         status: "Available",
         is_prime: true,
-        image: "https://images.unsplash.com/photo-1553413077-190dd305871c?w=800&q=80",
+        image: "/stockphoto.jpg",
     },
     {
         id: "del-prime-03",
@@ -59,6 +59,6 @@ export const featuredListings = [
         rate: 24,
         status: "Available",
         is_prime: true,
-        image: "https://images.unsplash.com/photo-1626073703374-6337a7223a31?w=800&q=80",
+        image: "/stockphoto.jpg",
     }
 ];

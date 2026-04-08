@@ -157,7 +157,7 @@ const NexusPrime = () => {
                             <div className={`relative rounded-2xl border border-white/20 bg-white/5 p-2 transition-all duration-1000 backdrop-blur-md ${whatIs3PLVis ? "translate-x-0 opacity-100" : "translate-x-12 opacity-0"}`}>
                                 <div className="aspect-video overflow-hidden rounded-xl bg-black/20 shadow-2xl">
                                     <img
-                                        src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&q=80"
+                                        src="/stockphoto.jpg"
                                         alt="Nexus Prime Operations"
                                         className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                                     />

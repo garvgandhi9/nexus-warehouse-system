@@ -51,7 +51,7 @@ const WarehouseDetail = () => {
           term_type: data.term_type || "long_term",
           term_duration: data.term_duration,
           description: data.description || null,
-          image: data.image_url || "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
+          image: data.image_url || "/stockphoto.jpg",
           temperatureRange: data.temperature_range,
           productSuitability: data.product_suitability,
           is_prime: data.is_prime,
@@ -324,7 +324,7 @@ const WarehouseDetail = () => {
 
         {/* Prime Modal */}
         {isPrimeActive && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xl animate-in fade-in duration-500">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-xl animate-in fade-in duration-500">
             <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-sm border border-purple-500/30 bg-[#0A0514] shadow-[0_0_50px_rgba(168,85,247,0.15)]">
               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-sm">
                 <div className="absolute -top-[50%] left-[-10%] h-[500px] w-[500px] rounded-full bg-purple-600/10 blur-[100px]" />
