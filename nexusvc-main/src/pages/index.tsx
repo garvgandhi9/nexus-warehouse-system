@@ -11,83 +11,89 @@ import { ArrowRight, Warehouse, Building2, Network } from "lucide-react";
 const Hero = () => {
   const { ref, isVisible } = useScrollAnimation(0.1);
   return (
-    <section className="relative flex min-h-screen items-center overflow-hidden pt-24 bg-[#0b1f2a]">
+    <section className="relative min-h-screen flex flex-col overflow-hidden bg-[#0b1f2a]">
       {/* Background image & overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-luminosity"
         style={{ backgroundImage: "url('/stockphoto.jpg')" }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0b1f2a]/95 via-[#0b1f2a]/80 to-[#0b1f2a]/40" />
+      
+      {/* Bottom fade for smooth transition to next section */}
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#112431] to-transparent z-10" />
 
-      <div ref={ref} className="relative mx-auto max-w-7xl px-6 py-32 lg:px-8 w-full flex flex-col items-center text-center sm:items-start sm:text-left">
-        <div className="max-w-4xl w-full">
+      <div
+        ref={ref}
+        className="relative flex flex-col w-full mx-auto max-w-7xl px-6 lg:px-8 pt-24 pb-16 mt-16"
+      >
+        {/* ── Top: headline block ── */}
+        <div className="max-w-4xl flex flex-col items-start text-left">
           <p
-            className={`mb-6 font-display text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-300 transition-all duration-700 sm:text-xs sm:tracking-[0.3em] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
+            className={`mb-3 font-display text-[10px] font-semibold uppercase tracking-[0.25em] text-[#80c8d4] transition-all duration-700 sm:text-sm ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
             INDIA'S FLEXIBLE WAREHOUSING NETWORK
           </p>
           <h1
-            className={`font-display text-[2rem] font-bold uppercase leading-[1.1] tracking-tight text-white transition-all delay-150 duration-700 sm:text-6xl lg:text-[5.5rem] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+            className={`font-display text-[2.25rem] font-bold uppercase leading-[1.05] tracking-tight text-white transition-all delay-150 duration-700 sm:text-5xl lg:text-[5.25rem] ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
           >
             WAREHOUSING.<br />INFRASTRUCTURE.<br />ON DEMAND.
           </h1>
           <p
-            className={`mt-6 max-w-xl mx-auto sm:mx-0 text-sm sm:text-base leading-relaxed text-gray-300 transition-all delay-300 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
+            className={`mt-4 max-w-2xl text-base sm:text-lg leading-relaxed text-gray-300 transition-all delay-300 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
           >
             We create Flexible Warehousing and Build To Suit solutions across India's key logistics corridors by unlocking underutilized industrial space.
           </p>
-          <div
-            className={`mt-10 flex flex-wrap justify-center sm:justify-start gap-4 transition-all delay-500 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-          >
-            <Link
-              to="/listings"
-              className="group flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-8 py-4 font-display text-sm font-bold uppercase tracking-wider text-[#0b1f2a] transition-all hover:shadow-lg hover:shadow-cyan-400/25"
-            >
-              EXPLORE LISTINGS &gt;
-            </Link>
-            <Link
-              to="/nexus-prime"
-              className="rounded-full border border-gray-400 px-8 py-4 font-display text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-white hover:text-[#0b1f2a]"
-            >
-              NEXUS PRIME
-            </Link>
-          </div>
         </div>
-      </div>
-    </section>
-  );
-};
 
-/* ── Metrics ── */
-const newMetrics = [
-  { value: 2.5, suffix: "M+", label: "Sq Ft. Networked" },
-  { value: 18, suffix: "", label: "Enterprise Clients" },
-  { value: 12, suffix: "", label: "Cities" },
-  { value: 100, suffix: "%", label: "Grade A Compliant" },
-];
+        {/* ── Bottom: CTA Cards ── */}
+        <div
+          className={`mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3 w-full transition-all delay-500 duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+        >
+          {/* Want to Lease */}
+          <Link
+            to="/listings"
+            className="group flex items-center gap-4 rounded-xl border border-white/10 border-l-2 border-l-blue-400/40 bg-white/5 backdrop-blur-sm p-6 hover:bg-white/10 transition-all duration-300"
+          >
+            {/* Icon */}
+            <div className="flex-shrink-0 w-11 h-11 rounded-full bg-white/10 border border-white/15 flex items-center justify-center">
+              <Warehouse size={20} className="text-[#80c8d4]" strokeWidth={1.5} />
+            </div>
+            {/* Text */}
+            <div className="flex-1 min-w-0">
+              <p className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 leading-none mb-1">WANT TO</p>
+              <h3 className="font-display text-4xl font-bold text-[#80c8d4] leading-tight">LEASE?</h3>
+              <p className="text-base text-white/80 mt-2 leading-snug">
+                Find the perfect warehouse space across India's key logistics hubs.
+              </p>
+            </div>
+            {/* Arrow */}
+            <div className="flex-shrink-0 w-9 h-9 rounded-full border border-white/15 bg-white/5 flex items-center justify-center group-hover:bg-[#80c8d4]/20 group-hover:border-[#80c8d4]/40 transition-all duration-300">
+              <ArrowRight size={15} className="text-white/70 group-hover:text-[#80c8d4] transition-colors" strokeWidth={2} />
+            </div>
+          </Link>
 
-const MetricItem = ({ metric, isActive }: { metric: typeof newMetrics[0]; isActive: boolean }) => {
-  const count = useCountUp(metric.value, 2000, 0, isActive);
-  const display = metric.value % 1 !== 0 ? count.toFixed(1) : Math.round(count).toString();
-  return (
-    <div className="text-center px-2">
-      <div className="font-display text-3xl font-bold text-white sm:text-5xl lg:text-5xl mb-2">
-        {display}<span className="text-white">{metric.suffix}</span>
-      </div>
-      <p className="text-[10px] uppercase tracking-widest text-[#0b1f2a] font-bold">{metric.label}</p>
-    </div>
-  );
-};
-
-const MetricsSection = () => {
-  const { ref, isVisible } = useScrollAnimation(0.3);
-  return (
-    <section ref={ref} className="bg-[#66a3b6] py-12">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-y-10 gap-x-8 lg:grid-cols-4 divide-x-0 lg:divide-x divide-white/20">
-          {newMetrics.map((m) => (
-            <MetricItem key={m.label} metric={m} isActive={isVisible} />
-          ))}
+          {/* Want to List */}
+          <Link
+            to="/add-listing"
+            className="group flex items-center gap-4 rounded-xl border border-white/10 border-l-2 border-l-teal-400/40 bg-white/5 backdrop-blur-sm p-6 hover:bg-white/10 transition-all duration-300"
+          >
+            {/* Icon */}
+            <div className="flex-shrink-0 w-11 h-11 rounded-full bg-white/10 border border-white/15 flex items-center justify-center">
+              <Building2 size={20} className="text-[#66a3b6]" strokeWidth={1.5} />
+            </div>
+            {/* Text */}
+            <div className="flex-1 min-w-0">
+              <p className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 leading-none mb-1">WANT TO</p>
+              <h3 className="font-display text-4xl font-bold text-[#66a3b6] leading-tight">LIST?</h3>
+              <p className="text-base text-white/80 mt-2 leading-snug">
+                List your space and connect with businesses seeking flexible solutions.
+              </p>
+            </div>
+            {/* Arrow */}
+            <div className="flex-shrink-0 w-9 h-9 rounded-full border border-white/15 bg-white/5 flex items-center justify-center group-hover:bg-[#66a3b6]/20 group-hover:border-[#66a3b6]/40 transition-all duration-300">
+              <ArrowRight size={15} className="text-white/70 group-hover:text-[#66a3b6] transition-colors" strokeWidth={2} />
+            </div>
+          </Link>
         </div>
       </div>
     </section>
@@ -104,7 +110,9 @@ const features = [
 const FeaturesSection = () => {
   const { ref, isVisible } = useScrollAnimation();
   return (
-    <section ref={ref} className="bg-[#112431] py-32 relative">
+    <section ref={ref} className="bg-[#112431] py-32 relative overflow-hidden">
+      {/* Subtle top glow to blend from hero */}
+      <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-full max-w-4xl h-48 bg-[#80c8d4]/5 blur-[100px] rounded-full" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-12 md:grid-cols-3">
           {features.map((f, i) => (
@@ -347,11 +355,10 @@ const Index = () => {
       <Navbar />
       <main>
         <Hero />
-        <MetricsSection />
         <FeaturesSection />
-        <ListingsPreview 
-          calculatedArea={calculatedArea} 
-          onClearFilter={() => setCalculatedArea(0)} 
+        <ListingsPreview
+          calculatedArea={calculatedArea}
+          onClearFilter={() => setCalculatedArea(0)}
         />
         <div className="bg-[#112431] pb-32 pt-24">
           <ROICalculator onComplete={(sqFt) => setCalculatedArea(sqFt)} />
