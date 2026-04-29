@@ -74,7 +74,7 @@ const Hero = () => {
 
           {/* Want to List */}
           <Link
-            to="/add-listing"
+            to="/login"
             className="group flex items-center gap-4 rounded-xl border border-white/10 border-l-2 border-l-teal-400/40 bg-white/5 backdrop-blur-sm p-6 hover:bg-white/10 transition-all duration-300"
           >
             {/* Icon */}
