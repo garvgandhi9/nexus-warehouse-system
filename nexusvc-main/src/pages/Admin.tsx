@@ -79,6 +79,8 @@ const Admin = () => {
     const [activeTab, setActiveTab] = useState<"warehouses" | "users" | "pending" | "messages">("warehouses");
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 30;
 
     const {
         values: formData,
@@ -109,6 +111,11 @@ const Admin = () => {
         fetchMessages(token, controller.signal);
         return () => controller.abort();
     }, [navigate]);
+
+    // Reset page on filter change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeTab, searchTerm, statusFilter, sortByDate]);
 
     const fetchWarehouses = async (token: string, signal?: AbortSignal) => {
         try {
@@ -375,6 +382,40 @@ const Admin = () => {
         });
     }
 
+    const totalPages = activeTab === "warehouses" || activeTab === "pending" 
+        ? Math.ceil(filteredWarehouses.length / ITEMS_PER_PAGE)
+        : activeTab === "users"
+            ? Math.ceil(users.length / ITEMS_PER_PAGE)
+            : Math.ceil(messages.length / ITEMS_PER_PAGE);
+
+    const paginatedWarehouses = filteredWarehouses.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const filteredUsers = users.filter(u =>
+        u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const paginatedUsers = filteredUsers.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const filteredMessages = messages.filter(m =>
+        m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        m.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        m.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (m.source || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (m.context || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const paginatedMessages = filteredMessages.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
     if (loading) return (
         <div className="flex min-h-screen items-center justify-center bg-background">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -486,6 +527,7 @@ const Admin = () => {
                                 <table className="w-full text-left text-sm">
                                     <thead className="border-b border-border/50 bg-muted/20 text-xs uppercase tracking-wider text-muted-foreground">
                                         <tr>
+                                            <th className="whitespace-nowrap px-6 py-4 font-semibold">S. No.</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">User Identity</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Security Level</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">System Entry</th>
@@ -494,11 +536,11 @@ const Admin = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/30">
-                                        {users.filter(u =>
-                                            u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            u.email.toLowerCase().includes(searchTerm.toLowerCase())
-                                        ).map((user) => (
+                                        {paginatedUsers.map((user, i) => (
                                             <tr key={user.id} className="transition-colors hover:bg-muted/10">
+                                                <td className="whitespace-nowrap px-6 py-6 font-mono text-xs text-muted-foreground">
+                                                    {(currentPage - 1) * ITEMS_PER_PAGE + i + 1}
+                                                </td>
                                                 <td className="whitespace-nowrap px-6 py-6">
                                                     <div className="flex items-center gap-3">
                                                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
@@ -551,6 +593,7 @@ const Admin = () => {
                                 <table className="w-full text-left text-sm">
                                     <thead className="border-b border-border/50 bg-muted/20 text-xs uppercase tracking-wider text-muted-foreground">
                                         <tr>
+                                            <th className="whitespace-nowrap px-6 py-4 font-semibold">S. No.</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Name & Message</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Source & Listing</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Contact</th>
@@ -560,14 +603,11 @@ const Admin = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/30">
-                                        {messages.filter(m =>
-                                            m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            m.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            m.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            (m.source || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            (m.context || "").toLowerCase().includes(searchTerm.toLowerCase())
-                                        ).map((msg) => (
+                                        {paginatedMessages.map((msg, i) => (
                                             <tr key={msg.id} className={`transition-colors hover:bg-muted/10 ${msg.tier === 'Prime' ? 'border-l-2 border-purple-500 bg-purple-500/5' : ''}`}>
+                                                <td className="whitespace-nowrap px-6 py-5 font-mono text-xs text-muted-foreground">
+                                                    {(currentPage - 1) * ITEMS_PER_PAGE + i + 1}
+                                                </td>
                                                 <td className="px-6 py-5 max-w-[220px]">
                                                     <div className="font-semibold text-white">{msg.name}</div>
                                                     <div className="text-xs text-muted-foreground line-clamp-2 mt-1">{msg.message}</div>
@@ -620,6 +660,7 @@ const Admin = () => {
                                 <table className="w-full text-left text-sm">
                                     <thead className="border-b border-border/50 bg-muted/20 text-xs uppercase tracking-wider text-muted-foreground">
                                         <tr>
+                                            <th className="whitespace-nowrap px-6 py-4 font-semibold">S. No.</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Asset Photo</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Code</th>
                                             <th className="whitespace-nowrap px-6 py-4 font-semibold">Location</th>
@@ -632,8 +673,11 @@ const Admin = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border/30">
-                                        {filteredWarehouses.map((w) => (
+                                        {paginatedWarehouses.map((w, i) => (
                       <tr key={w.id} className="transition-colors hover:bg-muted/10">
+                         <td className="whitespace-nowrap px-6 py-4 font-mono text-xs text-muted-foreground">
+                           {(currentPage - 1) * ITEMS_PER_PAGE + i + 1}
+                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
                           <div className="h-12 w-20 overflow-hidden rounded-sm border border-border/50 bg-muted/20">
                             {w.image_url ? (
@@ -740,6 +784,31 @@ const Admin = () => {
                         )}
                         {activeTab === "messages" && messages.length === 0 && (
                             <div className="py-12 text-center text-muted-foreground">No inquiries received.</div>
+                        )}
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-between border-t border-border/50 bg-muted/10 px-6 py-4">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                                    Page {currentPage} of {totalPages}
+                                </p>
+                                <div className="flex gap-2">
+                                    <button
+                                        disabled={currentPage === 1}
+                                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                        className="rounded-sm border border-border/50 bg-card/30 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted/20 hover:text-white disabled:opacity-30 disabled:pointer-events-none"
+                                    >
+                                        Previous
+                                    </button>
+                                    <button
+                                        disabled={currentPage === totalPages}
+                                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                        className="rounded-sm border border-border/50 bg-card/30 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted/20 hover:text-white disabled:opacity-30 disabled:pointer-events-none"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
                         )}
 
                     </div>
