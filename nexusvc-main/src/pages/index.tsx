@@ -325,19 +325,19 @@ const IndustriesSection = () => {
   return (
     <section ref={ref} className="bg-gradient-to-r from-[#70b1be] to-[#3a6d7f] pt-12 pb-16 shadow-inner">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2 text-center sm:text-left">Sectors</p>
-        <h2 className="font-display text-xl sm:text-[2.75rem] font-bold uppercase tracking-widest text-white mb-12 sm:mb-16 text-center sm:text-left">
+        <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2 text-center lg:text-left">Sectors</p>
+        <h2 className="font-display text-xl sm:text-[2.75rem] font-bold uppercase tracking-widest text-white mb-12 sm:mb-16 text-center lg:text-left">
           INDUSTRIES WE SERVE
         </h2>
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-0">
           {industriesNew.map((ind, i) => (
             <div
               key={ind.name}
-              className={`transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"} ${i > 0 ? "lg:border-l lg:border-white/20 lg:pl-8" : "lg:pr-8"}`}
+              className={`flex flex-col items-center lg:items-start text-center lg:text-left transition-all duration-700 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"} ${i > 0 ? "lg:border-l lg:border-white/20 lg:pl-8" : "lg:pr-8"}`}
               style={{ transitionDelay: `${i * 100}ms` }}
             >
               <h3 className="font-display text-[13px] font-extrabold uppercase tracking-widest text-white mb-3">{ind.name}</h3>
-              <p className="text-[13px] leading-relaxed text-white/90 max-w-[200px]">{ind.description}</p>
+              <p className="text-[13px] leading-relaxed text-white/90 max-w-[200px] mx-auto lg:mx-0">{ind.description}</p>
             </div>
           ))}
         </div>
