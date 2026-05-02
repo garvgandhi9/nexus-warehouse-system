@@ -27,7 +27,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({ onComplete }) => {
     const totalSavings = (baseSqFt - optimizedSqFt) * monthlySavingsPerSqFt * duration;
 
     return (
-        <section className="py-24 border-b border-white/10">
+        <section className="pt-24 pb-8 border-b border-white/10">
             <div className="mx-auto max-w-4xl px-6 lg:px-8">
                 <div className="rounded-tl-2xl rounded-br-2xl rounded-tr-[5rem] rounded-bl-[5rem] sm:rounded-tr-[10rem] sm:rounded-bl-[10rem] border border-white/10 bg-[#112431] p-6 sm:p-12 shadow-2xl relative overflow-hidden">
                     {/* Subtle background glow */}

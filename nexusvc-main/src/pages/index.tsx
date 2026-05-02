@@ -323,7 +323,7 @@ const industriesNew = [
 const IndustriesSection = () => {
   const { ref, isVisible } = useScrollAnimation();
   return (
-    <section ref={ref} className="bg-gradient-to-r from-[#70b1be] to-[#3a6d7f] py-24 shadow-inner">
+    <section ref={ref} className="bg-gradient-to-r from-[#70b1be] to-[#3a6d7f] pt-12 pb-16 shadow-inner">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <p className="font-display text-sm font-semibold uppercase tracking-[0.4em] text-white/70 mb-2 text-center sm:text-left">Sectors</p>
         <h2 className="font-display text-xl sm:text-[2.75rem] font-bold uppercase tracking-widest text-white mb-12 sm:mb-16 text-center sm:text-left">
@@ -360,7 +360,7 @@ const Index = () => {
           calculatedArea={calculatedArea}
           onClearFilter={() => setCalculatedArea(0)}
         />
-        <div className="bg-[#112431] pb-32 pt-24">
+        <div className="bg-[#112431]">
           <ROICalculator onComplete={(sqFt) => setCalculatedArea(sqFt)} />
         </div>
         <IndustriesSection />
